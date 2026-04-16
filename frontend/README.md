@@ -1,15 +1,16 @@
-# React Vite
+# React + Vite
 
-This project it a skeleton of **React** and **Vite** (and **Typescript**)! It was created to ensure a clean slate, with production grade features such as properly configured **eslint**, using **Vite** and **SWC** for a faster development experience and hot reloads. **Vite** also uses **Rollup** as a bundler, which is much more efficient than standard **Webpack**.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Commands
+Currently, two official plugins are available:
 
-- npm start - run your project in development mode
-- npm run lint - check your project for any warnings via **eslint**
-- npm run format - format your project using **prettier**
-- npm run build - build your project
-- npm run preview - test your built project
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Types folder
+## React Compiler
 
-The **tsconfig.json** is already set up to handle types from a `@types` folder inside the `src` directory.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
