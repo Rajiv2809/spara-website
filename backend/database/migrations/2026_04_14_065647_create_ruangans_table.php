@@ -12,7 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ruangans', function (Blueprint $table) {
-            $table->id();
+            $table->id('id_ruangan');
+            $table->string('kode_ruangan')->unique();
+
+            $table->string('nama_ruangan');
+            $table->integer('kapasitas')->nullable();
+            $table->text('fasilitas')->nullable();
+            $table->text('deskripsi_ruangan')->nullable();
+            $table->enum('status_ruangan', ['tersedia', 'tidak_tersedia', 'maintenance'])->default('tersedia');
+            $table->string('path_foto');
+            
+            $table->unsignedBigInteger('id_gedung');
+            $table->foreign('id_gedung')->references('id_gedung')->on('gedungs')->onDelete('cascade');
+
+            $table->unsignedBigInteger('nomor_induk_pic')->nullable();
+            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('pics')->onDelete('set null');
+
+            $table->unsignedBigInteger('nomor_lantai');
+            $table->foreign('nomor_lantai')->references('nomor_lantai')->on('lantai')->onDelete('cascade');
             $table->timestamps();
         });
     }

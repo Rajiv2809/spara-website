@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lantais', function (Blueprint $table) {
+        Schema::create('lantai', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('nomor_lantai')->unique(); // penting!
+            $table->string('nama_lantai')->nullable();
             $table->timestamps();
         });
     }

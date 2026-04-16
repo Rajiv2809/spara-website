@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gedungs', function (Blueprint $table) {
+        Schema::create('pics', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('nomor_induk');
+            
             $table->timestamps();
+
+            $table->foreign('nomor_induk')
+                ->references('nomor_induk')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gedungs');
+        Schema::dropIfExists('pics');
     }
 };

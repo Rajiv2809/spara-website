@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pegawai_sbums', function (Blueprint $table) {
+        Schema::create('mahasiswas', function (Blueprint $table) {
             $table->unsignedBigInteger('nomor_induk')->primary();
             $table->foreign('nomor_induk')->references('nomor_induk')->on('users')->onDelete('cascade');
-            $table->enum('role', ['admin', 'ketua'])->nullable();
+            $table->string('kelas')->nullable();
+            $table->string('angkatan')->nullable();
+            $table->string('peran')->nullable();
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
+            $table->unsignedBigInteger('id_prodi')->nullable();
+            $table->foreign('id_prodi')->references('id_prodi')->on('program_studis')->onDelete('set null');
             $table->timestamps();
         });
     }
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pegawai_sbums');
+        Schema::dropIfExists('mahasiswas');
     }
 };
