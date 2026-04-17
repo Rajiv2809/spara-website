@@ -18,8 +18,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'nomor_induk',
         'password',
     ];
 
@@ -28,6 +27,10 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    protected $primaryKey = 'nomor_induk';
+    public $incrementing = false;
+    protected $keyType = 'int';
+    
     protected $hidden = [
         'password',
         'remember_token',
@@ -44,5 +47,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

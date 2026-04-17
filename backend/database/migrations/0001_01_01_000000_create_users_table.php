@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('nomor_induk')->primary();
             $table->string('nama', 100);
             $table->string('email', 100)->unique();
-            $table->integer('no_telepon');
+            $table->string('no_telepon', 15);
             $table->string('password');
             $table->string('fotoprofil')->nullable();
             $table->rememberToken();
