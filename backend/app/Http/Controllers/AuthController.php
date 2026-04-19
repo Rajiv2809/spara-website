@@ -9,7 +9,10 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only('nomor_induk', 'password');
+        $credentials = [
+            'nomor_induk' => $request->nomor_induk,
+            'password' => $request->password
+        ];
 
         if (!$token = auth()->attempt($credentials)) {
             return response()->json([
@@ -17,6 +20,19 @@ class AuthController extends Controller
             ], 401);
         }
 
-        return $this->respondWithToken($token);
+        // ambil data user yang login
+        $user = auth()->user();
+
+        return $this->respondWithToken($token, $user);
+    }
+    protected function respondWithToken($token, $user)
+    {
+        return response()->json([
+            'message' => 'Login berhasil',
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
     }
 }
