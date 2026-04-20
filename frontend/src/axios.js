@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const URL = `http://127.0.0.1:8000/api/`
 
@@ -7,7 +8,7 @@ const axiosClient = axios.create({
 })
 
 axiosClient.interceptors.request.use(config => {
-    const token =  Cookies.get("token");
+    const token =  Cookies.get("accessToken");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

@@ -19,11 +19,11 @@ const  StateContext = createContext({
 })
 
 export const ContextProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState({});
-    const [userToken, setUserToken] = useState( Cookies.get("token"));
-    const [toast, setToast] =useState({message:'', color:'', show:false})
-    const [loading, setLoading] =useState(true)
-    const setToken = (token) => {
+        const [currentUser, setCurrentUser] = useState({});
+        const [userToken, setUserToken] = useState( Cookies.get("accessToken"));
+        const [toast, setToast] =useState({message:'', color:'', show:false})
+        const [loading, setLoading] = useState(true)
+        const setToken = (token) => {
         if(token){
        
             Cookies.set('accessToken', token)
@@ -32,14 +32,14 @@ export const ContextProvider = ({children}) => {
             Cookies.remove('accessToken')
         }
         setUserToken(token)
-    }
-    const showToast = (message, color) => {
-        setToast({message:message, color:color, show:true})
+        }
+        const showToast = (message, color) => {
+            setToast({message:message, color:color, show:true})
 
-        setTimeout(() => {
-            setToast({message:'', color:'', show:false})
-        }, 4000)
-    }
+            setTimeout(() => {
+                setToast({message:'', color:'', show:false})
+            }, 4000)
+        }
 
 
     return (

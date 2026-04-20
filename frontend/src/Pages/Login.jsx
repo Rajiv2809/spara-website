@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Styles/login.css";
 import wave1 from "./Assets/wave1.png";
 import wave2 from "./Assets/wave2.png";
@@ -6,11 +6,13 @@ import logo1 from "./Assets/logo1.png";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
 import Cookies from "js-cookie";
+import {useStateContext} from "../Contexts/context.jsx";
 
-export default function LoginPage() {
+export default function Login() {
+  const {setToken, showToast} = useStateContext();
   const [nomorInduk, setNomorInduk] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  
 
   const login = (e) => {
     e.preventDefault();
@@ -19,12 +21,17 @@ export default function LoginPage() {
       password: password,
     })
       .then(({ data }) => {
-        console.log(data);
+        
+        setToken(data.access_token);
       })
       .catch((err) => {
-        showToast(err.response.data.message, 'red');
+        console.log(err);
       });
   };
+  useEffect(() => {
+    const token = Cookies.get("accesstoken");
+    console.log(token);
+  }, []);
 
   return (
     <div className="login-container flex items-center justify-center bg-gradient-to-b from-[#DC4C75] to-[#862440] h-screen overflow-hidden relative">
