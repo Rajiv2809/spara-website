@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import Cookies from "js-cookie";
 
 
 const  StateContext = createContext({
@@ -19,14 +20,16 @@ const  StateContext = createContext({
 
 export const ContextProvider = ({children}) => {
     const [currentUser, setCurrentUser] = useState({});
-    const [userToken, setUserToken] = useState(localStorage.getItem('accessToken'));
+    const [userToken, setUserToken] = useState( Cookies.get("token"));
     const [toast, setToast] =useState({message:'', color:'', show:false})
     const [loading, setLoading] =useState(true)
     const setToken = (token) => {
         if(token){
-            localStorage.setItem('accessToken', token)
+       
+            Cookies.set('accessToken', token)
         } else {
-            localStorage.removeItem('accessToken')
+            
+            Cookies.remove('accessToken')
         }
         setUserToken(token)
     }

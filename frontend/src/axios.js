@@ -7,7 +7,7 @@ const axiosClient = axios.create({
 })
 
 axiosClient.interceptors.request.use(config => {
-    const token = localStorage.getItem('accessToken');
+    const token =  Cookies.get("token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -22,7 +22,7 @@ axiosClient.interceptors.response.use(
         const {response} = error;
         if (response && response.status === 401 && response.data.message === 'Unauthorized user') {
             localStorage.removeItem('accessToken');
-            window.location.href = '/login';
+            Cookies.remove('token')
         }
         return Promise.reject(error);
     }

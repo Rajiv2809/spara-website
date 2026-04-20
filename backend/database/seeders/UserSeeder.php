@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
                 'nama' => 'Admin User',
                 'email' => 'admin@gmail.com',
                 'no_telepon' => '081234567890',
+                'role' => 'admin',
                 'password' => Hash::make('password'), // penting!
                 'fotoprofil' => null,
                 'created_at' => now(),
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
                 'email' => 'user@gmail.com',
                 'no_telepon' => '081298765432',
                 'password' => Hash::make('password'),
+                'role' => 'mahasiswa',
                 'fotoprofil' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
