@@ -26,7 +26,7 @@ const DefaultLayout = () => {
     
     return (
         <div>
-            sdasd
+            
             <Outlet />
         </div>
     );
