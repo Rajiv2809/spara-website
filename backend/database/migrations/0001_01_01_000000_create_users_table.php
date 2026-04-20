@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('no_telepon', 15);
             $table->string('password');
             $table->string('fotoprofil')->nullable();
+            $table->enum('role', ['admin', 'dosen', 'pic', 'mahasiswa'])->default('mahasiswa');
             $table->rememberToken();
             $table->timestamps();
         });
