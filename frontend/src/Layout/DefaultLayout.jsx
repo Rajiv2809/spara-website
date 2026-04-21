@@ -4,6 +4,7 @@ import { useStateContext } from '../Contexts/context';
 import axiosClient from '../axios';
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import Toast from '../Components/Toast';
 
 const DefaultLayout = () => {
     const {setToken, userToken, setCurrentUser, userToe} = useStateContext();
@@ -26,7 +27,7 @@ const DefaultLayout = () => {
     
     return (
         <div>
-            
+            <Toast/>
             <Outlet />
         </div>
     );
