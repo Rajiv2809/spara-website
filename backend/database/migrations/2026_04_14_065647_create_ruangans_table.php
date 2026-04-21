@@ -23,7 +23,8 @@ return new class extends Migration
             $table->string('path_foto');
             
             $table->unsignedBigInteger('id_gedung');
-            $table->foreign('id_gedung')->references('id_gedung')->on('gedungs')->onDelete('cascade');
+            $table->foreign('id_gedung'
+            )->references('id_gedung')->on('gedungs')->onDelete('cascade');
 
             $table->unsignedBigInteger('nomor_induk_pic')->nullable();
             $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('pics')->onDelete('set null');
