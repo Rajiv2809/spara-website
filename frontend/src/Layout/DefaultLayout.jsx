@@ -15,8 +15,7 @@ const DefaultLayout = () => {
     useEffect(() => {
         axiosClient.get('/me')
         .then(({data}) => {
-            console.log(userToken);
-            
+            setCurrentUser(data);
         })
         .catch(({res}) => {
             console.log(res);
@@ -26,7 +25,7 @@ const DefaultLayout = () => {
     })
     
     return (
-        <div>
+        <div >
             <Toast/>
             <Outlet />
         </div>

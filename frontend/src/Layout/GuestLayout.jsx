@@ -8,7 +8,7 @@ const GuestLayout = () => {
         return <Navigate to="/home" />
     }
     return (
-        <div>
+        <div c>
             <Outlet />
         </div>
     );
