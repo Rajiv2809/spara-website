@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->foreign('id_peminjaman')->references('id_peminjaman')->on('peminjaman')->onDelete('cascade');
             $table->foreign('id_penanggungjawab')->references('nomor_induk')->on('users')->onDelete('set null');
-            $table->foreign('id_pic')->references('nomor_induk')->on('pics')->onDelete('set null');
+            $table->foreign('id_pic')->references('nomor_induk')->on('users')->onDelete('set null');
             $table->foreign('id_admin')->references('nomor_induk')->on('users')->onDelete('set null');
             $table->timestamps();
         });

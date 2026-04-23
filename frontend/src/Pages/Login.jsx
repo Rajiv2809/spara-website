@@ -7,11 +7,13 @@ import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
 import Cookies from "js-cookie";
 import {useStateContext} from "../Contexts/context.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const {setToken, showToast} = useStateContext();
   const [nomorInduk, setNomorInduk] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
   
 
   const login = (e) => {
@@ -23,6 +25,8 @@ export default function Login() {
       .then(({ data }) => {
         
         setToken(data.access_token);
+        navigate("/home");
+
       })
       .catch((err) => {
         console.log(err);

@@ -21,13 +21,13 @@ return new class extends Migration
             $table->text('deskripsi_ruangan')->nullable();
             $table->enum('status_ruangan', ['tersedia', 'tidak_tersedia', 'maintenance'])->default('tersedia');
             $table->string('path_foto');
-            
+
             $table->unsignedBigInteger('id_gedung');
             $table->foreign('id_gedung'
             )->references('id_gedung')->on('gedungs')->onDelete('cascade');
 
             $table->unsignedBigInteger('nomor_induk_pic')->nullable();
-            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('pics')->onDelete('set null');
+            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('users')->onDelete('set null');
 
             $table->unsignedBigInteger('nomor_lantai');
             $table->foreign('nomor_lantai')->references('nomor_lantai')->on('lantai')->onDelete('cascade');

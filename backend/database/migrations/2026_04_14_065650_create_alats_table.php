@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('status_alat', ['tersedia', 'dipinjam', 'rusak', 'maintenance'])->default('tersedia');
 
             $table->unsignedBigInteger('nomor_induk_pic')->nullable();
-            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('pics')->onDelete('set null');
+            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }
