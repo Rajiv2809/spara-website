@@ -4,3 +4,17 @@
 @theme {
   --font-poppins: Poppins, sans-serif;
 }
+
+/* scroll */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #da6179;
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #FADADD;
+}
