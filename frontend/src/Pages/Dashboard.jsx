@@ -20,10 +20,34 @@ const Dashboard = () => {
             <div className="line w-full h-[1px] bg-white    ">
 
             </div>
-            <div className="menu flex flex-col gap-4 mt-4">
-                <div className="list-menu flex flex-row gap-2 pl-4  item-center text-center">
+            <div className="menu flex flex-col gap-4 mt-4 bg-[#682B3C] rounded-lg   pl-2 text-[#FFEDDD] ">
+                <div className="list-menu flex flex-row gap-2 p-4  item-center text-center ">
                     <Icon icon="mdi:view-dashboard" width="30" />
-                    <a href="/dasd">Dashboard</a>
+                    <a className='text-[20px] font-bold' href="/dashboard">Dashboard</a>
+                </div>
+            </div>
+            <div className="menu flex flex-col gap-4 mt-4  rounded-lg   pl-2 text-[#FFEDDD] ">
+                <div className="list-menu flex flex-row gap-2 p-4  item-center text-center ">
+                    <Icon icon="mdi:view-dashboard" width="30" />
+                    <a className='text-[20px] font-bold' href="/dashboard">Dashboard</a>
+                </div>
+            </div>
+            <div className="menu flex flex-col gap-4 mt-4  rounded-lg   pl-2 text-[#FFEDDD] ">
+                <div className="list-menu flex flex-row gap-2 p-4  item-center text-center ">
+                    <Icon icon="mdi:view-dashboard" width="30" />
+                    <a className='text-[20px] font-bold' href="/dashboard">Dashboard</a>
+                </div>
+            </div>
+            <div className="menu flex flex-col gap-4 mt-4  rounded-lg   pl-2 text-[#FFEDDD] ">
+                <div className="list-menu flex flex-row gap-2 p-4  item-center text-center ">
+                    <Icon icon="mdi:view-dashboard" width="30" />
+                    <a className='text-[20px] font-bold' href="/dashboard">Dashboard</a>
+                </div>
+            </div>
+            <div className="menu flex flex-col gap-4 mt-4  rounded-lg   pl-2 text-[#FFEDDD] ">
+                <div className="list-menu flex flex-row gap-2 p-4  item-center text-center ">
+                    <Icon icon="mdi:view-dashboard" width="30" />
+                    <a className='text-[20px] font-bold' href="/dashboard">Dashboard</a>
                 </div>
             </div>
             

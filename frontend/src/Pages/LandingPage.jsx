@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 const LandingPage = () => {
     return (
         <div>
+            asdasd
             
         </div>
     );
