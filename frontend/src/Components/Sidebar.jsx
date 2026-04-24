@@ -2,8 +2,21 @@ import React from 'react';
 import logo2 from '../Pages/Assets/logo2.png';
 import { Icon } from "@iconify/react";
 import pakari from '../Pages/Assets/pakari.png';
+import { useStateContext } from '../Contexts/context.jsx';
+import axiosClient from "../axios";
+import { useNavigate } from 'react-router-dom';
 const Sidebar = () => {
-
+    const { currentUser, setUserToken } = useStateContext(); 
+    const navigate = useNavigate();
+        const logout = (e) => {
+            e.preventDefault();
+            axiosClient.post('/logout').then(() => {
+                navigate('/login');
+                setUserToken(null);
+            }).catch(({res}) => {
+                console.log(res);
+            })
+        }
     return (
         <div className='min-w-[300px] h-screen bg-[#862440] text-white absolute flex flex-col  px-3 '>
             <div className='headline flex flex-row items-center '>
@@ -44,13 +57,13 @@ const Sidebar = () => {
                 </div>
             </div>
             
-            <div className="logout align-bottom mt-auto flex flex-row gap-2 p-2 flex  item-center text-center border-1 border-[#eeeeee] ">
+            <div onClick={logout} className="logout align-bottom mt-auto flex flex-row gap-2 items-center  p-2 rounded-md mb-8 flex  item-center text-center border-1 border-[#eeeeee] ">
                 <img src={pakari} alt="Profile" />
                 <div className="name text-left">
                     <h1 className='text-[15px]'>Ari Wibowo, S.T, M.T</h1>
                     <h3 className='text-[8px]'>ariwibowo.geming@gmail.com</h3>
                 </div>
-                <Icon icon="uil:signout" width="30" />
+                <Icon className='ml-8' icon="uil:signout" width="36" />
             </div>
 
         </div>

@@ -25,11 +25,11 @@ export default function Login() {
       .then(({ data }) => {
         
         setToken(data.access_token);
-        navigate("/home");
+        navigate("/dashboard");
 
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(({res}) => {
+        console.log(res);
       });
   };
   useEffect(() => {
