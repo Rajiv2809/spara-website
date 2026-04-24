@@ -31,11 +31,11 @@ const router = createBrowserRouter([
                 element: <Login />
                 
             },
-            {
-                path: "/landing-page",
-                element: <LandingPage />
+            // {
+            //     path: "/landing-page",
+            //     element: <LandingPage />
                 
-            },
+            // },
         
         ]
     }

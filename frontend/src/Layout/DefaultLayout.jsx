@@ -22,7 +22,7 @@ const DefaultLayout = () => {
             setToken(null)
         })
 
-    })
+    },[])
     
     return (
         <div >
