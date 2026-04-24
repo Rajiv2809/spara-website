@@ -10,12 +10,12 @@ function App() {
   return (
     <>
       <div class="min-h-screen bg-gray-100">
-        
+
         <nav class="bg-blue-600 text-white p-4 shadow">
           <h1 class="text-xl font-bold">My App</h1>
         </nav>
 
-       
+
         <div class="p-6">
           <h2 class="text-2xl font-semibold mb-4">Dashboard</h2>
 
