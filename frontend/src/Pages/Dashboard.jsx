@@ -2,7 +2,7 @@ import React from "react";
 import Sidebar from "../Components/sidebar";
 import logo2 from "./assets/logo2.png";
 import { Icon } from "@iconify/react";
-
+import logo2 from '../Pages/Assets/logo2.png';
 const Dashboard = () => {
   return (
     <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
