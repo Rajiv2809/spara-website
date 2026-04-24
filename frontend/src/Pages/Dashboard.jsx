@@ -1,6 +1,9 @@
 import React from "react";
 import Sidebar from "../Components/sidebar";
 import logo2 from "./assets/logo2.png";
+import React from 'react';
+import Sidebar from '../Components/Sidebar.jsx';
+
 import { Icon } from "@iconify/react";
 
 const Dashboard = () => {
