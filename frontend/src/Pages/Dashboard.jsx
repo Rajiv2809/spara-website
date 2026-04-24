@@ -1,8 +1,5 @@
 import React from "react";
-import Sidebar from "../Components/sidebar";
-import logo2 from "./assets/logo2.png";
-import React from 'react';
-import Sidebar from '../Components/Sidebar.jsx';
+import Sidebar from "../Components/Sidebar";
 
 import { Icon } from "@iconify/react";
 
