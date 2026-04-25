@@ -6,6 +6,7 @@ import Home from "./Pages/Home.jsx";
 import Dashboard from "./Pages/Dashboard.jsx";
 import LandingPage from "./Pages/LandingPage.jsx";
 import PengajuanRuangan from "./Pages/PengajuanRuangan.jsx";
+import PengajuanPeralatan from "./Pages/PengajuanPeralatan.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -22,8 +23,11 @@ const router = createBrowserRouter([
             {
                 path: "/pengajuanruangan",
                 element: <PengajuanRuangan/>
+            },
+            {
+                path: "pengajuanperalatan",
+                element: <PengajuanPeralatan/>
             }
-         
            
         ]
     },
