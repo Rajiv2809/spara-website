@@ -1,6 +1,5 @@
 import React from "react";
 import Sidebar from "../Components/sidebar";
-import logo2 from "./assets/logo2.png";
 import { Icon } from "@iconify/react";
 import logo2 from '../Pages/Assets/logo2.png';
 const Dashboard = () => {
