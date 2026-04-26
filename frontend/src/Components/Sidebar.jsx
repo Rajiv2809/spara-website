@@ -18,7 +18,7 @@ const Sidebar = () => {
             })
         }
     return (
-        <div className='min-w-[300px] h-screen bg-[#862440] text-white absolute flex flex-col  px-3 '>
+        <div style={{ position: 'fixed' }} className='min-w-[300px] h-screen fixed top-0 left-0 overflow-hidden bg-[#862440] text-white flex flex-col px-3'>
             <div className='headline flex flex-row items-center '>
                 <div className="logo">
                     <img src={logo2} className='w-[88px]' alt="Logo" />
@@ -41,7 +41,7 @@ const Sidebar = () => {
             <div className="menu flex flex-col gap-4 mt-4  rounded-lg   pl-2 text-[#FFEDDD] ">
                 <div className="list-menu flex flex-row gap-2 p-4  item-center text-center ">
                     <Icon icon="octicon:checklist-16" width="30" />
-                    <a className='text-[20px] font-bold' href="/peminjaman-ruangan">Peminjaman Ruangan</a>
+                    <a className='text-[20px] font-bold' href="/pengajuanruangan">Peminjaman Ruangan</a>
                 </div>
             </div>
             <div className="menu flex flex-col gap-4 mt-4  rounded-lg   pl-2 text-[#FFEDDD] ">
