@@ -10,27 +10,72 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
+            // Admin
             [
-                'nomor_induk' => 1001,
-                'nama' => 'Admin User',
-                'email' => 'admin@gmail.com',
-                'no_telepon' => '081234567890',
-                'role' => 'admin',
-                'password' => Hash::make('password'), // penting!
-                'fotoprofil' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'nomor_induk' => 10000001,
+                'nama'        => 'Admin Utama',
+                'email'       => 'admin@kampus.ac.id',
+                'no_telepon'  => '081200000001',
+                'password'    => Hash::make('password'),
+                'role'        => 'admin',
+                'created_at'  => now(), 'updated_at' => now(),
+            ],
+            // Dosen
+            [
+                'nomor_induk' => 19900001,
+                'nama'        => 'Dr. Budi Santoso',
+                'email'       => 'budi.santoso@kampus.ac.id',
+                'no_telepon'  => '081200000002',
+                'password'    => Hash::make('password'),
+                'role'        => 'dosen',
+                'created_at'  => now(), 'updated_at' => now(),
             ],
             [
-                'nomor_induk' => 1002,
-                'nama' => 'User Biasa',
-                'email' => 'user@gmail.com',
-                'no_telepon' => '081298765432',
-                'password' => Hash::make('password'),
-                'role' => 'mahasiswa',
-                'fotoprofil' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'nomor_induk' => 19900002,
+                'nama'        => 'Dr. Sari Dewi',
+                'email'       => 'sari.dewi@kampus.ac.id',
+                'no_telepon'  => '081200000003',
+                'password'    => Hash::make('password'),
+                'role'        => 'dosen',
+                'created_at'  => now(), 'updated_at' => now(),
+            ],
+            // PIC
+            [
+                'nomor_induk' => 20230001,
+                'nama'        => 'Andi Wijaya',
+                'email'       => 'andi.pic@kampus.ac.id',
+                'no_telepon'  => '081200000004',
+                'password'    => Hash::make('password'),
+                'role'        => 'pic',
+                'created_at'  => now(), 'updated_at' => now(),
+            ],
+            // Mahasiswa
+            [
+                'nomor_induk' => 2021101001,
+                'nama'        => 'Rizky Pratama',
+                'email'       => 'rizky@mahasiswa.ac.id',
+                'no_telepon'  => '081200000005',
+                'password'    => Hash::make('password'),
+                'role'        => 'mahasiswa',
+                'created_at'  => now(), 'updated_at' => now(),
+            ],
+            [
+                'nomor_induk' => 2021101002,
+                'nama'        => 'Siti Nurhaliza',
+                'email'       => 'siti@mahasiswa.ac.id',
+                'no_telepon'  => '081200000006',
+                'password'    => Hash::make('password'),
+                'role'        => 'mahasiswa',
+                'created_at'  => now(), 'updated_at' => now(),
+            ],
+            [
+                'nomor_induk' => 2022202001,
+                'nama'        => 'Fajar Hidayat',
+                'email'       => 'fajar@mahasiswa.ac.id',
+                'no_telepon'  => '081200000007',
+                'password'    => Hash::make('password'),
+                'role'        => 'mahasiswa',
+                'created_at'  => now(), 'updated_at' => now(),
             ],
         ]);
     }

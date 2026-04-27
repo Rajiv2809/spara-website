@@ -15,7 +15,8 @@ const DefaultLayout = () => {
     useEffect(() => {
         axiosClient.get('/me')
         .then(({data}) => {
-            setCurrentUser(data);
+            setCurrentUser(data.user);
+     
         })
         .catch(({res}) => {
             console.log(res);
