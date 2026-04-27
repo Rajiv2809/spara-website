@@ -27,7 +27,7 @@ const router = createBrowserRouter([
                 element: <PengajuanRuangan/>
             },
             {
-                path: "pengajuanperalatan",
+                path: "/peminjaman-peralatan",
                 element: <PengajuanPeralatan/>
             }
            

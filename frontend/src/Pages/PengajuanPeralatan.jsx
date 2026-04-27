@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
+import peralatanImg from "../assets/peralatan.jpg";
 
 const statusStyles = {
   tersedia: { bg: "bg-green-500", text: "TERSEDIA" },
-  dipinjam: { bg: "bg-yellow-500", text: "DIPINJAM" },
+  dipinjam: { bg: "bg-blue-500", text: "DIPINJAM" },
   rusak: { bg: "bg-red-500", text: "RUSAK" },
-  maintenance: { bg: "bg-blue-500", text: "MAINTENANCE" },
+  maintenance: { bg: "bg-yellow-500", text: "MAINTENANCE" },
 };
 
 
@@ -19,13 +20,11 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail }) => {
     <div className="bg-white rounded-2xl overflow-hidden border border-pink-100 shadow-md hover:scale-[1.02] hover:shadow-xl transition duration-300">
 
       <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
-        <div className="absolute inset-0 flex items-end justify-center pb-3">
-          <div className="flex items-end gap-2">
-            <Icon icon="mdi:camera" className="text-white/80" width={28} />
-            <Icon icon="mdi:laptop" className="text-white/70" width={26} />
-            <Icon icon="mdi:monitor" className="text-white/60" width={24} />
-          </div>
-        </div>
+  <img
+    src={peralatanImg}
+    alt="equipment"
+    className="w-full h-full object-cover"
+  />
 
         <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 ${s.bg} text-white text-[9px] font-bold px-3 py-1 rounded-full`}>
           {s.text}
@@ -88,10 +87,11 @@ const equipments = [
   { nama: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK",stok:0  },
   { nama: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI",stok: 0 },
   { nama: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI",stok: 2},
-  { nama: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK",stok: 2 },
-  { nama: "USB Cable", kode: "USB-002", deskripsi: "Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK",stok: 2 },
-  { nama: "Solder Sucker", kode: "SLDR-001", deskripsi: "Menyedot timah solder", status: "rusak", jenis: "PROG PK",stok: 0 },
-  { nama: "Soldering Stand", kode: "SLDR-002", deskripsi: "Menopang solder", status: "tersedia", jenis: "PROG PK",stok: 4 },
+  { nama: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK",stok: 2 },
+  { nama: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK",stok: 2 },
+  { nama: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK",stok: 0 },
+  { nama: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK",stok: 4 },
+  { nama: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM",stok: 1 },
 ];
 
 /* MAIN PAGE */
@@ -170,10 +170,12 @@ const jenisOptions = [
 
             {/* BODY */}
            <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Icon icon="mdi:camera" className="text-white/80" width={80} />
-              </div>
-            </div>
+  <img
+    src={peralatanImg}
+    alt="equipment"
+    className="w-full h-full object-cover"
+  />
+</div>
 
             <div className="p-4 flex flex-col gap-2.5">
               
