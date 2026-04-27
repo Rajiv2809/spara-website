@@ -7,6 +7,8 @@ import Dashboard from "./Pages/Dashboard.jsx";
 import LandingPage from "./Pages/LandingPage.jsx";
 import PengajuanRuangan from "./Pages/PengajuanRuangan.jsx";
 import PengajuanPeralatan from "./Pages/PengajuanPeralatan.jsx";
+import TentangKami from "./Pages/TentangKami.jsx";
+
 const router = createBrowserRouter([
     {
         path: "/",
@@ -45,7 +47,11 @@ const router = createBrowserRouter([
                 element: <LandingPage />
                 
             },
-        
+            {
+                path: "/tentangkami",
+                element: <TentangKami />
+                
+            },
         ]
     }
 ]);
