@@ -1,12 +1,24 @@
-  import React from "react";
-  import Sidebar from "../Components/sidebar";
-  import { Icon } from "@iconify/react";
-  import logo2 from '../Pages/Assets/logo2.png';
-  const Dashboard = () => {
-    return (
-      <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
-        {/* Sidebar */}
-        <Sidebar/>
+import React from "react";
+import Sidebar from "../Components/sidebar";
+import logo2 from "./assets/logo2.png";
+import { Icon } from "@iconify/react";
+const Dashboard = () => {
+  return (
+    <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
+      {/* Sidebar */}
+      <div className="min-w-[300px] h-screen bg-[#862440] text-white absolute flex flex-col px-3">
+        {/* Logo & Title */}
+        <div className="headline flex flex-row items-center">
+          <div className="logo">
+            <img src={logo2} className="w-[88px]" alt="Logo" />
+          </div>
+          <div className="text">
+            <h1 className="text-xl font-bold">SPARA</h1>
+            <h3 className="text-[#B1B1B1] text-[12px]">
+              Politeknik Negeri Batam
+            </h3>
+          </div>
+        </div>
 
         {/* Main Content */}
         <div className="dasboard p-[50px] ml-[300px]">
@@ -291,6 +303,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
     );
   };

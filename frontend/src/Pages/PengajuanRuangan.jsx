@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import Sidebar from "../Components/sidebar";
 import { Icon } from "@iconify/react";
+import ModalPengajuan from "../Components/ModalPengajuan";
 
 const ruanganData = [
   { nama: "Workspace Multimedia", kode: "GT-L2-001", gedung: "Gedung Technopreneur", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 30, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi", "TV LED"], deskripsi: "Ruangan multifungsi yang dilengkapi perangkat multimedia lengkap, cocok untuk workshop, presentasi, dan rapat tim kreatif." },
@@ -168,7 +169,7 @@ const FilterKapasitas = ({ value, onChange }) => {
   );
 };
 
-const ModalDetail = ({ ruangan, onClose }) => {
+const ModalDetail = ({ ruangan, onClose, onAjukan }) => {
   if (!ruangan) return null;
   const canApply = ruangan.status === "TERSEDIA";
   const statusStyles = {
@@ -243,6 +244,7 @@ const ModalDetail = ({ ruangan, onClose }) => {
           </button>
           <button
             disabled={!canApply}
+            onClick={() => onAjukan(ruangan)}
             className={`flex-1 rounded-full py-2 text-[12px] font-bold transition ${
               canApply ? "bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white hover:opacity-90" : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
@@ -255,7 +257,7 @@ const ModalDetail = ({ ruangan, onClose }) => {
   );
 };
 
-const GedungCard = ({ ruangan, onDetail }) => {
+const GedungCard = ({ ruangan, onDetail, onAjukan }) => {
   const { nama, gedung, lantai, status } = ruangan;
   const canApply = status === "TERSEDIA";
 
@@ -307,7 +309,9 @@ const GedungCard = ({ ruangan, onDetail }) => {
           </button>
 
           {canApply ? (
-            <button className="flex items-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2.5 py-1 rounded-full hover:bg-pink-800/30 transition">
+            <button 
+              onClick={() => onAjukan(ruangan)}
+              className="flex items-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2.5 py-1 rounded-full hover:bg-pink-800/30 transition">
               <Icon icon="mdi:plus" width={11} />
               Ajukan
             </button>
@@ -327,6 +331,8 @@ const PeminjamanRuangan = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [showModalPengajuan, setShowModalPengajuan] = useState(false);
+  const [selectedPengajuanRoom, setSelectedPengajuanRoom] = useState(null);
   const [filterGedung, setFilterGedung] = useState(null);
   const [filterLantai, setFilterLantai] = useState(null);
   const [filterKapasitas, setFilterKapasitas] = useState(null);
@@ -381,7 +387,21 @@ const PeminjamanRuangan = () => {
       <Sidebar />
 
       {selectedRoom && (
-        <ModalDetail ruangan={selectedRoom} onClose={() => setSelectedRoom(null)} />
+        <ModalDetail 
+        ruangan={selectedRoom} 
+        onClose={() => setSelectedRoom(null)}
+        onAjukan={(room) => {
+          setSelectedRoom(null);
+          setSelectedPengajuanRoom(room);
+          setShowModalPengajuan(true);
+        }}
+        />
+      )}
+
+      {showModalPengajuan && (
+        <ModalPengajuan
+          ruangan={selectedPengajuanRoom}
+          onClose={() => setShowModalPengajuan(false)}/>
       )}
 
       <div className="ml-[300px] flex-1 p-10 overflow-y-auto">
@@ -440,7 +460,14 @@ const PeminjamanRuangan = () => {
           {paginated.length > 0 ? (
             <div className="grid grid-cols-4 gap-4 mb-6">
               {paginated.map((r, i) => (
-                <GedungCard key={i} ruangan={r} onDetail={setSelectedRoom} />
+                <GedungCard key={i}
+                ruangan={r}
+                onDetail={setSelectedRoom} 
+                onAjukan={(room) => {
+                  setSelectedPengajuanRoom(room);
+                  setShowModalPengajuan(true);
+                }}
+                />
               ))}
             </div>
           ) : (
