@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 
-/* =======================
-   INPUT COMPONENT
-======================= */
 const Input = ({
   label,
   name,
@@ -27,9 +24,6 @@ const Input = ({
   </div>
 );
 
-/* =======================
-   SELECT COMPONENT
-======================= */
 const Select = ({
   label,
   name,
@@ -162,15 +156,15 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     )}
 
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center px-4"
+      className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center pl-[300px] pr-6"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"
+        className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"
       >
         {/* HEADER */}
-        <div className="bg-[#A3264C] text-white px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="bg-[#A3264C] text-white px-6 py-4 flex items-center rounded-t-lg justify-between shrink-0">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Icon icon="mdi:arrow-left" />
             Form Pengajuan Peminjaman Ruangan
@@ -351,7 +345,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
           </div>
         </div>
         {/* BUTTON */}
-          <div className="px-8 py-4 bg-white shrink-0">
+          <div className="px-8 py-4 bg-white rounded-b-lg shrink-0">
             <div className="flex justify-center">
             <button
               onClick={() =>
