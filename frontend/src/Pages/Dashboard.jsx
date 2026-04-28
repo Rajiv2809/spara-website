@@ -7,7 +7,7 @@ const Dashboard = () => {
     <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
       {/* Sidebar */}
       <Sidebar/>
-      <div className="min-w-[300px] min-h-screen  text-white flex flex-col px-3">
+      <div className="min-w-[300px] min-h-screen  text-whited flex flex-col px-3">
         {/* Logo & Title */}
         
 

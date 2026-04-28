@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import Sidebar from "../Components/sidebar";
 import { Icon } from "@iconify/react";
-import ModalPengajuan from "../Components/ModalPengajuan";
+import ModalPengajuan from "../Components/ModalPengajuanRuangan";
 import gedung_utama from '../assets/gu601.jpeg';
 
 const ruanganData = [

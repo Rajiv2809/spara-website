@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
+import ModalPengajuan from "../Components/ModalPengajuanPeralatan";
 import peralatanImg from "../assets/peralatan.jpg";
 
 const statusStyles = {
@@ -11,7 +12,7 @@ const statusStyles = {
 };
 
 
-const EquipmentCard = ({ nama, deskripsi, status, onDetail }) => {
+const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan}) => {
   const normalizedStatus = status?.toLowerCase();
   const s = statusStyles[normalizedStatus] || statusStyles.tersedia;
   const canApply = normalizedStatus === "tersedia";
@@ -57,7 +58,9 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail }) => {
           </button>
 
           {canApply ? (
-            <button className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition">
+            <button 
+            onClick={onAjukan}
+            className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition">
               <Icon icon="mdi:plus" width={11} />
               Ajukan
             </button>
@@ -99,6 +102,9 @@ const PeminjamanPeralatan = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const [filterStatus, setFilterStatus] = useState(null);
   const [filterJenis, setFilterJenis] = useState(null);
@@ -205,9 +211,13 @@ const jenisOptions = [
                 Tutup
               </button>
 
-              <button className="flex-1 bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white rounded-full py-2 text-[12px]">
-                Ajukan
-              </button>
+              <button
+              onClick={() => onAjukan?.()}
+                className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition"
+              >
+              <Icon icon="mdi:plus" width={11} />
+              Ajukan Peminjaman
+            </button>
             </div>
           </div>
         </div>
@@ -284,6 +294,10 @@ const jenisOptions = [
                 key={item.kode}
                 {...item}
                 onDetail={() => setSelectedEquipment(item)}
+                onAjukan={() => {
+                  setSelectedItem(item);
+                  setShowModal(true);
+                }}
               />
             ))}
           </div>
@@ -388,6 +402,16 @@ const jenisOptions = [
 )}
         </div>
       </div>
+      {showModal && (
+        <ModalPengajuan
+        ruangan={selectedItem}
+        onClose={() => setShowModal(false)}
+        onSuccess={() => {
+          setShowModal(false);
+        }}
+        />
+      )}
+
     </div>
   );
 };

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 
-/* =======================
-   INPUT COMPONENT
-======================= */
 const Input = ({
   label,
   name,
@@ -27,9 +24,6 @@ const Input = ({
   </div>
 );
 
-/* =======================
-   SELECT COMPONENT
-======================= */
 const Select = ({
   label,
   name,
@@ -60,7 +54,7 @@ const Select = ({
   </div>
 );
 
-const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
+const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   const [step, setStep] = useState(2);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -73,7 +67,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     jenisKegiatan: "",
     namaKegiatan: "",
     penanggungJawab: "",
-    ruangan: "",
+    peralatan: "",
     tanggalMulai: "",
     tanggalSelesai: "",
     jamMulai: "",
@@ -83,9 +77,9 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   useEffect(() => {
     setForm((prev) => ({
       ...prev,
-      ruangan: ruangan?.nama || "",
+      peralatan: peralatan?.nama || "",
     }));
-  }, [ruangan]);
+  }, [peralatan]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -162,18 +156,18 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     )}
 
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center px-4"
+      className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center pl-[300px] pr-6"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"
+        className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"
       >
         {/* HEADER */}
-        <div className="bg-[#A3264C] text-white px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="bg-[#A3264C] text-white px-6 py-4 flex items-center rounded-t-lg justify-between shrink-0">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Icon icon="mdi:arrow-left" />
-            Form Pengajuan Peminjaman Ruangan
+            Form Pengajuan Peminjaman Peralatan
           </h2>
 
           <button
@@ -205,7 +199,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                 </div>
 
                 <span className="text-xs mt-2 text-gray-500">
-                  {s === 1 && "Pilih Ruangan"}
+                  {s === 1 && "Pilih Peralatan"}
                   {s === 2 && "Isi Form"}
                   {s === 3 && "Konfirmasi"}
                 </span>
@@ -218,7 +212,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
         <div className="custom-scroll px-8 pt-4 overflow-y-auto">
           {/* SECTION 1 */}
           <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">
-            Detail Peminjaman Ruangan
+            Detail Peminjaman Peralatan
           </h3>
 
           <div className="border-t pt-4">
@@ -296,17 +290,17 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
 
           {/* SECTION 3 */}
           <h3 className="text-xl font-semibold text-[#3D0C1F] mt-8 mb-4">
-            Detail Penggunaan Ruangan
+            Detail Penggunaan Peralatan
           </h3>
 
           <div className="border-t pt-4">
             <Select
-              label="Ruangan"
-              name="ruangan"
-              value={form.ruangan}
+              label="Peralatan"
+              name="peralatan"
+              value={form.peralatan}
               onChange={handleChange}
               required
-              options={[ruangan?.nama || "Ruangan Dipilih"]}
+              options={[[peralatan]?.nama || "Peralatan Dipilih"]}
             />
 
             <div className="grid grid-cols-2 gap-4 mt-4">
@@ -351,7 +345,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
           </div>
         </div>
         {/* BUTTON */}
-          <div className="px-8 py-4 bg-white shrink-0">
+          <div className="px-8 py-4 bg-white rounded-b-lg shrink-0">
             <div className="flex justify-center">
             <button
               onClick={() =>
