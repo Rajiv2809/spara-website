@@ -8,6 +8,7 @@ import LandingPage from "./Pages/LandingPage.jsx";
 import PengajuanRuangan from "./Pages/PengajuanRuangan.jsx";
 import PengajuanPeralatan from "./Pages/PengajuanPeralatan.jsx";
 import TentangKami from "./Pages/TentangKami.jsx";
+import KelolaRuangan from "./Pages/KelolaRuangan.jsx";
 
 const router = createBrowserRouter([
     {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
             {
                 path: "/peminjaman-peralatan",
                 element: <PengajuanPeralatan/>
+            },
+            {
+                path: "/kelola-ruangan",
+                element: <KelolaRuangan/>
             }
            
         ]

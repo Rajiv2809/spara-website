@@ -226,7 +226,7 @@ const jenisOptions = [
       {/* ================= CONTENT ================= */}
       <div className="ml-[300px] flex-1 p-10">
 
-        <h1 className="text-[32px] font-extrabold text-[#2D0A18]">
+        <h1 className="text-[#2D0A18] text-[32px] font-extrabold">
           Daftar Peralatan
         </h1>
 
