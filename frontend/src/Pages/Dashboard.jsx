@@ -6,19 +6,10 @@ const Dashboard = () => {
   return (
     <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
       {/* Sidebar */}
-      <div className="min-w-[300px] h-screen bg-[#862440] text-white absolute flex flex-col px-3">
+      <Sidebar/>
+      <div className="min-w-[300px] h-screen  text-white absolute flex flex-col px-3">
         {/* Logo & Title */}
-        <div className="headline flex flex-row items-center">
-          <div className="logo">
-            <img src={logo2} className="w-[88px]" alt="Logo" />
-          </div>
-          <div className="text">
-            <h1 className="text-xl font-bold">SPARA</h1>
-            <h3 className="text-[#B1B1B1] text-[12px]">
-              Politeknik Negeri Batam
-            </h3>
-          </div>
-        </div>
+        
 
         {/* Main Content */}
         <div className="dasboard p-[50px] ml-[300px]">
@@ -220,92 +211,92 @@ const Dashboard = () => {
                   Beberapa aktivitas terkini dalam sistem
                 </h1>
                 <div className="space-y-0">
-                {/* Item 1 */}
-  <div className="flex items-start justify-between p-3 bg-[#EEEEEE]">
-    <div className="flex items-start gap-2">
-      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]"/>
+                  {/* Item 1 */}
+                  <div className="flex items-start justify-between p-3 bg-[#EEEEEE]">
+                    <div className="flex items-start gap-2">
+                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
 
-      <div>
-        <h4 className="font-semibold text-[#471020]">
-          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-        </h4>
+                      <div>
+                        <h4 className="font-semibold text-[#471020]">
+                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
+                        </h4>
 
-        <div className="flex items-center gap-[2px] mt-1">
-          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-          <p className="text-[12px] text-[#A3A3A3]">
-            12 jam lalu
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+                        <div className="flex items-center gap-[2px] mt-1">
+                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
+                          <p className="text-[12px] text-[#A3A3A3]">
+                            12 jam lalu
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-  {/* Item 2 */}
-  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
-    <div className="flex items-start gap-2">
-      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]"/>
+                  {/* Item 2 */}
+                  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
+                    <div className="flex items-start gap-2">
+                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
 
-      <div>
-        <h4 className="font-semibold text-[#471020]">
-          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-        </h4>
+                      <div>
+                        <h4 className="font-semibold text-[#471020]">
+                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
+                        </h4>
 
-        <div className="flex items-center gap-[2px] mt-1">
-          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-          <p className="text-[12px] text-[#A3A3A3]">
-            12 jam lalu
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  {/* Item 3 */}
-  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
-    <div className="flex items-start gap-2">
-      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]"/>
+                        <div className="flex items-center gap-[2px] mt-1">
+                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
+                          <p className="text-[12px] text-[#A3A3A3]">
+                            12 jam lalu
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Item 3 */}
+                  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
+                    <div className="flex items-start gap-2">
+                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
 
-      <div>
-        <h4 className="font-semibold text-[#471020]">
-          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-        </h4>
+                      <div>
+                        <h4 className="font-semibold text-[#471020]">
+                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
+                        </h4>
 
-        <div className="flex items-center gap-[2px] mt-1">
-          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-          <p className="text-[12px] text-[#A3A3A3]">
-            12 jam lalu
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  {/* Item 4 */}
-  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
-    <div className="flex items-start gap-2">
-      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]"/>
+                        <div className="flex items-center gap-[2px] mt-1">
+                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
+                          <p className="text-[12px] text-[#A3A3A3]">
+                            12 jam lalu
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Item 4 */}
+                  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
+                    <div className="flex items-start gap-2">
+                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
 
-      <div>
-        <h4 className="font-semibold text-[#471020]">
-          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-        </h4>
+                      <div>
+                        <h4 className="font-semibold text-[#471020]">
+                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
+                        </h4>
 
-        <div className="flex items-center gap-[2px] mt-1">
-          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-          <p className="text-[12px] text-[#A3A3A3]">
-            12 jam lalu
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-
+                        <div className="flex items-center gap-[2px] mt-1">
+                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
+                          <p className="text-[12px] text-[#A3A3A3]">
+                            12 jam lalu
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
               </div>
             </div>
           </div>
         </div>
-        </div>
-    );
-  };
+      </div>
+    </div>
+  );
+};
 
-  export default Dashboard;
+export default Dashboard;
