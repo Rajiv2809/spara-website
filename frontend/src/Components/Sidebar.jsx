@@ -6,6 +6,40 @@ import { useStateContext } from '../Contexts/context.jsx';
 import axiosClient from "../axios";
 import { useNavigate } from 'react-router-dom';
 
+// Definisi menu per role
+const menuByRole = {
+    mahasiswa: [
+        { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
+        { icon: "octicon:checklist-16", label: "Peminjaman Ruangan", href: "/pengajuanruangan" },
+        { icon: "material-symbols:monitor-outline", label: "Peminjaman Peralatan", href: "/peminjaman-peralatan" },
+        { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
+    ],
+    pic: [
+        { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
+        { icon: "octicon:checklist-16", label: "Peminjaman Ruangan", href: "/pengajuanruangan" },
+        { icon: "material-symbols:monitor-outline", label: "Peminjaman Peralatan", href: "/peminjaman-peralatan" },
+        { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
+        { icon: "material-symbols:meeting-room-outline", label: "Kelola Ruangan", href: "/kelola-ruangan" },
+        { icon: "material-symbols:devices-outline", label: "Kelola Peralatan", href: "/kelola-peralatan" },
+        { icon: "material-symbols:check-circle-outline", label: "Persetujuan", href: "/persetujuan" },
+    ],
+    admin: [
+        { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
+        { icon: "octicon:checklist-16", label: "Peminjaman", href: "/pengajuanruangan" },
+        { icon: "material-symbols:devices-outline", label: "Kelola Alat", href: "/kelola-peralatan" },
+        { icon: "material-symbols:meeting-room-outline", label: "Kelola Ruangan", href: "/kelola-ruangan" },
+        { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
+        { icon: "material-symbols:check-circle-outline", label: "Persetujuan", href: "/persetujuan" },
+    ],
+    dosen: [
+        { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
+        { icon: "octicon:checklist-16", label: "Peminjaman Ruangan", href: "/pengajuanruangan" },
+        { icon: "material-symbols:monitor-outline", label: "Peminjaman Peralatan", href: "/peminjaman-peralatan" },
+        { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
+        { icon: "material-symbols:check-circle-outline", label: "Persetujuan", href: "/persetujuan" },
+    ],
+};
+
 const Sidebar = () => {
     const { currentUser, setUserToken } = useStateContext();
     const navigate = useNavigate();
@@ -30,9 +64,20 @@ const Sidebar = () => {
         setShowLogoutModal(false);
     };
 
+    // Ambil menu berdasarkan role, fallback ke mahasiswa jika role tidak dikenal
+    const role = currentUser?.role?.toLowerCase() || 'mahasiswa';
+    const menus = menuByRole[role] || menuByRole['mahasiswa'];
+
+    // Tentukan path aktif saat ini
+    const currentPath = window.location.pathname;
+
     return (
         <>
-            <div style={{ position: 'fixed' }} className='min-w-[300px] h-screen fixed top-0 left-0 overflow-hidden bg-[#862440] text-white flex flex-col px-3'>
+            <div
+                style={{ position: 'fixed' }}
+                className='min-w-[300px] h-screen fixed top-0 left-0 overflow-y-auto bg-[#862440] text-white flex flex-col px-3'
+            >
+                {/* Header / Logo */}
                 <div className='headline flex flex-row items-center'>
                     <div className="logo">
                         <img src={logo2} className='w-[88px]' alt="Logo" />
@@ -45,44 +90,45 @@ const Sidebar = () => {
 
                 <div className="line w-full h-[1px] bg-white"></div>
 
-                <div className="menu flex flex-col gap-4 mt-4 bg-[#682B3C] rounded-lg pl-2 text-[#FFEDDD]">
-                    <div className="list-menu flex flex-row gap-2 p-4 item-center text-center">
-                        <Icon icon="mdi:view-dashboard" width="30" />
-                        <a className='text-[20px] font-bold' href="/dashboard">Dashboard</a>
-                    </div>
+                {/* Role Badge */}
+                <div className="mt-3 mb-1 px-2">
+                    <span className="inline-block bg-[#682B3C] text-[#FFEDDD] text-[11px] font-semibold px-3 py-1 rounded-full capitalize">
+                        {role}
+                    </span>
                 </div>
 
-                <div className="menu flex flex-col gap-4 mt-4 rounded-lg pl-2 text-[#FFEDDD]">
-                    <div className="list-menu flex flex-row gap-2 p-4 item-center text-center">
-                        <Icon icon="octicon:checklist-16" width="30" />
-                        <a className='text-[20px] font-bold' href="/pengajuanruangan">Peminjaman Ruangan</a>
-                    </div>
+                {/* Menu Items */}
+                <div className="flex flex-col gap-1 mt-2">
+                    {menus.map((menu) => {
+                        const isActive = currentPath === menu.href;
+                        return (
+                            <a
+                                key={menu.href + menu.label}
+                                href={menu.href}
+                                className={`flex flex-row gap-2 items-center p-4 rounded-lg text-[#FFEDDD] transition-colors
+                                    ${isActive
+                                        ? 'bg-[#682B3C] font-bold'
+                                        : 'hover:bg-[#682B3C]'
+                                    }`}
+                            >
+                                <Icon icon={menu.icon} width="26" />
+                                <span className='text-[18px] font-semibold'>{menu.label}</span>
+                            </a>
+                        );
+                    })}
                 </div>
 
-                <div className="menu flex flex-col gap-4 mt-4 rounded-lg pl-2 text-[#FFEDDD]">
-                    <div className="list-menu flex flex-row gap-2 p-4 item-center text-center">
-                        <Icon icon="material-symbols:monitor-outline" width="30" />
-                        <a className='text-[20px] font-bold' href="/peminjaman-peralatan">Peminjaman Peralatan</a>
-                    </div>
-                </div>
-
-                <div className="menu flex flex-col gap-4 mt-4 rounded-lg pl-2 text-[#FFEDDD]">
-                    <div className="list-menu flex flex-row gap-2 p-4 item-center text-center">
-                        <Icon icon="material-symbols:history" width="30" />
-                        <a className='text-[20px] font-bold' href="/dashboard">Riwayat</a>
-                    </div>
-                </div>
-
+                {/* Profile & Logout */}
                 <div
                     onClick={handleLogoutClick}
-                    className="logout align-bottom mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 item-center text-center border-1 border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors"
+                    className="logout align-bottom mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors"
                 >
-                    <img src={pakari} alt="Profile" />
-                    <div className="name text-left">
-                        <h1 className='text-[15px]'>{currentUser.nama}</h1>
-                        <h3 className='text-[8px]'>{currentUser.email}</h3>
+                    <img src={pakari} alt="Profile" className="w-9 h-9 rounded-full object-cover" />
+                    <div className="name text-left flex-1 min-w-0">
+                        <h1 className='text-[15px] truncate'>{currentUser.nama}</h1>
+                        <h3 className='text-[8px] text-[#B1B1B1] truncate'>{currentUser.email}</h3>
                     </div>
-                    <Icon className='ml-8' icon="uil:signout" width="36" />
+                    <Icon className='ml-2 shrink-0' icon="uil:signout" width="36" />
                 </div>
             </div>
 
@@ -97,20 +143,15 @@ const Sidebar = () => {
 
                     {/* Modal Box */}
                     <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-[340px] flex flex-col items-center gap-4 z-10">
-                        {/* Icon */}
                         <div className="bg-[#FFF0F3] rounded-full p-4">
                             <Icon icon="uil:signout" width="40" color="#862440" />
                         </div>
-
-                        {/* Teks */}
                         <h2 className="text-[18px] font-bold text-gray-800 text-center">
                             Konfirmasi Keluar
                         </h2>
                         <p className="text-gray-500 text-center text-[14px]">
                             Apakah anda yakin ingin keluar dari aplikasi?
                         </p>
-
-                        {/* Tombol */}
                         <div className="flex flex-row gap-3 w-full mt-2">
                             <button
                                 onClick={cancelLogout}
