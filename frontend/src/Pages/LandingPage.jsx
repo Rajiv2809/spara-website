@@ -3,7 +3,19 @@ import bekgron from "../assets/bg.jpg";
 import logo from "../assets/logo.png";
 import githap from "../assets/githap.png";
 import ige from "../assets/ige.png";
+import login from "../Pages/Login.jsx";
+import tentangkami from "../Pages/TentangKami.jsx";
 
+const sosmetLink = [
+  {
+    img: githap,
+    url: "https://github.com/spara-209/spara.polibatam",
+  },
+  {
+    img: ige,
+    url: "https://www.instagram.com/sparadotid",
+  },
+];
 export default function Home() {
   return (
     <div className="font-sans">
@@ -17,8 +29,10 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-6 text-white text-sm">
             <a href="#" className="hover:text-pink-300 transition-colors">Beranda</a>
+            <Link to="/tentangkami">
             <a href="#" className="hover:text-pink-300 transition-colors">Tentang kami</a>
-            <Link to="login">
+            </Link>
+            <Link to="/login">
               <button className="bg-pink-500 hover:bg-pink-600 px-5 py-1.5 rounded-full font-semibold">
                 Masuk
               </button>
@@ -38,9 +52,11 @@ export default function Home() {
               untuk mendukung kegiatan anda. Cepat, mudah, dan efisien!
             </p>
             <div className="mt-8 flex gap-4">
-              <button className="bg-pink-500 hover:bg-pink-600 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors">
-                Pinjam sekarang →
-              </button>
+              <Link to="/login">
+                <button className="bg-pink-500 hover:bg-pink-600 px-5 py-1.5 rounded-full font-semibold">
+                  Pinjam Sekarang
+                </button>
+              </Link>
               <button className="border border-white/70 hover:bg-white/10 px-6 py-2.5 rounded-full text-sm transition-colors">
                 Pelajari lebih lanjut
               </button>
@@ -69,9 +85,11 @@ export default function Home() {
           ))}
         </div>
 
-        <button className="mt-10 bg-pink-500 hover:bg-pink-600 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors">
-          Pinjam sekarang →
-        </button>
+        <Link to="/login">
+          <button className="mt-10 bg-pink-500 hover:bg-pink-600 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors">
+            Pinjam sekarang →
+          </button>
+        </Link>
       </section>
 
       <section className="bg-gradient-to-b from-[#fce4ec] to-[#f8bbd9] py-20 text-center">
@@ -135,12 +153,13 @@ export default function Home() {
               alat dan ruangan Polibatam yang gratis, mudah, dan terorganisir.
             </p>
             <div className="flex gap-3 mt-4">
-              {[githap, ige].map((img, i) => (
+              {sosmetLink.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer transition-opacity"
+                  onClick={() => window.open(item.url, "_blank")}
+                  className="flex items-center justify-center opacity-60 hover:opacity-100 hover:scale-110 cursor-pointer transition-all duration-200"
                 >
-                  <img src={img} className="w-10 h-10 object-contain" />
+                  <img src={item.img} className="w-10 h-10 object-contain" />
                 </div>
               ))}
             </div>
@@ -149,7 +168,7 @@ export default function Home() {
           <div>
             <h4 className="font-bold mb-4 text-sm">Tautan Cepat</h4>
             <ul className="space-y-2 text-xs opacity-55">
-              {["Beranda", "Tentang Kami", "Katalog Peralatan", "Katalog Ruangan", "Alur Peminjaman"].map((l) => (
+              {["Beranda", "Tentang Kami", "Katalog Peralatan", "Katalog Ruangan"].map((l) => (
                 <li key={l} className="hover:opacity-100 cursor-pointer transition-opacity">{l}</li>
               ))}
             </ul>
