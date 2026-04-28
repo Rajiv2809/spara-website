@@ -237,7 +237,7 @@ const ModalDetail = ({ ruangan, onClose, onAjukan }) => {
           </button>
           <button
             disabled={!canApply}
-            onClick={() => onAjukan(ruangan)}
+            onClick={() => onAjukan(ruangan)} 
             className={`flex-1 rounded-full py-2 text-[12px] font-bold transition ${
               canApply ? "bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white hover:opacity-90" : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
@@ -391,9 +391,9 @@ const PeminjamanRuangan = () => {
           onClose={() => setShowModalPengajuan(false)}/>
       )}
 
-      <div className="ml-[300px] flex-1 p-10 overflow-y-auto">
+      <div className="lg:ml-[300px] flex-1 lg:p-10 p-4 overflow-y-auto">
         <div className="mb-8">
-          <h1 className="text-[#2D0A18] text-[32px] font-extrabold">Daftar Ruangan</h1>
+          <h1 className="text-[#2D0A18] text-[32px] lg:mt-2 mt-12 font-extrabold">Daftar Ruangan</h1>
           <p className="text-gray-500 text-[14px] mt-1">
             Memilih ruangan yang tersedia berdasarkan jadwal dan kapasitas
           </p>
@@ -445,7 +445,7 @@ const PeminjamanRuangan = () => {
           </div>
 
           {paginated.length > 0 ? (
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6">
               {paginated.map((r, i) => (
                 <GedungCard key={i}
                 ruangan={r}
