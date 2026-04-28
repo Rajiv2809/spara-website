@@ -10,7 +10,8 @@ const GuestLayout = () => {
     }
     return (
         <div >
-                <Toast />
+            
+            <Toast />
             <Outlet />
         </div>
     );
