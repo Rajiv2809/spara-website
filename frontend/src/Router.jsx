@@ -45,7 +45,8 @@ const router = createBrowserRouter([
              {
                 path: "/persetujuan-peminjaman",
                 element: <PersetujuanPeminjaman/>
-            }
+            },
+            {
                 path: "/kelola-peralatan",
                 element: <KelolaPeralatan/>
             },            
