@@ -10,6 +10,7 @@ import PengajuanPeralatan from "./Pages/PengajuanPeralatan.jsx";
 import TentangKami from "./Pages/TentangKami.jsx";
 import KelolaRuangan from "./Pages/KelolaRuangan.jsx";
 import Riwayat from "./Pages/Riwayat.jsx";
+import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
 
 const router = createBrowserRouter([
     {
@@ -40,7 +41,10 @@ const router = createBrowserRouter([
                 path: "/riwayat",
                 element: <Riwayat/>
              },
-            
+             {
+                path: "/kelola-peralatan",
+                element: <KelolaPeralatan/>
+            },            
            
         ]
     },
