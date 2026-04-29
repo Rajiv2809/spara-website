@@ -82,9 +82,6 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   ]);
 
   const [form, setForm] = useState({
-    nim: "",
-    nama: "",
-    email: "",
     jenisKegiatan: "",
     namaKegiatan: "",
     penanggungJawab: "",
@@ -116,15 +113,16 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   );
 
   const handleSubmit = () => {
-    if (!form.nim || !form.nama || !form.email) {
+    if (
+      !form.jenisKegiatan ||
+      !form.namaKegiatan ||
+      !form.penanggungJawab ||
+      !form.tanggalMulai ||
+      !form.tanggalSelesai ||
+      !form.jamMulai ||
+      !form.jamSelesai
+    ) {
       alert("Harap lengkapi data wajib");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(form.email)) {
-      alert("Format email tidak valid");
       return;
     }
 
@@ -213,7 +211,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                   </div>
 
                   <p className="text-xs mt-2 text-gray-500">
-                    {s === 1 && "Cek Peralatan"}
+                    {s === 1 && "Cek Jadwal"}
                     {s === 2 && "Isi Form"}
                     {s === 3 && "Konfirmasi"}
                   </p>
@@ -236,38 +234,24 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                     {peralatan?.nama}
                   </p>
 
-                  <div className="mt-3 grid md:grid-cols-2 gap-4 text-sm">
-                    <div className="bg-white rounded-lg p-3 border">
-                      <p className="text-gray-500">Status</p>
-                      <p className="font-semibold text-green-600">
-                        Tersedia
-                      </p>
-                    </div>
+                  <p className="text-sm text-gray-500 mt-1 mb-4">
+                    Pilih tanggal untuk melihat jadwal peminjaman
+                  </p>
 
-                    <div className="bg-white rounded-lg p-3 border">
-                      <p className="text-gray-500">Stok</p>
-                      <p className="font-semibold text-[#3D0C1F]">
-                        5 Unit
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <Input
-                      label="Tanggal"
-                      name="tanggalMulai"
-                      type="date"
-                      value={form.tanggalMulai}
-                      onChange={handleChange}
-                    />
-                  </div>
+                  <Input
+                    label="Cek Ketersediaan Alat"
+                    name="tanggalMulai"
+                    type="date"
+                    value={form.tanggalMulai}
+                    onChange={handleChange}
+                  />
 
                   <div className="mt-4 space-y-2">
                     {jadwalHariIni.length > 0 ? (
                       jadwalHariIni.map((item, i) => (
                         <div
                           key={i}
-                          className="bg-white border rounded-lg px-4 py-3 flex justify-between text-sm"
+                          className="bg-white border rounded-lg px-4 py-3 flex justify-between"
                         >
                           <span>
                             {item.mulai} - {item.selesai}
@@ -280,7 +264,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                       ))
                     ) : (
                       <p className="text-sm text-gray-400">
-                        Belum ada peminjaman di tanggal ini
+                        Belum ada peminjaman
                       </p>
                     )}
                   </div>
@@ -296,35 +280,6 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                 </h3>
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Input
-                    label="NIM / NIK / Unit Pengaju"
-                    name="nim"
-                    value={form.nim}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  <Input
-                    label="Nama Pengaju"
-                    name="nama"
-                    value={form.nama}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="mt-4">
-                  <Input
-                    label="Alamat E-Mail Pengaju"
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <Select
                     label="Jenis Kegiatan"
                     name="jenisKegiatan"
@@ -359,18 +314,16 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                   />
                 </div>
 
-                <div className="mt-4">
-                  <Select
-                    label="Peralatan"
-                    name="peralatan"
-                    value={form.peralatan}
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                  <Input
+                    label="Tanggal Mulai"
+                    name="tanggalMulai"
+                    type="date"
+                    value={form.tanggalMulai}
                     onChange={handleChange}
                     required
-                    options={[peralatan?.nama || "Peralatan Dipilih"]}
                   />
-                </div>
 
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <Input
                     label="Tanggal Selesai"
                     name="tanggalSelesai"
@@ -379,7 +332,9 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                   />
+                </div>
 
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <Input
                     label="Jam Mulai"
                     name="jamMulai"
@@ -388,9 +343,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                   />
-                </div>
 
-                <div className="mt-4">
                   <Input
                     label="Jam Selesai"
                     name="jamSelesai"

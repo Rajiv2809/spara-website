@@ -81,10 +81,9 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     },
   ]);
 
+  const [tanggalCek, setTanggalCek] = useState("");
+
   const [form, setForm] = useState({
-    nim: "",
-    nama: "",
-    email: "",
     jenisKegiatan: "",
     namaKegiatan: "",
     penanggungJawab: "",
@@ -112,11 +111,19 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   };
 
   const jadwalHariIni = jadwalTerpakai.filter(
-    (item) => item.tanggal === form.tanggalMulai
+    (item) => item.tanggal === tanggalCek
   );
 
   const handleSubmit = () => {
-    if (!form.nim || !form.nama || !form.email) {
+    if (
+      !form.jenisKegiatan ||
+      !form.namaKegiatan ||
+      !form.penanggungJawab ||
+      !form.tanggalMulai ||
+      !form.tanggalSelesai ||
+      !form.jamMulai ||
+      !form.jamSelesai
+    ) {
       alert("Harap lengkapi data wajib");
       return;
     }
@@ -125,9 +132,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     setIsSubmitting(true);
     setStep(3);
 
-    setTimeout(() => {
-      setIsSuccess(true);
-    }, 1800);
+    setTimeout(() => setIsSuccess(true), 1800);
 
     setTimeout(() => {
       setIsSubmitting(false);
@@ -224,15 +229,14 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                   </p>
 
                   <p className="text-sm text-gray-500 mt-1 mb-4">
-                    Pilih tanggal untuk melihat jadwal ruangan
+                    Pilih tanggal untuk mengecek apakah ruangan sedang dipinjam
                   </p>
 
                   <Input
-                    label="Tanggal"
-                    name="tanggalMulai"
+                    label="Cek Ketersediaan Ruangan"
                     type="date"
-                    value={form.tanggalMulai}
-                    onChange={handleChange}
+                    value={tanggalCek}
+                    onChange={(e) => setTanggalCek(e.target.value)}
                   />
 
                   <div className="mt-4 space-y-2">
@@ -269,47 +273,18 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                 </h3>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="NIM / NIK / Unit Pengaju"
-                    name="nim"
-                    value={form.nim}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  <Input
-                    label="Nama Pengaju"
-                    name="nama"
-                    value={form.nama}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="mt-4">
-                  <Input
-                    label="Alamat E-Mail"
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mt-4">
                   <Select
                     label="Jenis Kegiatan"
                     name="jenisKegiatan"
                     value={form.jenisKegiatan}
                     onChange={handleChange}
+                    required
                     options={[
                       "Akademik",
                       "Non Akademik",
                       "Seminar",
                       "Rapat",
                     ]}
-                    required
                   />
 
                   <Input
@@ -327,12 +302,21 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     name="penanggungJawab"
                     value={form.penanggungJawab}
                     onChange={handleChange}
-                    options={["Ketua", "Wakil", "Staff", "Lainnya"]}
                     required
+                    options={["Ketua", "Wakil", "Staff", "Lainnya"]}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mt-4">
+                  <Input
+                    label="Tanggal Mulai"
+                    name="tanggalMulai"
+                    type="date"
+                    value={form.tanggalMulai}
+                    onChange={handleChange}
+                    required
+                  />
+
                   <Input
                     label="Tanggal Selesai"
                     name="tanggalSelesai"
@@ -341,7 +325,9 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                   />
+                </div>
 
+                <div className="grid grid-cols-2 gap-4 mt-4">
                   <Input
                     label="Jam Mulai"
                     name="jamMulai"
@@ -350,9 +336,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     onChange={handleChange}
                     required
                   />
-                </div>
 
-                <div className="mt-4">
                   <Input
                     label="Jam Selesai"
                     name="jamSelesai"
@@ -366,7 +350,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
             )}
           </div>
 
-          {/* Footer Button */}
+          {/* Footer */}
           <div className="px-8 py-4 border-t bg-white rounded-b-2xl">
             <div className="flex justify-center gap-3">
               {step === 2 && (
