@@ -1,60 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Sidebar from "../Components/sidebar";
 import { Icon } from "@iconify/react";
 import ModalPengajuan from "../Components/ModalPengajuanRuangan";
 import gedung_utama from '../assets/gu601.jpeg';
-
-const ruanganData = [
-  { nama: "Workspace Multimedia", kode: "GU-604", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 30, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi", "TV LED"], deskripsi: "Ruangan multifungsi yang dilengkapi perangkat multimedia lengkap, cocok untuk workshop, presentasi, dan rapat tim kreatif." },
-  { nama: "Lab Motion Capture", kode: "GU-607", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 3", kapasitas: 20, fasilitas: ["Kamera Motion Capture", "AC", "PC Workstation", "WiFi", "Green Screen"], deskripsi: "Lab khusus motion capture dengan peralatan profesional untuk penelitian dan produksi animasi 3D." },
-  { nama: "Workspace Software Development", kode: "GU-704", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 40, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi", "32 PC"], deskripsi: "Ruang kerja pengembangan perangkat lunak dengan workstation berperforma tinggi dan koneksi internet dedicated." },
-  { nama: "Cyber Physical System Security Lab", kode: "TA-X-3", gedung: "Gedung Utama", status: "MAINTENANCE", lantai: "Lantai 4", kapasitas: 25, fasilitas: ["Server Rack", "AC", "Whiteboard", "WiFi", "Firewall Hardware"], deskripsi: "Laboratorium keamanan sistem cyber-physical dengan perangkat penelitian keamanan siber mutakhir." },
-  { nama: "Workspace Cyber Forensic", kode: "TA-XI-5A", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 15, fasilitas: ["PC Forensik", "AC", "Whiteboard", "WiFi", "Write Blocker"], deskripsi: "Ruang kerja forensik digital dengan perangkat lunak dan keras khusus investigasi kejahatan siber." },
-  { nama: "Lab Clay Modeling", kode: "GT-L1-006", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 20, fasilitas: ["Meja Kerja", "AC", "Rak Penyimpanan", "Wastafel", "Oven Keramik"], deskripsi: "Laboratorium pemodelan clay dengan fasilitas lengkap untuk desain produk dan eksplorasi seni kreatif." },
-  { nama: "Workspace Remote Sensing", kode: "GT-L3-007", gedung: "Gedung Utama", status: "TIDAK TERSEDIA", lantai: "Lantai 3", kapasitas: 30, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi", "GPS Tools", "Drone"], deskripsi: "Ruang kerja penginderaan jauh dengan perangkat analisis data geospasial dan citra satelit." },
-  { nama: "Hydrographic Survey Lab", kode: "GT-L1-008", gedung: "Gedung Technopreneur", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 18, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi", "Peralatan Survey", "Sonar"], deskripsi: "Ruang survei hidrografi lengkap dengan peralatan pemetaan dan pengukuran kedalaman bawah air." },
-  { nama: "Studio Podcast & Broadcasting", kode: "GT-L3-009", gedung: "Gedung Technopreneur", status: "TERSEDIA", lantai: "Lantai 3", kapasitas: 8, fasilitas: ["Mic Condenser", "Mixing Board", "AC", "Kedap Suara", "Kamera DSLR", "Lighting Kit"], deskripsi: "Studio siaran profesional kedap suara untuk produksi podcast, wawancara, dan konten video berkualitas tinggi." },
-  { nama: "Ruang Inkubator Startup", kode: "GT-L4-010", gedung: "Gedung Technopreneur", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 35, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi Cepat", "Sofa", "Standing Desk"], deskripsi: "Ruang inkubator startup modern dengan fasilitas co-working premium untuk mendukung pengembangan bisnis rintisan." },
-  { nama: "Lab Augmented Reality", kode: "GT-L2-011", gedung: "Gedung Technopreneur", status: "MAINTENANCE", lantai: "Lantai 2", kapasitas: 22, fasilitas: ["AR Headset", "PC Workstation", "AC", "WiFi", "Proyektor"], deskripsi: "Laboratorium augmented reality dengan perangkat AR terkini untuk pengembangan aplikasi dan konten interaktif." },
-  { nama: "Workspace IoT Development", kode: "GT-L1-012", gedung: "Gedung Technopreneur", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 28, fasilitas: ["Arduino Kit", "Raspberry Pi", "AC", "Whiteboard", "WiFi", "Oscilloscope"], deskripsi: "Ruang pengembangan Internet of Things lengkap dengan berbagai komponen elektronik dan alat ukur." },
-  { nama: "GDS Rempang - Workspace Multimedia", kode: "GU-L1-013", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 50, fasilitas: ["Proyektor", "AC", "Whiteboard", "WiFi", "TV LED", "Sound System"], deskripsi: "Workspace multimedia berkapasitas besar di gedung utama untuk kegiatan kolaborasi skala menengah." },
-  { nama: "VRS Setokok", kode: "GU-L2-014", gedung: "Gedung Utama", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 35, fasilitas: ["VR Headset", "AC", "PC Workstation", "WiFi", "Green Screen", "Motion Controller"], deskripsi: "Ruang virtual reality dengan perangkat VR terkini untuk penelitian dan pengembangan konten immersif." },
-  { nama: "AS Galang - Workspace Animasi", kode: "GU-L2-015", gedung: "Gedung Utama", status: "MAINTENANCE", lantai: "Lantai 2", kapasitas: 28, fasilitas: ["Drawing Tablet", "AC", "PC Workstation", "WiFi", "Proyektor", "Cintiq Display"], deskripsi: "Workspace animasi dengan tablet grafis dan perangkat lunak animasi profesional untuk produksi konten digital." },
-  { nama: "Mini Theatre", kode: "GU-L3-016", gedung: "Gedung Tower A", status: "TIDAK TERSEDIA", lantai: "Lantai 3", kapasitas: 80, fasilitas: ["Proyektor 4K", "Sound System", "AC", "Kursi Theatre", "Lighting", "Layar Lebar"], deskripsi: "Mini teater berkapasitas 80 orang dengan sistem audio-visual profesional untuk pemutaran film dan presentasi." },
-  { nama: "Aula Serbaguna", kode: "GU-L1-017", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 150, fasilitas: ["Stage", "Sound System", "AC", "Kursi Lipat", "Podium", "Proyektor Ganda"], deskripsi: "Aula berkapasitas besar yang dapat digunakan untuk seminar, wisuda, dan berbagai acara resmi kampus." },
-  { nama: "Ruang Seminar A", kode: "GU-L3-018", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 3", kapasitas: 60, fasilitas: ["Proyektor Ganda", "AC", "Sound System", "Kursi Seminar", "WiFi", "Podium"], deskripsi: "Ruang seminar representatif dengan dua proyektor dan sistem suara berkualitas tinggi untuk acara akademik." },
-  { nama: "Lab Komputer Terapan", kode: "GU-L2-019", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 45, fasilitas: ["45 PC", "Proyektor", "AC", "Printer", "WiFi", "Scanner"], deskripsi: "Lab komputer lengkap dengan 45 unit PC berperforma tinggi untuk praktikum pemrograman dan pengolahan data." },
-  { nama: "Ruang Rapat Eksekutif", kode: "GU-L4-020", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 12, fasilitas: ["TV Conference", "AC", "Meja Oval", "WiFi", "Teleconference System", "Mini Bar"], deskripsi: "Ruang rapat premium untuk pertemuan pimpinan dan tamu VIP dengan fasilitas konferensi video terkini." },
-  { nama: "Co-Working Space Premium", kode: "GU-L1-021", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 60, fasilitas: ["Meja Panjang", "AC", "WiFi Cepat", "Sofa", "Colokan Banyak", "Loker", "Pantry"], deskripsi: "Area kerja bersama premium dengan suasana modern, cocok untuk pekerjaan individual maupun kolaborasi tim besar." },
-  { nama: "Ruang Diskusi Terbuka", kode: "GU-L3-022", gedung: "Gedung Tower A", status: "TIDAK TERSEDIA", lantai: "Lantai 3", kapasitas: 16, fasilitas: ["TV LED", "Whiteboard", "AC", "WiFi", "Bean Bag"], deskripsi: "Ruang diskusi santai dengan konsep terbuka dan furnitur fleksibel, cocok untuk brainstorming informal." },
-  { nama: "Laboratorium Bahasa", kode: "GU-L4-023", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 36, fasilitas: ["Headset Audio", "PC", "AC", "Proyektor", "WiFi", "Bilik Rekam"], deskripsi: "Lab bahasa modern dengan bilik rekaman individual dan sistem audio terpusat untuk pembelajaran bahasa asing." },
-  { nama: "Studio Foto & Video", kode: "GU-L2-024", gedung: "Gedung Tower A", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 15, fasilitas: ["Lighting Studio", "Green Screen", "Kamera Mirrorless", "AC", "Backdrop", "Reflector"], deskripsi: "Studio foto dan video profesional dengan pencahayaan lengkap untuk produksi konten visual berkualitas tinggi." },
-  { nama: "Ruang Seminar B", kode: "GU-L4-025", gedung: "Gedung Tower A", status: "MAINTENANCE", lantai: "Lantai 4", kapasitas: 55, fasilitas: ["Proyektor", "AC", "Sound System", "Kursi Seminar", "WiFi", "Whiteboard Digital"], deskripsi: "Ruang seminar berkapasitas menengah dengan whiteboard digital interaktif dan sistem tata suara modern." },
-  { nama: "Workspace Data Science", kode: "GB-L1-026", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 32, fasilitas: ["PC High-End", "AC", "Proyektor", "WiFi", "Server Lokal", "Whiteboard"], deskripsi: "Ruang kerja data science dengan workstation berperforma tinggi dan akses server lokal untuk komputasi intensif." },
-  { nama: "Lab Robotika", kode: "GB-L2-027", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 24, fasilitas: ["Robot Kit", "AC", "Meja Kerja Luas", "WiFi", "Proyektor", "3D Printer"], deskripsi: "Laboratorium robotika lengkap dengan berbagai kit robot dan printer 3D untuk prototyping dan penelitian." },
-  { nama: "Ruang Presentasi Interaktif", kode: "GB-L1-028", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 42, fasilitas: ["Layar Sentuh Besar", "AC", "Sound System", "WiFi", "Kursi Lipat", "Podium Digital"], deskripsi: "Ruang presentasi modern dengan layar sentuh interaktif berukuran besar untuk sesi pembelajaran dan pitching." },
-  { nama: "Lab Kecerdasan Buatan", kode: "GB-L3-029", gedung: "Gedung Teaching Factory", status: "TIDAK TERSEDIA", lantai: "Lantai 3", kapasitas: 20, fasilitas: ["GPU Workstation", "AC", "Proyektor", "WiFi", "Whiteboard", "Server GPU"], deskripsi: "Lab AI dengan workstation GPU untuk pelatihan model machine learning dan deep learning skala besar." },
-  { nama: "Ruang Kolaborasi Kreatif", kode: "GB-L2-030", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 38, fasilitas: ["Meja Modular", "AC", "TV LED Ganda", "WiFi", "Whiteboard Magnetik", "Proyektor"], deskripsi: "Ruang kolaborasi fleksibel dengan furnitur modular yang dapat dikonfigurasi sesuai kebutuhan tim kreatif." },
-  { nama: "Studio Musik Digital", kode: "GB-L1-031", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 1", kapasitas: 10, fasilitas: ["DAW Workstation", "MIDI Controller", "AC", "Kedap Suara", "Monitor Speaker", "Synthesizer"], deskripsi: "Studio musik digital profesional dengan perangkat audio terlengkap untuk produksi musik dan sound design." },
-  { nama: "Lab Bioinformatika", kode: "GB-L3-032", gedung: "Gedung Teaching Factory", status: "MAINTENANCE", lantai: "Lantai 3", kapasitas: 26, fasilitas: ["PC Workstation", "AC", "Proyektor", "WiFi", "Server Bioinformatika", "Whiteboard"], deskripsi: "Laboratorium bioinformatika dengan infrastruktur komputasi untuk analisis data genomik dan penelitian hayati digital." },
-  { nama: "Ruang Workshop Desain", kode: "GB-L2-033", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 2", kapasitas: 30, fasilitas: ["Drawing Tablet", "AC", "Proyektor", "WiFi", "Meja Gambar", "Printer A3"], deskripsi: "Workshop desain grafis dan UI/UX dengan tablet digital dan printer format besar untuk produksi materi visual." },
-  { nama: "Ruang Mediasi & Negosiasi", kode: "GB-L4-034", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 14, fasilitas: ["AC", "Meja Oval", "WiFi", "TV Conference", "Whiteboard", "Kamera PTZ"], deskripsi: "Ruang formal untuk mediasi, negosiasi, dan rapat penting dengan fasilitas rekam dan konferensi video." },
-  { nama: "Lab Jaringan Komputer", kode: "GB-L1-035", gedung: "Gedung Teaching Factory", status: "TIDAK TERSEDIA", lantai: "Lantai 1", kapasitas: 30, fasilitas: ["Rack Switch", "AC", "PC", "WiFi", "Kabel Patch", "Network Analyzer"], deskripsi: "Laboratorium jaringan komputer dengan perangkat Cisco dan infrastruktur simulasi jaringan skala enterprise." },
-  { nama: "Ruang Pelatihan SDM", kode: "GB-L4-036", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 48, fasilitas: ["Proyektor", "AC", "Kursi Pelatihan", "WiFi", "Sound System", "Whiteboard"], deskripsi: "Ruang pelatihan berkapasitas besar untuk kegiatan pengembangan sumber daya manusia dan training internal." },
-  { nama: "Studio Desain Produk", kode: "GB-L3-037", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 3", kapasitas: 22, fasilitas: ["3D Printer", "Laser Cutter", "AC", "Meja Kerja", "WiFi", "Proyektor"], deskripsi: "Studio desain produk dengan fasilitas fabrikasi digital termasuk 3D printer dan laser cutter untuk prototyping." },
-  { nama: "Ruang Seminar C", kode: "GB-L2-038", gedung: "Gedung Teaching Factory", status: "MAINTENANCE", lantai: "Lantai 2", kapasitas: 70, fasilitas: ["Proyektor Ganda", "AC", "Sound System", "Kursi Seminar", "WiFi", "Panggung Mini"], deskripsi: "Ruang seminar besar dengan panggung mini dan sistem audio-visual profesional untuk acara akademik dan industri." },
-  { nama: "Lab Keamanan Jaringan", kode: "GB-L3-039", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 3", kapasitas: 18, fasilitas: ["PC Penetration Testing", "AC", "WiFi Isolated", "Whiteboard", "Server Honeypot"], deskripsi: "Lab keamanan jaringan dengan environment terisolasi untuk praktikum ethical hacking dan penetration testing." },
-  { nama: "Ruang Konferensi Internasional", kode: "GB-L4-040", gedung: "Gedung Teaching Factory", status: "TERSEDIA", lantai: "Lantai 4", kapasitas: 100, fasilitas: ["Layar LED Besar", "Sound System Premium", "AC", "Kursi Konferensi", "WiFi", "Simultaneous Interpreter Booth"], deskripsi: "Ruang konferensi internasional berkapasitas besar dengan fasilitas interpretasi simultan dan sistem AV premium." },
-];
-
-const gedungList = ["Gedung Technopreneur", "Gedung Utama", "Gedung Teaching Factory", "Gedung Tower A"];
-
-const lantaiPerGedung = {
-  "Gedung Technopreneur": ["Lantai 1", "Lantai 2", "Lantai 3", "Lantai 4"],
-  "Gedung Utama": ["Lantai 1", "Lantai 2", "Lantai 3", "Lantai 4", "Lantai 5", "Lantai 6", "Lantai 7"],
-  "Gedung Teaching Factory": ["Lantai 1", "Lantai 2", "Lantai 3", "Lantai 4", "Lantai 5", "Lantai 6", "Lantai 7", "Lantai 8", "Lantai 9", "Lantai 10"],
-  "Gedung Tower A": ["Lantai 1", "Lantai 2", "Lantai 3", "Lantai 4", "Lantai 5", "Lantai 6", "Lantai 7", "Lantai 8", "Lantai 9", "Lantai 10", "Lantai 11", "Lantai 12"]
-};
+import axiosClient from "../axios";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -237,7 +186,7 @@ const ModalDetail = ({ ruangan, onClose, onAjukan }) => {
           </button>
           <button
             disabled={!canApply}
-            onClick={() => onAjukan(ruangan)} 
+            onClick={() => onAjukan(ruangan)}
             className={`flex-1 rounded-full py-2 text-[12px] font-bold transition ${
               canApply ? "bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white hover:opacity-90" : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
@@ -296,7 +245,7 @@ const GedungCard = ({ ruangan, onDetail, onAjukan }) => {
           </button>
 
           {canApply ? (
-            <button 
+            <button
               onClick={() => onAjukan(ruangan)}
               className="flex items-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2.5 py-1 rounded-full hover:bg-pink-800/30 transition">
               <Icon icon="mdi:plus" width={11} />
@@ -323,6 +272,51 @@ const PeminjamanRuangan = () => {
   const [filterGedung, setFilterGedung] = useState(null);
   const [filterLantai, setFilterLantai] = useState(null);
   const [filterKapasitas, setFilterKapasitas] = useState(null);
+  const [ruanganData, setRuanganData] = useState([]);
+  const [gedungList, setGedungList] = useState([]);
+  const [lantaiPerGedung, setLantaiPerGedung] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axiosClient.get('/get-ruangan')
+      .then(({ data }) => {
+        const mapped = data.data.map((r) => ({
+          kode      : r.kode_ruangan,
+          nama      : r.nama_ruangan,
+          gedung    : r.nama_gedung,
+          lantai    : `Lantai ${r.nomor_lantai}`,
+          kapasitas : r.kapasitas,
+          fasilitas : r.fasilitas.split(', '),
+          deskripsi : r.deskripsi_ruangan,
+          status    : r.status_ruangan.toUpperCase().replace('_', ' '),
+          path_foto : r.path_foto,
+          nama_pic  : r.nomor_induk_pic,
+        }));
+
+        const gedungSet = [...new Set(mapped.map((r) => r.gedung))];
+
+        const lantaiMap = {};
+        gedungSet.forEach((gedung) => {
+          lantaiMap[gedung] = [
+            ...new Set(
+              mapped
+                .filter((r) => r.gedung === gedung)
+                .map((r) => r.lantai)
+            ),
+          ].sort((a, b) => parseInt(a.replace('Lantai ', '')) - parseInt(b.replace('Lantai ', '')));
+        });
+
+        setRuanganData(mapped);
+        setGedungList(gedungSet);
+        setLantaiPerGedung(lantaiMap);
+      })
+      .catch(({ res }) => {
+        console.log(res);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const handleFilterGedung = (val) => {
     setFilterGedung(val);
@@ -347,18 +341,17 @@ const PeminjamanRuangan = () => {
 
   const filtered = useMemo(() => {
     return ruanganData.filter((r) => {
-      const matchSearch = r.nama.toLowerCase().includes(search.toLowerCase());
-      const matchGedung = !filterGedung || r.gedung === filterGedung;
-      const matchLantai = !filterLantai || r.lantai === filterLantai;
+      const matchSearch    = r.nama.toLowerCase().includes(search.toLowerCase());
+      const matchGedung    = !filterGedung || r.gedung === filterGedung;
+      const matchLantai    = !filterLantai || r.lantai === filterLantai;
       const matchKapasitas = filterKapasitas === null || filterKapasitas === undefined || r.kapasitas >= filterKapasitas;
       return matchSearch && matchGedung && matchLantai && matchKapasitas;
     });
-  }, [search, filterGedung, filterLantai, filterKapasitas]);
+  }, [ruanganData, search, filterGedung, filterLantai, filterKapasitas]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-  const lantaiOptions = filterGedung ? lantaiPerGedung[filterGedung] : [];
+  const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const lantaiOptions = filterGedung ? lantaiPerGedung[filterGedung] ?? [] : [];
 
   const pageRange = useMemo(() => {
     const delta = 2;
@@ -374,21 +367,22 @@ const PeminjamanRuangan = () => {
       <Sidebar />
 
       {selectedRoom && (
-        <ModalDetail 
-        ruangan={selectedRoom} 
-        onClose={() => setSelectedRoom(null)}
-        onAjukan={(room) => {
-          setSelectedRoom(null);
-          setSelectedPengajuanRoom(room);
-          setShowModalPengajuan(true);
-        }}
+        <ModalDetail
+          ruangan={selectedRoom}
+          onClose={() => setSelectedRoom(null)}
+          onAjukan={(room) => {
+            setSelectedRoom(null);
+            setSelectedPengajuanRoom(room);
+            setShowModalPengajuan(true);
+          }}
         />
       )}
 
       {showModalPengajuan && (
         <ModalPengajuan
           ruangan={selectedPengajuanRoom}
-          onClose={() => setShowModalPengajuan(false)}/>
+          onClose={() => setShowModalPengajuan(false)}
+        />
       )}
 
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4 overflow-y-auto">
@@ -444,16 +438,23 @@ const PeminjamanRuangan = () => {
             </span>
           </div>
 
-          {paginated.length > 0 ? (
+          {/* Loading State */}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+              <Icon icon="mdi:loading" width={48} className="mb-3 opacity-50 animate-spin" />
+              <p className="text-[14px] font-semibold">Memuat data ruangan...</p>
+            </div>
+          ) : paginated.length > 0 ? (
             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6">
               {paginated.map((r, i) => (
-                <GedungCard key={i}
-                ruangan={r}
-                onDetail={setSelectedRoom} 
-                onAjukan={(room) => {
-                  setSelectedPengajuanRoom(room);
-                  setShowModalPengajuan(true);
-                }}
+                <GedungCard
+                  key={i}
+                  ruangan={r}
+                  onDetail={setSelectedRoom}
+                  onAjukan={(room) => {
+                    setSelectedPengajuanRoom(room);
+                    setShowModalPengajuan(true);
+                  }}
                 />
               ))}
             </div>

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('kapasitas')->nullable();
             $table->text('fasilitas')->nullable();
             $table->text('deskripsi_ruangan')->nullable();
-            $table->enum('status_ruangan', ['tersedia', 'tidak_tersedia', 'maintenance'])->default('tersedia');
+            $table->enum('status_ruangan', ['tersedia', 'maintenance', 'tidak tersedia'])->default('tersedia');
             $table->string('path_foto');
 
             $table->unsignedBigInteger('id_gedung');

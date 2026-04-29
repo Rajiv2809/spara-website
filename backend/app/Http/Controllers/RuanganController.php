@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
-
+use App\Http\Resources\RuanganResource;
 class RuanganController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function getRuangan()
     {
-        //
+        $ruangan = Ruangan::all();
+       return RuanganResource::collection($ruangan);
     }
 
     /**

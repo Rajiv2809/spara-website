@@ -8,7 +8,7 @@ use App\Models\Peminjaman;
 
 class Ruangan extends Model
 {
-     protected $table = 'ruangan';
+    protected $table = 'ruangans';
     protected $primaryKey = 'id_ruangan';
 
     protected $fillable = [
@@ -19,6 +19,8 @@ class Ruangan extends Model
         'deskripsi_ruangan',
         'status_ruangan',
         'nomor_lantai',
+        'id_gedung',
+        'nomor_induk_pic',
     ];
 
     public function lantai(): BelongsTo
@@ -30,5 +32,12 @@ class Ruangan extends Model
     {
         return $this->hasMany(Peminjaman::class, 'id_ruangan', 'id_ruangan');
     }
-    
+    public function gedung()
+    {
+        return $this->belongsTo(Gedungs::class, 'id_gedung');
+    }
+    public function pic()
+    {
+        return $this->belongsTo(Pic::class, 'nomor_induk_pic', 'nomor_induk');
+    }
 }
