@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Gedungs extends Model
 {
-    protected $table = 'gedung';
+    protected $table = 'gedungs';
     protected $primaryKey = 'id_gedung';
 
     protected $fillable = [

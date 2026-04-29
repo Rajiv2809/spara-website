@@ -11,6 +11,7 @@ import TentangKami from "./Pages/TentangKami.jsx";
 import KelolaRuangan from "./Pages/KelolaRuangan.jsx";
 import PersetujuanPeminjaman from "./Pages/PersetujuanPeminjaman.jsx";
 import Riwayat from "./Pages/Riwayat.jsx";
+import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
 
 const router = createBrowserRouter([
     {
@@ -45,6 +46,9 @@ const router = createBrowserRouter([
                 path: "/persetujuan-peminjaman",
                 element: <PersetujuanPeminjaman/>
             }
+                path: "/kelola-peralatan",
+                element: <KelolaPeralatan/>
+            },            
            
         ]
     },

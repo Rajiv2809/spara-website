@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pic extends Model
 {
-    //
+     protected $table = 'pics';
+    
+       public function user()
+    {
+        return $this->belongsTo(User::class, 'nomor_induk', 'nomor_induk');
+    }
 }

@@ -12,7 +12,7 @@ const Dashboard = () => {
         
 
         {/* Main Content */}
-        <div className="dasboard p-[50px] ml-[300px]">
+        <div className="dasboard md:p-[50px] p-4 lg:ml-[300px]">
           <h1 className="text-[#481020] text-[36px] font-extrabold font-poppins">
             Halaman Dasbor
           </h1>
@@ -84,7 +84,7 @@ const Dashboard = () => {
           </div>
 
           {/* Bottom Section */}
-          <div className="grid grid-cols-[3fr_2fr] gap-6 mt-8">
+          <div className="grid lg:grid-cols-[3fr_2fr] grid-cols-1 gap-6 mt-8">
             {/* Peminjaman yang Diajukan */}
             <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl">
               <div className="relative z-10">
