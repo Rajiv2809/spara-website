@@ -2,8 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AuthController, RuanganController};
-
+use App\Http\Controllers\{AuthController, PeminjamanController, RuanganController};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -16,4 +15,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::get('/get-ruangan', [RuanganController::class, 'getRuangan']);
+    Route::get('/jadwal-ruangan/{id}/{tanggal}', [RuanganController::class, 'jadwalRuangan']);
+
+
+    Route::post('/peminjaman', [PeminjamanController::class, 'create']);
 });

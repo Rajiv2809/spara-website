@@ -15,7 +15,7 @@ class RuanganResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            
+            'id_ruangan'       => $this->id_ruangan,
             'kode_ruangan'      => $this->kode_ruangan,
             'nama_ruangan'      => $this->nama_ruangan,
             'kapasitas'         => $this->kapasitas,

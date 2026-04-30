@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('peminjaman', function (Blueprint $table) {
             $table->id('id_peminjaman');
             $table->string('nama_kegiatan');
-            $table->string('jenis_kegiatan')->nullable();
+            $table->enum('jenis_kegiatan', ['akademik', 'non-akademik']);
             $table->date('hari_tanggal');
-            $table->time('jam');
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
             $table->text('keterangan')->nullable();
             $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
 

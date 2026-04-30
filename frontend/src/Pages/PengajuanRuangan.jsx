@@ -281,6 +281,7 @@ const PeminjamanRuangan = () => {
     axiosClient.get('/get-ruangan')
       .then(({ data }) => {
         const mapped = data.data.map((r) => ({
+          id        : r.id,   
           kode      : r.kode_ruangan,
           nama      : r.nama_ruangan,
           gedung    : r.nama_gedung,

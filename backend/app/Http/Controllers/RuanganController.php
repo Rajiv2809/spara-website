@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ruangan;
+use App\Http\Resources\JadwaRuanganResource;
 use Illuminate\Http\Request;
+use App\Models\{Peminjaman, Ruangan};
 use App\Http\Resources\RuanganResource;
 class RuanganController extends Controller
 {
@@ -22,6 +23,18 @@ class RuanganController extends Controller
     public function create()
     {
         //
+    }
+    
+     public function jadwalRuangan($id,$tanggal )
+    {
+        // $peminjaman = Peminjaman::all();
+        
+        $peminjaman = Peminjaman::whereDate('hari_tanggal', $tanggal)->get();
+        // $peminjaman = $ruangan->peminjaman()
+        //     ->whereDate('hari_tanggal', $tanggal)
+        //     ->get();
+        
+        return JadwaRuanganResource::collection($peminjaman);
     }
 
     /**

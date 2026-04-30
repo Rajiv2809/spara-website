@@ -15,14 +15,10 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('id_peminjaman');
-            $table->unsignedBigInteger('id_penanggungjawab')->nullable();
-            $table->unsignedBigInteger('id_pic')->nullable();
-            $table->unsignedBigInteger('id_admin')->nullable();
-
+            $table->unsignedBigInteger('nomor_induk_penyetuju')->nullable();
+            $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
             $table->foreign('id_peminjaman')->references('id_peminjaman')->on('peminjaman')->onDelete('cascade');
-            $table->foreign('id_penanggungjawab')->references('nomor_induk')->on('users')->onDelete('set null');
-            $table->foreign('id_pic')->references('nomor_induk')->on('users')->onDelete('set null');
-            $table->foreign('id_admin')->references('nomor_induk')->on('users')->onDelete('set null');
+            $table->foreign('nomor_induk_penyetuju')->references('nomor_induk')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

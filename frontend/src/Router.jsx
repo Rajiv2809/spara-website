@@ -40,15 +40,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "/riwayat",
-<<<<<<< Updated upstream
                 element: <Riwayat/>
              },
              {
                 path: "/persetujuan-peminjaman",
                 element: <PersetujuanPeminjaman/>
-=======
-                element: <Riwayat />
->>>>>>> Stashed changes
             },
             {
                 path: "/kelola-peralatan",
