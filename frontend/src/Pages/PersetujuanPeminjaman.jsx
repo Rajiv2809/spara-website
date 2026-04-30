@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState, useMemo } from "react";
 import Sidebar from "../Components/sidebar";
 import { Icon } from "@iconify/react";
@@ -517,3 +518,18 @@ const PersetujuanPeminjaman = () => {
 };
 
 export default PersetujuanPeminjaman;
+=======
+import React from 'react';
+import Sidebar from '../Components/sidebar';
+
+const PersetujuanPeminjaman = () => {
+    return (
+        <div>
+            <Sidebar/>
+            
+        </div>
+    );
+}
+
+export default PersetujuanPeminjaman;
+>>>>>>> Stashed changes

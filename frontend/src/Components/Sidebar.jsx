@@ -35,7 +35,7 @@ const menuByRole = {
         { icon: "octicon:checklist-16", label: "Peminjaman Ruangan", href: "/pengajuanruangan" },
         { icon: "material-symbols:monitor-outline", label: "Peminjaman Peralatan", href: "/peminjaman-peralatan" },
         { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
-        { icon: "material-symbols:check-circle-outline", label: "Persetujuan", href: "/persetujuan" },
+        { icon: "material-symbols:check-circle-outline", label: "Persetujuan", href: "/persetujuan-peminjaman" },
     ],
 };
 

@@ -12,7 +12,7 @@ import KelolaRuangan from "./Pages/KelolaRuangan.jsx";
 import PersetujuanPeminjaman from "./Pages/PersetujuanPeminjaman.jsx";
 import Riwayat from "./Pages/Riwayat.jsx";
 import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
-
+import PersetujuanPeminjman from "./Pages/PersetujuanPeminjaman.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -24,53 +24,61 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard",
-                element: <Dashboard/>
+                element: <Dashboard />
             },
             {
                 path: "/pengajuanruangan",
-                element: <PengajuanRuangan/>
+                element: <PengajuanRuangan />
             },
             {
                 path: "/peminjaman-peralatan",
-                element: <PengajuanPeralatan/>
+                element: <PengajuanPeralatan />
             },
             {
                 path: "/kelola-ruangan",
-                element: <KelolaRuangan/>
+                element: <KelolaRuangan />
             },
             {
                 path: "/riwayat",
+<<<<<<< Updated upstream
                 element: <Riwayat/>
              },
              {
                 path: "/persetujuan-peminjaman",
                 element: <PersetujuanPeminjaman/>
+=======
+                element: <Riwayat />
+>>>>>>> Stashed changes
             },
             {
                 path: "/kelola-peralatan",
-                element: <KelolaPeralatan/>
-            },            
-           
+                element: <KelolaPeralatan />
+            },
+            {
+                path: "/persetujuan-peminjaman",
+                element: <PersetujuanPeminjman/>
+            },
+
         ]
     },
     {
         path: "/",
         element: <GuestLayout />,
-        children:[
+        children: [
             {
                 path: "/login",
                 element: <Login />
-                
+
             },
             {
                 path: "/landing-page",
                 element: <LandingPage />
-                
+
             },
             {
                 path: "/tentangkami",
                 element: <TentangKami />
-                
+
             },
         ]
     }
