@@ -88,8 +88,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     namaKegiatan: "",
     penanggungJawab: "",
     ruangan: "",
-    tanggalMulai: "",
-    tanggalSelesai: "",
+    tanggalPinjam: "",
     jamMulai: "",
     jamSelesai: "",
   });
@@ -119,8 +118,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
       !form.jenisKegiatan ||
       !form.namaKegiatan ||
       !form.penanggungJawab ||
-      !form.tanggalMulai ||
-      !form.tanggalSelesai ||
+      !form.tanggalPinjam ||
       !form.jamMulai ||
       !form.jamSelesai
     ) {
@@ -229,7 +227,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                   </p>
 
                   <p className="text-sm text-gray-500 mt-1 mb-4">
-                    Pilih tanggal untuk mengecek apakah ruangan sedang dipinjam
+                    Pilih tanggal untuk mengecek ketersediaan ruangan
                   </p>
 
                   <Input
@@ -307,21 +305,12 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="mt-4">
                   <Input
-                    label="Tanggal Mulai"
-                    name="tanggalMulai"
+                    label="Tanggal Peminjaman"
+                    name="tanggalPinjam"
                     type="date"
-                    value={form.tanggalMulai}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  <Input
-                    label="Tanggal Selesai"
-                    name="tanggalSelesai"
-                    type="date"
-                    value={form.tanggalSelesai}
+                    value={form.tanggalPinjam}
                     onChange={handleChange}
                     required
                   />
