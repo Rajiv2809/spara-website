@@ -182,7 +182,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-5">
                   <p className="font-semibold text-[#A3264C] text-lg">{ruangan?.nama}</p>
                   <p className="text-sm text-gray-500 mt-1 mb-4">
-                    Pilih tanggal untuk mengecek apakah ruangan sedang dipinjam
+                    Pilih tanggal untuk mengecek ketersediaan ruangan
                   </p>
 
                   <Input

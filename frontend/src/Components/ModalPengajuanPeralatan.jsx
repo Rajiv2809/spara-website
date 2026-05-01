@@ -59,6 +59,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [tanggalCek, setTanggalCek] = useState("");
 
   const [jadwalTerpakai] = useState([
     {
@@ -85,18 +86,18 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
     jenisKegiatan: "",
     namaKegiatan: "",
     penanggungJawab: "",
-    peralatan: "",
-    tanggalMulai: "",
-    tanggalSelesai: "",
+    tanggalPinjam: "",
     jamMulai: "",
     jamSelesai: "",
   });
 
   useEffect(() => {
-    setForm((prev) => ({
-      ...prev,
-      peralatan: peralatan?.nama || "",
-    }));
+    if (peralatan?.nama) {
+      setForm((prev) => ({
+        ...prev,
+        peralatan: peralatan.nama,
+      }));
+    }
   }, [peralatan]);
 
   const handleChange = (e) => {
@@ -109,7 +110,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   };
 
   const jadwalHariIni = jadwalTerpakai.filter(
-    (item) => item.tanggal === form.tanggalMulai
+    (item) => item.tanggal === tanggalCek
   );
 
   const handleSubmit = () => {
@@ -117,8 +118,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
       !form.jenisKegiatan ||
       !form.namaKegiatan ||
       !form.penanggungJawab ||
-      !form.tanggalMulai ||
-      !form.tanggalSelesai ||
+      !form.tanggalPinjam ||
       !form.jamMulai ||
       !form.jamSelesai
     ) {
@@ -130,9 +130,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
     setIsSubmitting(true);
     setStep(3);
 
-    setTimeout(() => {
-      setIsSuccess(true);
-    }, 1800);
+    setTimeout(() => setIsSuccess(true), 1800);
 
     setTimeout(() => {
       setIsSubmitting(false);
@@ -151,6 +149,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
             {!isSuccess ? (
               <>
                 <div className="w-10 h-10 border-4 border-[#C0254A] border-t-transparent rounded-full animate-spin"></div>
+
                 <p className="font-semibold text-[#3D0C1F]">
                   Pengajuan sedang diproses...
                 </p>
@@ -160,6 +159,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                 <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                   <span className="text-4xl text-green-600">✓</span>
                 </div>
+
                 <p className="font-bold text-[#3D0C1F]">
                   Pengajuan berhasil diajukan!
                 </p>
@@ -240,10 +240,9 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
 
                   <Input
                     label="Cek Ketersediaan Alat"
-                    name="tanggalMulai"
                     type="date"
-                    value={form.tanggalMulai}
-                    onChange={handleChange}
+                    value={tanggalCek}
+                    onChange={(e) => setTanggalCek(e.target.value)}
                   />
 
                   <div className="mt-4 space-y-2">
@@ -314,21 +313,12 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                   />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                <div className="mt-4">
                   <Input
-                    label="Tanggal Mulai"
-                    name="tanggalMulai"
+                    label="Tanggal Peminjaman"
+                    name="tanggalPinjam"
                     type="date"
-                    value={form.tanggalMulai}
-                    onChange={handleChange}
-                    required
-                  />
-
-                  <Input
-                    label="Tanggal Selesai"
-                    name="tanggalSelesai"
-                    type="date"
-                    value={form.tanggalSelesai}
+                    value={form.tanggalPinjam}
                     onChange={handleChange}
                     required
                   />

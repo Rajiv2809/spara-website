@@ -12,7 +12,6 @@ import KelolaRuangan from "./Pages/KelolaRuangan.jsx";
 import PersetujuanPeminjaman from "./Pages/PersetujuanPeminjaman.jsx";
 import Riwayat from "./Pages/Riwayat.jsx";
 import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
-import PersetujuanPeminjman from "./Pages/PersetujuanPeminjaman.jsx";
 const router = createBrowserRouter([
     {
         path: "/",
@@ -49,10 +48,6 @@ const router = createBrowserRouter([
             {
                 path: "/kelola-peralatan",
                 element: <KelolaPeralatan />
-            },
-            {
-                path: "/persetujuan-peminjaman",
-                element: <PersetujuanPeminjman/>
             },
 
         ]
