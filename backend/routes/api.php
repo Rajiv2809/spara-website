@@ -19,4 +19,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::post('/peminjaman', [PeminjamanController::class, 'create']);
+    Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
+
+    Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
 });
