@@ -26,8 +26,8 @@ return new class extends Migration
             $table->foreign('id_gedung'
             )->references('id_gedung')->on('gedungs')->onDelete('cascade');
 
-            $table->unsignedBigInteger('nomor_induk_pic')->nullable();
-            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('nomor_induk_pic');
+            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('users');
 
             $table->unsignedBigInteger('nomor_lantai');
             $table->foreign('nomor_lantai')->references('nomor_lantai')->on('lantai')->onDelete('cascade');

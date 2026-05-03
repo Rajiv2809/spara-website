@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_peminjaman');
             $table->unsignedBigInteger('nomor_induk_penyetuju')->nullable();
             $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
-            $table->foreign('id_peminjaman')->references('id_peminjaman')->on('peminjamans')->onDelete('cascade');
+            $table->foreign('id_peminjaman')->references('id_peminjaman')->on('peminjaman')->onDelete('cascade');
             $table->foreign('nomor_induk_penyetuju')->references('nomor_induk')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

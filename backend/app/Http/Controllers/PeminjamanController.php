@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Validator};
 use Carbon\Carbon;
 use App\Models\{Peminjaman, Persetujuan};
-
+use App\Http\Resources\PeminjamanResource;
 class PeminjamanController extends Controller
 {
     public function create(Request $request)
@@ -161,7 +161,7 @@ class PeminjamanController extends Controller
             ->get();
 
         return response()->json([
-            'peminjaman' => $peminjaman,
+            'peminjaman' => PeminjamanResource::collection($peminjaman),
         ]);
     }
 }
