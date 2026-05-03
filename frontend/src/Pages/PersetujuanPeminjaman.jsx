@@ -1,243 +1,293 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Sidebar from "../Components/sidebar";
 import { Icon } from "@iconify/react";
-
-// ─── DATA ────────────────────────────────────────────────────────────────────
-const LOAN_DATA = [
-  {
-    id: 1, name: "Total Station Topcon ES-105", code: "PJ-067", type: "Peralatan",
-    user: "Angelica Sun", role: "Mahasiswi", nim: "434250518",
-    email: "anngelicaaa00@gmail.com", phone: "089823769781", dept: "Teknik Informatika",
-    date: "Selasa, 6 April 2027", time: "08.00 s/d 14.00", status: "Menunggu",
-    activity: "Memasuki bulan suci ramadan, saya mewakili segenap keluarga besar teropela mengucapkan minal aidin wal faizin mohon maaf lahir dan batin",
-  },
-  {
-    id: 2, name: "Total Station Topcon ES-105", code: "PJ-067", type: "Peralatan",
-    user: "Budi Santoso", role: "Mahasiswa", nim: "434250519",
-    email: "budi.santoso@gmail.com", phone: "089812345678", dept: "Teknik Mesin",
-    date: "Selasa, 6 April 2027", time: "08.00 s/d 14.00", status: "Disetujui",
-    activity: "Mengerjakan tugas akhir semester untuk pengukuran area lapangan",
-  },
-  {
-    id: 3, name: "Total Station Topcon ES-105", code: "PJ-067", type: "Peralatan",
-    user: "Citra Dewi", role: "Mahasiswi", nim: "434250520",
-    email: "citra.dewi@gmail.com", phone: "089823456789", dept: "Teknik Elektro",
-    date: "Selasa, 6 April 2027", time: "09.00 s/d 15.00", status: "Ditolak",
-    activity: "Praktikum lapangan geodesi semester 5 bersama kelompok",
-  },
-  {
-    id: 4, name: "Total Station Topcon ES-105", code: "PJ-067", type: "Peralatan",
-    user: "Deni Pratama", role: "Mahasiswa", nim: "434250521",
-    email: "deni.pratama@gmail.com", phone: "089834567890", dept: "Teknik Sipil",
-    date: "Rabu, 7 April 2027", time: "07.00 s/d 13.00", status: "Menunggu",
-    activity: "Pengukuran topografi untuk kerja praktek lapangan",
-  },
-  {
-    id: 5, name: "Waterpass Topcon AT-B4", code: "PJ-068", type: "Peralatan",
-    user: "Eka Putri", role: "Mahasiswi", nim: "434250522",
-    email: "eka.putri@gmail.com", phone: "089845678901", dept: "Teknik Informatika",
-    date: "Rabu, 7 April 2027", time: "10.00 s/d 16.00", status: "Menunggu",
-    activity: "Riset tugas akhir pengukuran area kampus politeknik",
-  },
-  {
-    id: 6, name: "Theodolite Sokkia DT740L", code: "PJ-069", type: "Peralatan",
-    user: "Faris Rizki", role: "Mahasiswa", nim: "434250523",
-    email: "faris.rizki@gmail.com", phone: "089856789012", dept: "Teknik Mesin",
-    date: "Kamis, 8 April 2027", time: "08.00 s/d 12.00", status: "Disetujui",
-    activity: "Pengambilan data untuk Program Kreativitas Mahasiswa bidang teknologi",
-  },
-  {
-    id: 7, name: "Total Station Topcon ES-105", code: "PJ-067", type: "Peralatan",
-    user: "Gita Lestari", role: "Mahasiswi", nim: "434250524",
-    email: "gita.lestari@gmail.com", phone: "089867890123", dept: "Teknik Sipil",
-    date: "Kamis, 8 April 2027", time: "13.00 s/d 17.00", status: "Menunggu",
-    activity: "Pengukuran untuk proyek akhir semester bersama tim",
-  },
-  {
-    id: 8, name: "Ruang Seminar A", code: "RU-012", type: "Ruangan",
-    user: "Hendra Wijaya", role: "Mahasiswa", nim: "434250525",
-    email: "hendra.wijaya@gmail.com", phone: "089878901234", dept: "Teknik Elektro",
-    date: "Jumat, 9 April 2027", time: "08.00 s/d 12.00", status: "Menunggu",
-    activity: "Seminar proposal tugas akhir dihadiri dosen pembimbing",
-  },
-  {
-    id: 9, name: "Ruang Lab Komputer B", code: "RU-024", type: "Ruangan",
-    user: "Indah Permata", role: "Mahasiswi", nim: "434250526",
-    email: "indah.permata@gmail.com", phone: "089889012345", dept: "Teknik Informatika",
-    date: "Jumat, 9 April 2027", time: "13.00 s/d 17.00", status: "Disetujui",
-    activity: "Latihan ujian kompetensi nasional bersama kelas",
-  },
-  {
-    id: 10, name: "Ruang Rapat C", code: "RU-031", type: "Ruangan",
-    user: "Joko Susilo", role: "Mahasiswa", nim: "434250527",
-    email: "joko.susilo@gmail.com", phone: "089890123456", dept: "Teknik Mesin",
-    date: "Sabtu, 10 April 2027", time: "09.00 s/d 14.00", status: "Ditolak",
-    activity: "Rapat koordinasi panitia acara wisuda angkatan 2027",
-  },
-];
-
-const STAT_DATA = {
-  alat:    { approved: 67, waiting: 67, rejected: 67 },
-  ruangan: { approved: 31, waiting: 8,  rejected: 5  },
-};
+import axiosClient from "../axios";
 
 const ITEMS_PER_PAGE = 9;
 
 // ─── BADGE ───────────────────────────────────────────────────────────────────
 const Badge = ({ status }) => {
+  const normalized = status?.charAt(0).toUpperCase() + status?.slice(1).toLowerCase();
   const styles = {
-    Menunggu:  { backgroundColor: "#FFF3CD", color: "#946C00" },
-    Disetujui: { backgroundColor: "#DFF2D8", color: "#2E6B1F" },
-    Ditolak:   { backgroundColor: "#FFE0E0", color: "#86090A" },
+    Menunggu:  "bg-yellow-100 text-yellow-700",
+    Disetujui: "bg-green-100 text-green-700",
+    Ditolak:   "bg-red-100 text-red-700",
   };
   return (
-    <span
-      style={{
-        ...(styles[status] ?? { backgroundColor: "#f3f4f6", color: "#666" }),
-        fontSize: 10,
-        fontWeight: 700,
-        padding: "3px 10px",
-        borderRadius: 999,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {status}
+    <span className={`text-[10px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap ${styles[normalized] ?? "bg-gray-100 text-gray-500"}`}>
+      {normalized}
     </span>
   );
 };
 
-// ─── LOAN CARD ───────────────────────────────────────────────────────────────
-const LoanCard = ({ item, onApprove, onReject }) => (
-  <div
-    style={{
-      backgroundColor: "#FFFFFF",
-      border: "1.5px solid #F0D0DA",
-      borderRadius: 18,
-      boxShadow: "0 2px 10px rgba(201,43,88,0.06)",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden",
-      transition: "box-shadow .2s, transform .15s",
-    }}
-    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 6px 20px rgba(201,43,88,0.13)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 2px 10px rgba(201,43,88,0.06)"; e.currentTarget.style.transform = "none"; }}
-  >
-    {/* ── Card Header ── */}
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "16px 16px 10px" }}>
-      <div style={{
-        width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-        backgroundColor: "#FDEAF0", border: "1px solid #F5C6D8",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <Icon icon="ph:wrench-bold" width={20} color="#C92B58" />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: "#481020", lineHeight: 1.3, margin: 0 }}>{item.name}</p>
-        <p style={{ fontSize: 11, color: "#C92B58", opacity: 0.6, marginTop: 2, fontWeight: 500 }}>{item.code} • {item.type}</p>
-      </div>
-      <Badge status={item.status} />
-    </div>
+// ─── MODAL SETUJUI ────────────────────────────────────────────────────────────
+const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
+  if (!item) return null;
+  const isAlat = item.id_alat !== null;
+  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
 
-    {/* ── User Section ── */}
-    <div style={{ backgroundColor: "#FFF5F7", margin: "0 12px 12px", borderRadius: 12, padding: "10px 12px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <Icon icon="ph:user-circle-fill" width={15} color="#C92B58" />
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#481020" }}>{item.user}</span>
-        <span style={{
-          marginLeft: "auto", fontSize: 10, fontWeight: 700,
-          backgroundColor: "#FDEAF0", color: "#C92B58",
-          border: "1px solid #F5C6D8", padding: "2px 8px", borderRadius: 999,
-        }}>{item.role}</span>
+  return (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(72,16,32,0.45)] backdrop-blur-sm animate-fadeIn"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-slideUp"
+      >
+        {/* Header */}
+        <div className="relative bg-gradient-to-br from-green-600 to-green-700 px-7 pt-6 pb-5">
+          <button
+            onClick={onClose}
+            className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full flex items-center justify-center text-white bg-white/20 hover:bg-white/35 transition-colors border-none cursor-pointer"
+          >
+            <Icon icon="ph:x-bold" width={14} />
+          </button>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <Icon icon="ph:check-circle-fill" width={28} color="white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-extrabold text-white leading-tight m-0">Konfirmasi Persetujuan</h2>
+              <p className="text-xs text-white/75 mt-1 font-medium">Tindakan ini tidak dapat dibatalkan</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-7 pt-6 pb-2">
+          <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+            Apakah Anda yakin ingin <strong className="text-green-600">menyetujui</strong> peminjaman berikut?
+          </p>
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
+            <div className="flex items-center gap-2.5 mb-3">
+              <Icon icon={isAlat ? "ph:wrench-bold" : "material-symbols:meeting-room-outline-rounded"} width={16} className="text-green-600" />
+              <span className="text-sm font-bold text-green-900">{namaItem}</span>
+              <span className="ml-auto text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
+                {isAlat ? "Peralatan" : "Ruangan"}
+              </span>
+            </div>
+            {[
+              { icon: "ph:user-circle-fill", text: `${item.peminjam} (${item.role_peminjam})` },
+              { icon: "ph:calendar-blank",   text: new Date(item.hari_tanggal).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
+              { icon: "ph:clock",            text: `${item.jam_mulai?.slice(0,5)} s/d ${item.jam_selesai?.slice(0,5)}` },
+              { icon: "ph:note-pencil",      text: item.nama_kegiatan },
+            ].map(({ icon, text }) => (
+              <div key={icon} className="flex items-start gap-2 mb-1.5">
+                <Icon icon={icon} width={12} className="text-green-500 opacity-70 flex-shrink-0 mt-0.5" />
+                <span className="text-[11px] text-gray-500 leading-relaxed">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-2.5 px-7 py-5">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-500 text-sm font-bold cursor-pointer hover:border-gray-400 hover:text-gray-700 transition-all"
+          >
+            Batal
+          </button>
+          <button
+            onClick={() => onConfirm(item)}
+            disabled={loading}
+            className={`flex-[2] py-2.5 rounded-xl border-none text-white text-sm font-bold flex items-center justify-center gap-2 transition-opacity shadow-lg shadow-green-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-br from-green-600 to-green-700 cursor-pointer hover:opacity-90"}`}
+          >
+            {loading
+              ? <><Icon icon="mdi:loading" width={15} className="animate-spin" /> Memproses...</>
+              : <><Icon icon="ph:check-circle-fill" width={15} /> Ya, Setujui</>
+            }
+          </button>
+        </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 12px" }}>
+    </div>
+  );
+};
+
+// ─── MODAL TOLAK ──────────────────────────────────────────────────────────────
+const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
+  if (!item) return null;
+  const isAlat = item.id_alat !== null;
+  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
+
+  return (
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(72,16,32,0.45)] backdrop-blur-sm animate-fadeIn"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-slideUp"
+      >
+        {/* Header */}
+        <div className="relative bg-gradient-to-br from-red-600 to-red-700 px-7 pt-6 pb-5">
+          <button
+            onClick={onClose}
+            className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full flex items-center justify-center text-white bg-white/20 hover:bg-white/35 transition-colors border-none cursor-pointer"
+          >
+            <Icon icon="ph:x-bold" width={14} />
+          </button>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <Icon icon="ph:x-circle-fill" width={28} color="white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-extrabold text-white leading-tight m-0">Konfirmasi Penolakan</h2>
+              <p className="text-xs text-white/75 mt-1 font-medium">Tindakan ini tidak dapat dibatalkan</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-7 pt-6 pb-2">
+          <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+            Anda akan <strong className="text-red-600">menolak</strong> peminjaman berikut:
+          </p>
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+            <div className="flex items-center gap-2.5 mb-3">
+              <Icon icon={isAlat ? "ph:wrench-bold" : "material-symbols:meeting-room-outline-rounded"} width={16} className="text-red-600" />
+              <span className="text-sm font-bold text-red-900">{namaItem}</span>
+              <span className="ml-auto text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 rounded-full">
+                {isAlat ? "Peralatan" : "Ruangan"}
+              </span>
+            </div>
+            {[
+              { icon: "ph:user-circle-fill", text: `${item.peminjam} (${item.role_peminjam})` },
+              { icon: "ph:calendar-blank",   text: new Date(item.hari_tanggal).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
+              { icon: "ph:clock",            text: `${item.jam_mulai?.slice(0,5)} s/d ${item.jam_selesai?.slice(0,5)}` },
+              { icon: "ph:note-pencil",      text: item.nama_kegiatan },
+            ].map(({ icon, text }) => (
+              <div key={icon} className="flex items-start gap-2 mb-1.5">
+                <Icon icon={icon} width={12} className="text-red-400 opacity-70 flex-shrink-0 mt-0.5" />
+                <span className="text-[11px] text-gray-500 leading-relaxed">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-2.5 px-7 py-5">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-500 text-sm font-bold cursor-pointer hover:border-gray-400 hover:text-gray-700 transition-all"
+          >
+            Batal
+          </button>
+          <button
+            onClick={() => onConfirm(item)}
+            disabled={loading}
+            className={`flex-[2] py-2.5 rounded-xl border-none text-white text-sm font-bold flex items-center justify-center gap-2 transition-opacity shadow-lg shadow-red-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-br from-red-600 to-red-700 cursor-pointer hover:opacity-90"}`}
+          >
+            {loading
+              ? <><Icon icon="mdi:loading" width={15} className="animate-spin" /> Memproses...</>
+              : <><Icon icon="ph:x-circle-fill" width={15} /> Ya, Tolak</>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── LOAN CARD ───────────────────────────────────────────────────────────────
+const LoanCard = ({ item, onApprove, onReject }) => {
+  const isAlat = item.id_alat !== null;
+  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
+  const kodeItem = isAlat ? item.kode_alat : item.kode_ruangan;
+  const tipeItem = isAlat ? "Peralatan" : "Ruangan";
+
+  const formatTanggal = (iso) => {
+    if (!iso) return "-";
+    return new Date(iso).toLocaleDateString("id-ID", {
+      weekday: "long", day: "numeric", month: "long", year: "numeric",
+    });
+  };
+  const formatJam = (jam) => jam?.slice(0, 5) ?? "-";
+
+  return (
+    <div className="bg-white border border-[#F0D0DA] rounded-[18px] shadow-sm flex flex-col overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+
+      {/* Header */}
+      <div className="flex items-start gap-3 px-4 pt-4 pb-2.5">
+        <div className="w-10 h-10 rounded-xl flex-shrink-0 bg-[#FDEAF0] border border-[#F5C6D8] flex items-center justify-center">
+          <Icon icon={isAlat ? "ph:wrench-bold" : "material-symbols:meeting-room-outline-rounded"} width={20} color="#C92B58" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-bold text-[#481020] leading-tight m-0">{namaItem}</p>
+          <p className="text-[11px] text-[#C92B58] opacity-60 mt-0.5 font-medium">{kodeItem} • {tipeItem}</p>
+        </div>
+        <Badge status={item.status_persetujuan} />
+      </div>
+
+      {/* User Section */}
+      <div className="bg-[#FFF5F7] mx-3 mb-3 rounded-xl px-3 py-2.5">
+        <div className="flex items-center gap-2 mb-2">
+          <Icon icon="ph:user-circle-fill" width={15} color="#C92B58" />
+          <span className="text-xs font-bold text-[#481020]">{item.peminjam}</span>
+          <span className="ml-auto text-[10px] font-bold bg-[#FDEAF0] text-[#C92B58] border border-[#F5C6D8] px-2 py-0.5 rounded-full">
+            {item.role_peminjam}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+          {[
+            { icon: "ph:envelope", text: item.email_peminjam },
+            { icon: "ph:phone",    text: item.nomor_telephone_peminjam },
+            { icon: "ph:user",     text: `PIC: ${item.pic ?? "-"}` },
+          ].map(({ icon, text }) => (
+            <div key={icon + text} className="flex items-center gap-1.5 overflow-hidden">
+              <Icon icon={icon} width={10} color="#C92B58" className="opacity-70 flex-shrink-0" />
+              <span className="text-[10px] text-gray-500 truncate">{text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Info Rows */}
+      <div className="px-4 pb-1">
         {[
-          { icon: "ph:identification-card", text: item.nim },
-          { icon: "ph:envelope",            text: item.email },
-          { icon: "ph:phone",               text: item.phone },
-          { icon: "ph:buildings",           text: item.dept },
-        ].map(({ icon, text }) => (
-          <div key={icon} style={{ display: "flex", alignItems: "center", gap: 5, overflow: "hidden" }}>
-            <Icon icon={icon} width={10} color="#C92B58" style={{ opacity: 0.7, flexShrink: 0 }} />
-            <span style={{ fontSize: 10, color: "#777", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{text}</span>
+          { icon: "ph:calendar-blank", label: "Hari/Tanggal", value: formatTanggal(item.hari_tanggal) },
+          { icon: "ph:clock",          label: "Waktu",        value: `${formatJam(item.jam_mulai)} s/d ${formatJam(item.jam_selesai)}` },
+          { icon: "ph:tag",            label: "Jenis",        value: item.jenis_kegiatan },
+          { icon: "ph:note-pencil",    label: "Kegiatan",     value: item.nama_kegiatan?.length > 80 ? item.nama_kegiatan.slice(0, 80) + "…" : item.nama_kegiatan },
+        ].map(({ icon, label, value }) => (
+          <div key={label} className="flex gap-2 items-start mb-1.5">
+            <Icon icon={icon} width={13} color="#C92B58" className="opacity-70 flex-shrink-0 mt-0.5" />
+            <span className="text-[10px] text-gray-300 min-w-[70px] flex-shrink-0 font-medium">{label}</span>
+            <span className="text-[10px] text-gray-500 font-medium leading-snug">: {value}</span>
           </div>
         ))}
       </div>
+
+      <hr className="border-0 border-t border-[#F5E0E8] mx-4 my-2" />
+
+      {/* Actions */}
+      <div className="flex items-center gap-2 px-4 pb-4">
+        <button
+          onClick={() => onApprove(item)}
+          className="flex items-center gap-1.5 bg-green-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full border-none cursor-pointer shadow-sm shadow-green-200 hover:opacity-85 transition-opacity"
+        >
+          <Icon icon="ph:check-circle-fill" width={13} color="white" />
+          Setujui
+        </button>
+
+        <button
+          onClick={() => onReject(item)}
+          className="flex items-center gap-1.5 bg-red-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full border-none cursor-pointer shadow-sm shadow-red-200 hover:opacity-85 transition-opacity"
+        >
+          <Icon icon="ph:x-circle-fill" width={13} color="white" />
+          Tolak
+        </button>
+
+        <button className="ml-auto bg-transparent text-gray-400 text-[11px] font-semibold px-4 py-1.5 rounded-full border border-gray-200 cursor-pointer hover:border-[#C92B58] hover:text-[#C92B58] transition-all">
+          Detail
+        </button>
+      </div>
     </div>
-
-    {/* ── Info Rows ── */}
-    <div style={{ padding: "0 16px 4px" }}>
-      {[
-        { icon: "ph:calendar-blank", label: "Hari/Tanggal", value: item.date },
-        { icon: "ph:clock",          label: "Waktu",        value: item.time },
-        { icon: "ph:note-pencil",    label: "Kegiatan",     value: item.activity.length > 80 ? item.activity.slice(0, 80) + "…" : item.activity },
-      ].map(({ icon, label, value }) => (
-        <div key={label} style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5 }}>
-          <Icon icon={icon} width={13} color="#C92B58" style={{ opacity: 0.7, flexShrink: 0, marginTop: 1 }} />
-          <span style={{ fontSize: 10, color: "#aaa", minWidth: 70, flexShrink: 0, fontWeight: 500 }}>{label}</span>
-          <span style={{ fontSize: 10, color: "#555", fontWeight: 500, lineHeight: 1.4 }}>: {value}</span>
-        </div>
-      ))}
-    </div>
-
-    {/* ── Divider ── */}
-    <hr style={{ border: "none", borderTop: "1.5px solid #F5E0E8", margin: "8px 16px 12px" }} />
-
-    {/* ── Actions ── sesuai referensi: pill hijau Setujui + pill merah Tolak + kanan Detail */}
-    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 16px 16px" }}>
-      <button
-        onClick={() => onApprove(item.id)}
-        style={{
-          display: "flex", alignItems: "center", gap: 5,
-          backgroundColor: "#16A34A", color: "#fff",
-          fontSize: 11, fontWeight: 700,
-          padding: "7px 16px", borderRadius: 999, border: "none",
-          cursor: "pointer", fontFamily: "inherit",
-          boxShadow: "0 1px 4px rgba(22,163,74,0.3)",
-          transition: "opacity .15s",
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
-        onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
-      >
-        <Icon icon="ph:check-circle-fill" width={13} color="#fff" />
-        Setujui
-      </button>
-
-      <button
-        onClick={() => onReject(item.id)}
-        style={{
-          display: "flex", alignItems: "center", gap: 5,
-          backgroundColor: "#DC2626", color: "#fff",
-          fontSize: 11, fontWeight: 700,
-          padding: "7px 16px", borderRadius: 999, border: "none",
-          cursor: "pointer", fontFamily: "inherit",
-          boxShadow: "0 1px 4px rgba(220,38,38,0.3)",
-          transition: "opacity .15s",
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
-        onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
-      >
-        <Icon icon="ph:x-circle-fill" width={13} color="#fff" />
-        Tolak
-      </button>
-
-      <button
-        style={{
-          marginLeft: "auto",
-          backgroundColor: "transparent",
-          color: "#999", fontSize: 11, fontWeight: 600,
-          padding: "6px 16px", borderRadius: 999,
-          border: "1.5px solid #E5E7EB",
-          cursor: "pointer", fontFamily: "inherit",
-          transition: "all .15s",
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#C92B58"; e.currentTarget.style.color = "#C92B58"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E5E7EB"; e.currentTarget.style.color = "#999"; }}
-      >
-        Detail
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 // ─── PAGINATION ──────────────────────────────────────────────────────────────
 const Pagination = ({ current, total, onChange }) => {
@@ -254,41 +304,28 @@ const Pagination = ({ current, total, onChange }) => {
 
   if (total <= 1) return null;
 
-  const navStyle = {
-    width: 36, height: 36, borderRadius: 8, border: "none", cursor: "pointer",
-    backgroundColor: "#FDEAF0", color: "#481020", fontWeight: 700, fontSize: 14,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontFamily: "inherit", transition: "all .15s",
-  };
-
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flexWrap: "wrap", marginTop: 32 }}>
-      <button style={navStyle} onClick={() => onChange(1)}>«</button>
-      <button style={navStyle} onClick={() => onChange(Math.max(1, current - 1))}>‹</button>
+    <div className="flex items-center justify-center gap-1.5 flex-wrap mt-8">
+      <button onClick={() => onChange(1)} className="w-9 h-9 rounded-lg bg-[#FDEAF0] text-[#481020] font-bold text-sm border-none cursor-pointer hover:bg-[#F5C6D8] transition-colors">«</button>
+      <button onClick={() => onChange(Math.max(1, current - 1))} className="w-9 h-9 rounded-lg bg-[#FDEAF0] text-[#481020] font-bold text-sm border-none cursor-pointer hover:bg-[#F5C6D8] transition-colors">‹</button>
 
       {pages.map((p, i) =>
         p === "…" ? (
-          <span key={i} style={{ color: "#aaa", fontSize: 14, padding: "0 4px" }}>…</span>
+          <span key={i} className="text-gray-400 text-sm px-1">…</span>
         ) : (
           <button
             key={p}
             onClick={() => onChange(p)}
-            style={{
-              width: 36, height: 36, borderRadius: "50%", border: "none", cursor: "pointer",
-              backgroundColor: p === current ? "#481020" : "transparent",
-              color: p === current ? "#fff" : "#666",
-              fontWeight: 700, fontSize: 14, fontFamily: "inherit",
-              transition: "all .15s",
-            }}
+            className={`w-9 h-9 rounded-full font-bold text-sm border-none cursor-pointer transition-all ${p === current ? "bg-[#481020] text-white" : "bg-transparent text-gray-500 hover:bg-gray-100"}`}
           >{p}</button>
         )
       )}
 
-      <button style={navStyle} onClick={() => onChange(Math.min(total, current + 1))}>›</button>
-      <button style={navStyle} onClick={() => onChange(total)}>»</button>
+      <button onClick={() => onChange(Math.min(total, current + 1))} className="w-9 h-9 rounded-lg bg-[#FDEAF0] text-[#481020] font-bold text-sm border-none cursor-pointer hover:bg-[#F5C6D8] transition-colors">›</button>
+      <button onClick={() => onChange(total)} className="w-9 h-9 rounded-lg bg-[#FDEAF0] text-[#481020] font-bold text-sm border-none cursor-pointer hover:bg-[#F5C6D8] transition-colors">»</button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
-        <span style={{ fontSize: 13, color: "#777", fontWeight: 600 }}>Go To</span>
+      <div className="flex items-center gap-2 ml-2">
+        <span className="text-[13px] text-gray-500 font-semibold">Go To</span>
         <input
           type="number" min={1} max={total}
           value={gotoVal}
@@ -300,13 +337,9 @@ const Pagination = ({ current, total, onChange }) => {
             }
           }}
           placeholder="#"
-          style={{
-            width: 56, textAlign: "center", padding: "6px 8px",
-            border: "1.5px solid #E5E7EB", borderRadius: 8,
-            fontSize: 13, fontWeight: 600, outline: "none", fontFamily: "inherit",
-          }}
+          className="w-14 text-center px-2 py-1.5 border border-gray-200 rounded-lg text-sm font-semibold outline-none"
         />
-        <span style={{ fontSize: 13, color: "#777", fontWeight: 600 }}>Page</span>
+        <span className="text-[13px] text-gray-500 font-semibold">Page</span>
       </div>
     </div>
   );
@@ -314,23 +347,44 @@ const Pagination = ({ current, total, onChange }) => {
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
 const PersetujuanPeminjaman = () => {
-  const [data, setData]                 = useState(LOAN_DATA);
-  const [statType, setStatType]         = useState("alat");
-  const [filterType, setFilterType]     = useState("alat");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [waktuFilter, setWaktuFilter]   = useState("");
-  const [search, setSearch]             = useState("");
-  const [page, setPage]                 = useState(1);
+  const [data, setData]                   = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [filterType, setFilterType]       = useState("alat");
+  const [statusFilter, setStatusFilter]   = useState("");
+  const [search, setSearch]               = useState("");
+  const [page, setPage]                   = useState(1);
 
-  const stats = STAT_DATA[statType];
+  const [modalSetujui, setModalSetujui]   = useState(null);
+  const [modalTolak, setModalTolak]       = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    axiosClient.get("/list-persetujuan")
+      .then(({ data: res }) => setData(res.persetujuan_list ?? []))
+      .catch((err) => console.error("Gagal memuat data persetujuan:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const stats = useMemo(() => {
+    const scope = filterType === "ruangan"
+      ? data.filter((d) => d.id_ruangan !== null)
+      : data.filter((d) => d.id_alat !== null);
+    return {
+      approved: scope.filter((d) => d.status_persetujuan === "disetujui").length,
+      waiting:  scope.filter((d) => d.status_persetujuan === "menunggu").length,
+      rejected: scope.filter((d) => d.status_persetujuan === "ditolak").length,
+    };
+  }, [data, filterType]);
 
   const filtered = useMemo(() => {
     return data.filter((d) => {
-      const matchType   = filterType === "ruangan" ? d.type === "Ruangan" : d.type !== "Ruangan";
-      const matchStatus = !statusFilter || d.status === statusFilter;
+      const isRuangan   = d.id_ruangan !== null;
+      const matchType   = filterType === "ruangan" ? isRuangan : !isRuangan;
+      const matchStatus = !statusFilter || d.status_persetujuan === statusFilter.toLowerCase();
       const matchSearch = !search
-        || d.name.toLowerCase().includes(search.toLowerCase())
-        || d.user.toLowerCase().includes(search.toLowerCase());
+        || (d.nama_ruangan ?? d.kode_alat ?? "").toLowerCase().includes(search.toLowerCase())
+        || (d.peminjam ?? "").toLowerCase().includes(search.toLowerCase());
       return matchType && matchStatus && matchSearch;
     });
   }, [data, filterType, statusFilter, search]);
@@ -338,181 +392,160 @@ const PersetujuanPeminjaman = () => {
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const pageData   = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-  const handleApprove    = (id) => setData((prev) => prev.map((d) => d.id === id ? { ...d, status: "Disetujui" } : d));
-  const handleReject     = (id) => setData((prev) => prev.map((d) => d.id === id ? { ...d, status: "Ditolak"   } : d));
-  const handlePage       = (n)  => { setPage(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const handleFilterType = (t)  => { setFilterType(t); setPage(1); };
-  const handleStatType   = (t)  => setStatType(t);
+  const handleConfirmApprove = (item) => {
+    setActionLoading(true);
+    axiosClient.post(`/persetujuan-setujui/${item.id_persetujuan}`)
+      .then(() => {
+        setData((prev) => prev.map((d) =>
+          d.id_persetujuan === item.id_persetujuan ? { ...d, status_persetujuan: "disetujui" } : d
+        ));
+        setModalSetujui(null);
+      })
+      .catch((err) => console.error("Gagal menyetujui:", err))
+      .finally(() => setActionLoading(false));
+  };
+
+  const handleConfirmReject = (item) => {
+    setActionLoading(true);
+    axiosClient.post(`/persetujuan-tolak/${item.id_persetujuan}`)
+      .then(() => {
+        setData((prev) => prev.map((d) =>
+          d.id_persetujuan === item.id_persetujuan ? { ...d, status_persetujuan: "ditolak" } : d
+        ));
+        setModalTolak(null);
+      })
+      .catch((err) => console.error("Gagal menolak:", err))
+      .finally(() => setActionLoading(false));
+  };
+
+  const handlePage       = (n) => { setPage(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const handleFilterType = (t) => { setFilterType(t); setPage(1); };
 
   return (
-    <div
-      style={{ background: "linear-gradient(180deg, #FFF6F1 0%, #FFD1D1 100%)", minHeight: "100vh", display: "flex" }}
-      className="font-poppins"
-    >
-      <Sidebar />
+    <>
+      <style>{`
+        @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideUp { from { transform: translateY(24px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+        .animate-fadeIn  { animation: fadeIn  .18s ease; }
+        .animate-slideUp { animation: slideUp .22s cubic-bezier(.34,1.56,.64,1); }
+      `}</style>
 
-      <div style={{ marginLeft: 300, flex: 1, padding: 50 }}>
+      <div className="min-h-screen flex bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] font-poppins">
+        <Sidebar />
 
-        {/* ── Header ── */}
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 36, fontWeight: 800, color: "#481020", margin: 0 }}>Halaman Peminjaman</h1>
-          <p style={{ fontSize: 18, color: "#888", marginTop: 4 }}>Pantau dan setujui seluruh peminjaman alat atau ruangan</p>
-        </div>
+        <div className="md:p-[50px] p-4 lg:ml-[300px] flex-1 lg:p-12">
 
-        {/* ── Stat Card ── */}
-        <div style={{
-          backgroundColor: "#FFFFFF",
-          border: "1.5px solid #F0C0D0",      /* border pink-merah sesuai referensi */
-          borderRadius: 20,
-          boxShadow: "0 2px 16px rgba(201,43,88,0.09)",
-          padding: "24px 28px",
-          marginBottom: 28,
-        }}>
-          {/* Title + Toggle */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#C92B58", margin: 0, letterSpacing: 0.5 }}>
-              DATA PERSETUJUAN TERKINI
-            </h3>
-            {/* Toggle pill ALAT | RUANGAN */}
-            <div style={{ display: "flex", border: "2px solid #C92B58", borderRadius: 999, overflow: "hidden" }}>
-              {["alat", "ruangan"].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleStatType(t)}
-                  style={{
-                    backgroundColor: statType === t ? "#C92B58" : "transparent",
-                    color: statType === t ? "#fff" : "#C92B58",
-                    padding: "6px 20px", fontSize: 12, fontWeight: 700,
-                    border: "none", cursor: "pointer", textTransform: "uppercase",
-                    fontFamily: "inherit", transition: "all .2s",
-                  }}
-                >{t}</button>
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-extrabold text-[#481020] m-0">Halaman Peminjaman</h1>
+            <p className="text-lg text-gray-400 mt-1">Pantau dan setujui seluruh peminjaman alat atau ruangan</p>
+          </div>
+
+          {/* Stat Card */}
+          <div className="bg-white border border-[#F0C0D0] rounded-2xl shadow-sm p-7 mb-7">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-sm font-bold text-[#C92B58] m-0 tracking-wide">DATA PERSETUJUAN TERKINI</h3>
+              <div className="flex border-2 border-[#C92B58] rounded-full overflow-hidden">
+                {["alat", "ruangan"].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => handleFilterType(t)}
+                    className={`px-5 py-1.5 text-xs font-bold uppercase border-none cursor-pointer transition-all ${filterType === t ? "bg-[#C92B58] text-white" : "bg-transparent text-[#C92B58] hover:bg-[#FDEAF0]"}`}
+                  >{t}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3">
+              {[
+                { key: "approved", label: "Telah Disetujui",    icon: "material-symbols:verified-rounded", gradient: "from-[#7FDA0F] to-[#437408]", labelColor: "text-[#3C5900]", iconColor: "#7FDA0F" },
+                { key: "waiting",  label: "Menunggu Disetujui", icon: "subway:time-1",                     gradient: "from-[#FBCE3A] to-[#C2A33E]", labelColor: "text-[#7B651C]", iconColor: "#FBCE3A" },
+                { key: "rejected", label: "Telah Ditolak",      icon: "solar:list-cross-outline",          gradient: "from-[#F71519] to-[#AD0F12]", labelColor: "text-[#86090A]", iconColor: "#F71519" },
+              ].map(({ key, label, icon, gradient, labelColor, iconColor }, idx) => (
+                <div key={key} className={`flex flex-col items-center px-4 py-2 relative ${idx < 2 ? "border-r border-[#F0D0DA]" : ""}`}>
+                  <div className="absolute top-1 right-4 opacity-15 pointer-events-none">
+                    <Icon icon={icon} width={72} color={iconColor} />
+                  </div>
+                  <span className={`text-[72px] font-black leading-none bg-gradient-to-b ${gradient} bg-clip-text text-transparent`}>
+                    {loading ? "–" : stats[key]}
+                  </span>
+                  <span className={`text-[13px] italic font-semibold mt-1 ${labelColor}`}>{label}</span>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Numbers row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>
-            {[
-              { key: "approved", label: "Telah Disetujui",    icon: "material-symbols:verified-rounded", from: "#7FDA0F", to: "#437408", labelColor: "#3C5900" },
-              { key: "waiting",  label: "Menunggu Disetujui", icon: "subway:time-1",                     from: "#FBCE3A", to: "#C2A33E", labelColor: "#7B651C"},
-              { key: "rejected", label: "Telah Ditolak",      icon: "solar:list-cross-outline",          from: "#F71519", to: "#AD0F12", labelColor: "#86090A" },
-            ].map(({ key, label, icon, from, to, labelColor }, idx) => (
-              <div
-                key={key}
-                style={{
-                  display: "flex", flexDirection: "column", alignItems: "center",
-                  padding: "8px 16px", position: "relative",
-                  borderRight: idx < 2 ? "1.5px solid #F0D0DA" : "none",
-                }}
-              >
-                <div style={{ position: "absolute", top: 4, right: 16, opacity: 0.15, pointerEvents: "none" }}>
-                  <Icon icon={icon} width={72} color={from} />
-                </div>
-                <span style={{
-                  fontSize: 72, fontWeight: 900, lineHeight: 1, fontFamily: "inherit",
-                  background: `linear-gradient(180deg, ${from} 0%, ${to} 100%)`,
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                }}>
-                  {stats[key]}
-                </span>
-                <span style={{ fontSize: 13, fontStyle: "italic", fontWeight: 600, color: labelColor, marginTop: 4 }}>
-                  {label}
-                </span>
-              </div>
-            ))}
+          {/* Filter Bar */}
+          <div className="flex items-center gap-2.5 flex-wrap mb-5">
+            <div className="flex bg-[#6B1028] rounded-full p-[3px]">
+              {["alat", "ruangan"].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => handleFilterType(t)}
+                  className={`px-5 py-2 rounded-full text-[13px] font-bold uppercase border-none cursor-pointer transition-all ${filterType === t ? "bg-[#E9E9E9] text-[#701A32]" : "bg-transparent text-[#C8909A] hover:text-white"}`}
+                >{t}</button>
+              ))}
+            </div>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              className="appearance-none px-4 py-2 rounded-full border border-[#701A32] bg-[#701A32] text-[13px] font-semibold text-[#E9E9E9] cursor-pointer outline-none"
+            >
+              <option value="">Status ▾</option>
+              <option value="Menunggu">Menunggu</option>
+              <option value="Disetujui">Disetujui</option>
+              <option value="Ditolak">Ditolak</option>
+            </select>
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              placeholder="telusuri peralatan atau nama peminjam..."
+              className="flex-1 min-w-[180px] px-5 py-2 border-2 border-[#701A32] rounded-full text-[13px] text-gray-500 bg-white outline-none"
+            />
           </div>
+
+          {/* Cards Grid */}
+          {loading ? (
+            <div className="text-center py-16 text-[#C92B58] text-sm">
+              <Icon icon="mdi:loading" className="animate-spin inline mr-2" width={20} />
+              Memuat data...
+            </div>
+          ) : pageData.length === 0 ? (
+            <div className="text-center py-16 text-gray-400 text-sm">Tidak ada data ditemukan.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {pageData.map((item, idx) => (
+                <LoanCard
+                  key={idx}
+                  item={item}
+                  onApprove={(i) => setModalSetujui(i)}
+                  onReject={(i) => setModalTolak(i)}
+                />
+              ))}
+            </div>
+          )}
+
+          <Pagination current={page} total={totalPages} onChange={handlePage} />
         </div>
-
-        {/* ── Filter Bar ── */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-
-          {/* Alat / Ruangan toggle — dark pill sesuai referensi */}
-          <div style={{ display: "flex", backgroundColor: "#6B1028", borderRadius: 999, padding: 3 }}>
-            {["alat", "ruangan"].map((t) => (
-              <button
-                key={t}
-                onClick={() => handleFilterType(t)}
-                style={{
-                  backgroundColor: filterType === t ? "#E9E9E9" : "transparent",
-                  color: filterType === t ? "#701A32" : "#C8909A",
-                  padding: "8px 22px", borderRadius: 999, fontSize: 13, fontWeight: 700,
-                  border: "none", cursor: "pointer", textTransform: "uppercase",
-                  fontFamily: "inherit", transition: "all .2s",
-                }}
-              >{t}</button>
-            ))}
-          </div>
-
-          {/* Status dropdown */}
-          <select
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            style={{
-              appearance: "none", padding: "9px 18px", borderRadius: 999,
-              border: "1.5px solid #701A32", backgroundColor: "#701A32",
-              fontSize: 13, fontWeight: 600, color: "#E9E9E9", cursor: "pointer",
-              outline: "none", fontFamily: "inherit",
-            }}
-          >
-            <option value="">Status ▾</option>
-            <option value="Menunggu">Menunggu</option>
-            <option value="Disetujui">Disetujui</option>
-            <option value="Ditolak">Ditolak</option>
-          </select>
-
-          {/* Waktu dropdown */}
-          <select
-            value={waktuFilter}
-            onChange={(e) => setWaktuFilter(e.target.value)}
-            style={{
-              appearance: "none", padding: "9px 18px", borderRadius: 999,
-              border: "1.5px solid #701A32", backgroundColor: "#701A32",
-              fontSize: 13, fontWeight: 600, color: "#E9E9E9", cursor: "pointer",
-              outline: "none", fontFamily: "inherit",
-            }}
-          >
-            <option value="">Waktu ▾</option>
-            <option value="hari">Hari ini</option>
-            <option value="minggu">Minggu ini</option>
-            <option value="bulan">Bulan ini</option>
-          </select>
-
-          {/* Search */}
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="telusuri peralatan..."
-            style={{
-              flex: 1, minWidth: 180, padding: "9px 20px",
-              border: "2.5px solid #701A32", borderRadius: 999,
-              fontSize: 13, color: "#555", backgroundColor: "#fff",
-              outline: "none", fontFamily: "inherit",
-            }}
-            onFocus={(e) => e.target.style.borderColor = "#701A32"}
-            onBlur={(e) => e.target.style.borderColor = "#701A32"}
-          />
-        </div>
-
-        {/* ── Cards Grid ── */}
-        {pageData.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#aaa", fontSize: 15 }}>
-            Tidak ada data ditemukan.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {pageData.map((item) => (
-              <LoanCard key={item.id} item={item} onApprove={handleApprove} onReject={handleReject} />
-            ))}
-          </div>
-        )}
-
-        {/* ── Pagination ── */}
-        <Pagination current={page} total={totalPages} onChange={handlePage} />
-
       </div>
-    </div>
+
+      {/* Modals */}
+      <ModalSetujui
+        item={modalSetujui}
+        onClose={() => !actionLoading && setModalSetujui(null)}
+        onConfirm={handleConfirmApprove}
+        loading={actionLoading}
+      />
+      <ModalTolak
+        item={modalTolak}
+        onClose={() => !actionLoading && setModalTolak(null)}
+        onConfirm={handleConfirmReject}
+        loading={actionLoading}
+      />
+    </>
   );
 };
 

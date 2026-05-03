@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\{DB, Validator};
 use Carbon\Carbon;
 use App\Models\{Peminjaman, Persetujuan};
 use App\Http\Resources\PeminjamanResource;
+use App\Http\Resources\PersetujuanResource;
+use App\Http\Resources\ListPersetujuanResource;
 class PeminjamanController extends Controller
 {
     public function create(Request $request)
@@ -162,6 +164,67 @@ class PeminjamanController extends Controller
 
         return response()->json([
             'peminjaman' => PeminjamanResource::collection($peminjaman),
+        ]);
+    }
+    public function getPersetujuan()
+    {
+        $persetujuan = Persetujuan::where('nomor_induk_penyetuju', request()->user()->nomor_induk)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return response()->json([
+            'persetujuan' => $persetujuan,
+        ]);
+    }
+
+    public function getPersetujuanList()
+    {
+      $persetujuanList = Persetujuan::where('nomor_induk_penyetuju', request()->user()->nomor_induk)
+          ->latest()
+          ->get();
+
+        return response()->json([
+            'persetujuan_list' => ListPersetujuanResource::collection($persetujuanList),
+        ]);
+    }
+
+    public function setujuPeminjaman($id)
+    {
+        $persetujuan = Persetujuan::find($id);
+
+        if (!$persetujuan) {
+            return response()->json([
+                'message' => 'Persetujuan tidak ditemukan.',
+            ], 404);
+        }
+
+        $persetujuan->status_persetujuan = 'disetujui';
+        $persetujuan->updated_at = Carbon::now();
+        $persetujuan->save();
+
+        return response()->json([
+            'message' => 'Peminjaman disetujui.',
+            'persetujuan' => new PersetujuanResource($persetujuan),
+        ]);
+    }
+    public function tolakPeminjaman($id)
+    {
+        $persetujuan = Persetujuan::find($id);
+
+        if (!$persetujuan) {
+            return response()->json([
+                'message' => 'Persetujuan tidak ditemukan.',
+            ], 404);
+        }
+
+        $persetujuan->status_persetujuan = 'ditolak';
+        $persetujuan->updated_at = Carbon::now();
+        $persetujuan->save();
+
+        return response()->json([
+            'message' => 'Peminjaman ditolak.',
+            'persetujuan' => new PersetujuanResource($persetujuan),
         ]);
     }
 }

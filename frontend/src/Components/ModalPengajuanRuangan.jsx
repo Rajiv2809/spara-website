@@ -17,6 +17,22 @@ const Input = ({ label, name, type = "text", required = false, value, onChange }
   </div>
 );
 
+const Textarea = ({ label, name, required = false, value, onChange, placeholder = "" }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-[13px] font-medium text-[#3D0C1F]">
+      {label} {required && "*"}
+    </label>
+    <textarea
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      rows={3}
+      className="border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-[#C0254A] resize-none"
+    />
+  </div>
+);
+
 const Select = ({ label, name, options, required = false, value, onChange }) => (
   <div className="flex flex-col gap-1">
     <label className="text-[13px] font-medium text-[#3D0C1F]">
@@ -192,15 +208,16 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     jam_selesai: "",
     id_ruangan: "",
     nomor_induk_penanggungjawab: "",
+    keterangan: "",
   });
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, id_ruangan: ruangan?.id || "" }));
+    setForm((prev) => ({ ...prev, id_ruangan: ruangan?.id_ruangan || "" }));
   }, [ruangan]);
 
   useEffect(() => {
     if (!tanggalCek) return;
-    const ruanganId = ruangan?.id ?? ruangan?.kode;
+    const ruanganId = ruangan?.id_ruangan;
     if (!ruanganId) return;
 
     setIsLoadingJadwal(true);
@@ -244,6 +261,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
       jam_selesai: form.jam_selesai.slice(0, 5),
       id_ruangan: form.id_ruangan,
       nomor_induk_penanggungjawab: form.nomor_induk_penanggungjawab,
+      keterangan: form.keterangan || null,
     };
 
     setShowConfirm(false);
@@ -450,6 +468,16 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     required
                   />
                 </div>
+
+                <div className="mt-4">
+                  <Textarea
+                    label="Keterangan"
+                    name="keterangan"
+                    value={form.keterangan}
+                    onChange={handleChange}
+                    placeholder="Tuliskan keterangan tambahan jika diperlukan..."
+                  />
+                </div>
               </>
             )}
           </div>
@@ -490,10 +518,14 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
             </p>
             <div className="mt-4 bg-gray-50 rounded-xl p-4 text-left space-y-2 text-sm text-gray-600">
               <p><span className="font-medium">Ruangan:</span> {ruangan?.nama}</p>
+              <p><span className="font-medium">ID Ruangan:</span> {form.id_ruangan}</p>
               <p><span className="font-medium">Kegiatan:</span> {form.nama_kegiatan}</p>
               <p><span className="font-medium">Jenis:</span> {form.jenis_kegiatan}</p>
               <p><span className="font-medium">Tanggal:</span> {form.hari_tanggal}</p>
               <p><span className="font-medium">Jam:</span> {form.jam_mulai.slice(0, 5)} - {form.jam_selesai.slice(0, 5)}</p>
+              {form.keterangan && (
+                <p><span className="font-medium">Keterangan:</span> {form.keterangan}</p>
+              )}
             </div>
             <div className="flex gap-3 justify-center mt-6">
               <button

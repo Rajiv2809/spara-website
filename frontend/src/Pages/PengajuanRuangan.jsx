@@ -281,17 +281,18 @@ const PeminjamanRuangan = () => {
     axiosClient.get('/get-ruangan')
       .then(({ data }) => {
         const mapped = data.data.map((r) => ({
-          id        : r.id,   
-          kode      : r.kode_ruangan,
-          nama      : r.nama_ruangan,
-          gedung    : r.nama_gedung,
-          lantai    : `Lantai ${r.nomor_lantai}`,
-          kapasitas : r.kapasitas,
-          fasilitas : r.fasilitas.split(', '),
-          deskripsi : r.deskripsi_ruangan,
-          status    : r.status_ruangan.toUpperCase().replace('_', ' '),
-          path_foto : r.path_foto,
-          nama_pic  : r.nomor_induk_pic,
+          id         : r.id_ruangan,
+          id_ruangan : r.id_ruangan,  // ✅ Fix: tambah field id_ruangan agar ModalPengajuan bisa akses via ruangan?.id_ruangan
+          kode       : r.kode_ruangan,
+          nama       : r.nama_ruangan,
+          gedung     : r.nama_gedung,
+          lantai     : `Lantai ${r.nomor_lantai}`,
+          kapasitas  : r.kapasitas,
+          fasilitas  : r.fasilitas.split(', '),
+          deskripsi  : r.deskripsi_ruangan,
+          status     : r.status_ruangan.toUpperCase().replace('_', ' '),
+          path_foto  : r.path_foto,
+          nama_pic   : r.nomor_induk_pic,
         }));
 
         const gedungSet = [...new Set(mapped.map((r) => r.gedung))];

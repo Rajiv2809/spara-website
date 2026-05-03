@@ -36,11 +36,9 @@ class PeminjamanSeeder extends Seeder
 
                 $hariTanggal = Carbon::create(2026, 5, rand(1, 31))->toDateString();
 
-                // ✅ jam_mulai antara 07:00 - 16:00
                 $mulaiHour   = rand(7, 16);
                 $mulaiMinute = [0, 15, 30, 45][rand(0, 3)];
 
-                // ✅ jam_selesai = jam_mulai + 1-3 jam, max 20:00
                 $selesaiHour   = min($mulaiHour + rand(1, 3), 20);
                 $selesaiMinute = $mulaiMinute;
 
@@ -50,9 +48,9 @@ class PeminjamanSeeder extends Seeder
                 $statusList = ['menunggu', 'disetujui', 'ditolak'];
                 $status     = $statusList[rand(0, 2)];
 
-                $tipe      = rand(0, 2);
-                $idRuangan = in_array($tipe, [0, 2]) ? rand(1, 10) : null;
-                $idAlat    = in_array($tipe, [1, 2]) && !empty($alats)
+                $pinjamRuangan = rand(0, 1) === 0;
+                $idRuangan     = $pinjamRuangan ? rand(1, 10) : null;
+                $idAlat        = !$pinjamRuangan && !empty($alats)
                     ? $alats[rand(0, count($alats) - 1)]
                     : null;
 

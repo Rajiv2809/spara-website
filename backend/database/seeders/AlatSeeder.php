@@ -33,7 +33,7 @@ class AlatSeeder extends Seeder
                 'nama_alat'          => 'Microphone Wireless',
                 'deskripsi_alat'     => 'Mikrofon nirkabel untuk acara',
                 'status_alat'        => 'maintenance',
-                'nomor_induk_pic'    => null,
+                'nomor_induk_pic'    => $picNomorInduk,
                 'created_at'         => now(), 'updated_at' => now(),
             ],
             [

@@ -15,17 +15,15 @@ class PeminjamanResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id_peminjaman' => $this->id_peminjaman,
+            'id_peminjaman' => $this->peminjam->nama,
             'nama_kegiatan' => $this->nama_kegiatan,
             'jenis_kegiatan' => $this->jenis_kegiatan,
             'hari_tanggal' => $this->hari_tanggal,
             'jam_mulai' => $this->jam_mulai,
             'jam_selesai' => $this->jam_selesai,
-            'keterangan' => $this->keterangan,
             'id_alat' => $this->id_alat,
             'id_ruangan' => $this->ruangan->kode_ruangan ?? null, 
-            'pic' => $this->ruangan->pic?->user?->nama ?? null,
-            'nomor_induk_penanggungjawab' => $this->nomor_induk_penanggungjawab,
+            'pic' => $this->ruangan->pic?->user?->nama ?? $this->alat->pic->user?->nama ?? null,
             'status_persetujuan' => $this->status_persetujuan,
         ];
     }

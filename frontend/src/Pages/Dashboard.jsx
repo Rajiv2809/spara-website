@@ -1,17 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/sidebar";
-import logo2 from "./assets/logo2.png";
 import { Icon } from "@iconify/react";
+import axiosClient from "../axios"
+
 const Dashboard = () => {
+  const [peminjaman, setPeminjaman] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axiosClient.get("/peminjaman")
+      .then((res) => {
+        setPeminjaman(res.data.peminjaman || []);
+      })
+      .catch((err) => {
+        console.error("Gagal mengambil data peminjaman:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const totalMenunggu = peminjaman.filter(
+    (p) => p.status_persetujuan === "menunggu"
+  ).length;
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "disetujui":
+        return { bg: "bg-[#8BB166]", label: "DISETUJUI" };
+      case "ditolak":
+        return { bg: "bg-[#B16666]", label: "DITOLAK" };
+      default:
+        return { bg: "bg-[#999999]", label: "MENUNGGU" };
+    }
+  };
+
+  const formatTanggal = (tanggal) => {
+    return new Date(tanggal).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
-      {/* Sidebar */}
-      <Sidebar/>
-      <div className="min-w-[300px] min-h-screen  text-white flex flex-col px-3">
-        {/* Logo & Title */}
-        
-
-        {/* Main Content */}
+      <Sidebar />
+      <div className="min-w-[300px] min-h-screen text-white flex flex-col px-3">
         <div className="dasboard md:p-[50px] p-4 lg:ml-[300px]">
           <h1 className="text-[#481020] text-[36px] font-extrabold font-poppins">
             Halaman Dasbor
@@ -51,7 +86,7 @@ const Dashboard = () => {
               />
               <div className="relative z-10">
                 <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  TOTAL PERALATAN
+                  TOTAL RUANGAN
                 </h3>
                 <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
                   67
@@ -62,7 +97,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Card 3 */}
+            {/* Card 3 — dinamis dari data peminjaman */}
             <div className="bg-gradient-to-l relative h-[140px] from-[#FF3A72] to-[#C62E4D] p-4 rounded-2xl shadow">
               <Icon
                 icon="streamline-ultimate:task-list-approve-bold"
@@ -71,10 +106,10 @@ const Dashboard = () => {
               />
               <div className="relative z-10">
                 <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  TOTAL PERALATAN
+                  PERLU DISETUJUI
                 </h3>
                 <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
-                  4
+                  {loading ? "..." : totalMenunggu}
                 </h1>
                 <h1 className="text-[#EEEEEE] text-[14px] italic font-thin font-poppins text-end leading-none">
                   Menunggu Disetujui
@@ -98,109 +133,54 @@ const Dashboard = () => {
                   Beberapa peminjaman yang baru-baru ini diajukan
                 </h2>
 
-                <div className="custom-scroll bg-[#EEEEEE ] relative p-4 rounded-2xl mt-4 max-h-[324px] overflow-y-auto pr-3 space-y-3">
-                  {/* Item 1 */}
-                  <div className="flex items-start justify-between p-3 rounded-xl bg-[#ECDFE3] shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
-                        <Icon icon="la:tools" width="28" />
-                      </div>
+                <div className="custom-scroll bg-[#EEEEEE] relative p-4 rounded-2xl mt-4 max-h-[324px] overflow-y-auto pr-3 space-y-3">
+                  {loading ? (
+                    <p className="text-center text-[#999] py-8">Memuat data...</p>
+                  ) : peminjaman.length === 0 ? (
+                    <p className="text-center text-[#999] py-8">Belum ada peminjaman.</p>
+                  ) : (
+                    peminjaman.map((item, index) => {
+                      const { bg, label } = getStatusStyle(item.status_persetujuan);
+                      const isAlat = item.id_alat !== null;
 
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Drone Mavic 3 Pro
-                        </h4>
-                        <p className="text-[12px] text-[#606060]">
-                          PIC: Ahmad Saropi
-                        </p>
-                        <p className="text-[12px] text-[#606060] mt-2">
-                          Boneca Ambalabu - Mahasigma
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="bg-[#8BB166] text-white px-3 py-1 rounded-full text-xs font-semibold min-w-[90px] text-center">
-                      DISETUJUI
-                    </span>
-                  </div>
-
-                  {/* Item 2 */}
-                  <div className="flex items-start justify-between p-3 rounded-xl bg-[#ECDFE3] shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
-                        <Icon icon="la:tools" width="28" />
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Apple Iphone 14 Pro Max
-                        </h4>
-                        <p className="text-[12px] text-[#606060]">
-                          PIC: Ahmad Saropi
-                        </p>
-                        <p className="text-[12px] text-[#606060] mt-2">
-                          Boneca Ambalabu - Mahasigma
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="bg-[#B16666] text-white px-3 py-1 rounded-full text-xs font-semibold min-w-[90px] text-center">
-                      DITOLAK
-                    </span>
-                  </div>
-
-                  {/* Item 3 */}
-                  <div className="flex items-start justify-between p-3 rounded-xl bg-[#ECDFE3] shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
-                        <Icon icon="la:tools" width="28" />
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Apple Iphone 14 Pro Max
-                        </h4>
-                        <p className="text-[12px] text-[#606060]">
-                          PIC: Ahmad Saropi
-                        </p>
-                        <p className="text-[12px] text-[#606060] mt-2">
-                          Boneca Ambalabu - Mahasigma
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="bg-[#999999] text-white px-3 py-1 rounded-full text-xs font-semibold min-w-[90px] text-center">
-                      MENUNGGU
-                    </span>
-                  </div>
-
-                  {/* Item 4 */}
-                  <div className="flex items-start justify-between p-3 rounded-xl bg-[#ECDFE3] shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
-                        <Icon icon="la:tools" width="28" />
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Mini Theatre
-                        </h4>
-                        <p className="text-[12px] text-[#606060]">
-                          PIC: Ahmad Saropi
-                        </p>
-                        <p className="text-[12px] text-[#606060] mt-2">
-                          Boneca Ambalabu - Mahasigma
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="bg-[#B16666] text-white px-3 py-1 rounded-full text-xs font-semibold min-w-[90px] text-center">
-                      DITOLAK
-                    </span>
-                  </div>
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-start justify-between p-3 rounded-xl bg-[#ECDFE3] shadow-sm"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
+                              <Icon
+                                icon={isAlat ? "la:tools" : "material-symbols:meeting-room-outline-rounded"}
+                                width="28"
+                              />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-[#471020]">
+                                {item.id_alat ?? item.id_ruangan ?? "-"}
+                              </h4>
+                              <p className="text-[12px] text-[#606060]">
+                                PIC: {item.pic ?? "-"}
+                              </p>
+                              <p className="text-[12px] text-[#606060] mt-1">
+                                {item.nama_kegiatan}
+                              </p>
+                              <p className="text-[12px] text-[#606060]">
+                                {formatTanggal(item.hari_tanggal)} · {item.jam_mulai.slice(0, 5)} - {item.jam_selesai.slice(0, 5)}
+                              </p>
+                            </div>
+                          </div>
+                          <span className={`${bg} text-white px-3 py-1 rounded-full text-xs font-semibold min-w-[90px] text-center`}>
+                            {label}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
+
             {/* Aktivitas Terbaru */}
             <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl">
               <div className="relative z-10">
@@ -211,85 +191,48 @@ const Dashboard = () => {
                   Beberapa aktivitas terkini dalam sistem
                 </h1>
                 <div className="space-y-0">
-                  {/* Item 1 */}
-                  <div className="flex items-start justify-between p-3 bg-[#EEEEEE]">
-                    <div className="flex items-start gap-2">
-                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-                        </h4>
-
-                        <div className="flex items-center gap-[2px] mt-1">
-                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-                          <p className="text-[12px] text-[#A3A3A3]">
-                            12 jam lalu
-                          </p>
+                  {loading ? (
+                    <p className="text-center text-[#999] py-8">Memuat data...</p>
+                  ) : (
+                    peminjaman.slice(0, 5).map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start justify-between p-3 bg-[#EEEEEE]"
+                      >
+                        <div className="flex items-start gap-2">
+                          <Icon
+                            icon="zondicons:exclamation-outline"
+                            width="28"
+                            className={
+                              item.status_persetujuan === "disetujui"
+                                ? "text-[#4DB04A]"
+                                : item.status_persetujuan === "ditolak"
+                                ? "text-[#B16666]"
+                                : "text-[#999999]"
+                            }
+                          />
+                          <div>
+                            <h4 className="font-semibold text-[#471020]">
+                              Peminjaman {item.id_alat ?? item.id_ruangan ?? "-"}{" "}
+                              {item.status_persetujuan === "disetujui"
+                                ? "disetujui"
+                                : item.status_persetujuan === "ditolak"
+                                ? "ditolak"
+                                : "menunggu persetujuan"}
+                              {item.pic ? ` oleh ${item.pic}` : ""}
+                            </h4>
+                            <div className="flex items-center gap-[2px] mt-1">
+                              <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
+                              <p className="text-[12px] text-[#A3A3A3]">
+                                {formatTanggal(item.hari_tanggal)}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Item 2 */}
-                  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
-                    <div className="flex items-start gap-2">
-                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-                        </h4>
-
-                        <div className="flex items-center gap-[2px] mt-1">
-                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-                          <p className="text-[12px] text-[#A3A3A3]">
-                            12 jam lalu
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Item 3 */}
-                  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
-                    <div className="flex items-start gap-2">
-                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-                        </h4>
-
-                        <div className="flex items-center gap-[2px] mt-1">
-                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-                          <p className="text-[12px] text-[#A3A3A3]">
-                            12 jam lalu
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Item 4 */}
-                  <div className="-mt-1 flex items-start justify-between p-3 bg-[#EEEEEE]">
-                    <div className="flex items-start gap-2">
-                      <Icon icon="zondicons:exclamation-outline" width="28" className="text-[#4DB04A]" />
-
-                      <div>
-                        <h4 className="font-semibold text-[#471020]">
-                          Peminjaman Wacom Intuos Pro disetujui oleh Penanggung Jawab
-                        </h4>
-
-                        <div className="flex items-center gap-[2px] mt-1">
-                          <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-                          <p className="text-[12px] text-[#A3A3A3]">
-                            12 jam lalu
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    ))
+                  )}
                 </div>
-
               </div>
             </div>
           </div>

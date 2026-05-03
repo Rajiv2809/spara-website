@@ -22,4 +22,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
 
     Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
+
+    Route::get('/persetujuan', [PeminjamanController::class, 'getPersetujuan']);
+    Route::get('/list-persetujuan', [PeminjamanController::class, 'getPersetujuanList']);
+
+    Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
+    Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
 });
