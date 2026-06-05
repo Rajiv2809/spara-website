@@ -9,6 +9,7 @@ use App\Models\{Peminjaman, Persetujuan};
 use App\Http\Resources\PeminjamanResource;
 use App\Http\Resources\PersetujuanResource;
 use App\Http\Resources\ListPersetujuanResource;
+
 class PeminjamanController extends Controller
 {
     public function create(Request $request)
@@ -180,9 +181,9 @@ class PeminjamanController extends Controller
 
     public function getPersetujuanList()
     {
-      $persetujuanList = Persetujuan::where('nomor_induk_penyetuju', request()->user()->nomor_induk)
-          ->latest()
-          ->get();
+        $persetujuanList = Persetujuan::where('nomor_induk_penyetuju', request()->user()->nomor_induk)
+            ->latest()
+            ->get();
 
         return response()->json([
             'persetujuan_list' => ListPersetujuanResource::collection($persetujuanList),
@@ -225,6 +226,18 @@ class PeminjamanController extends Controller
         return response()->json([
             'message' => 'Peminjaman ditolak.',
             'persetujuan' => new PersetujuanResource($persetujuan),
+        ]);
+    }
+    public function riwayatPeminjaman()
+    {
+        $riwayat = Peminjaman::with('persetujuans')
+            ->where('id_peminjam', request()->user()->nomor_induk)
+            ->orderBy('dibuat_pada', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Riwayat peminjaman berhasil diambil.',
+            'data' => $riwayat,
         ]);
     }
 }

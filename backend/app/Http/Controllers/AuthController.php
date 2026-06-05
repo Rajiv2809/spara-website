@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,6 +48,12 @@ class AuthController extends Controller
         auth()->logout();
         return response()->json([
             'message' => 'Logout berhasil'
+        ],200);
+    }
+    public function test(){
+     
+        return response()->json([
+            'test' => 'berhasil test'
         ],200);
     }
 }

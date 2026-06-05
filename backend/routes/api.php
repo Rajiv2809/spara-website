@@ -10,6 +10,7 @@ use App\Http\Controllers\{AuthController, PeminjamanController, RuanganControlle
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('/test', [AuthController::class, 'test']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
