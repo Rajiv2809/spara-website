@@ -77,6 +77,17 @@ class UserSeeder extends Seeder
                 'role'        => 'mahasiswa',
                 'created_at'  => now(), 'updated_at' => now(),
             ],
+            // Kepala SBUM
+            [
+                'nomor_induk' => 10000002,
+                'nama'        => 'Kepala SBUM',
+                'email'       => 'kepala.sbum@kampus.ac.id',
+                'no_telepon'  => '081200000008',
+                'password'    => Hash::make('password'),
+                'role'        => 'kepala',
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ],
         ]);
     }
 }
