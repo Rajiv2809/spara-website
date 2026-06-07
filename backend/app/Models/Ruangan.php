@@ -21,6 +21,7 @@ class Ruangan extends Model
         'nomor_lantai',
         'id_gedung',
         'nomor_induk_pic',
+        'path_foto'
     ];
 
     public function lantai(): BelongsTo
