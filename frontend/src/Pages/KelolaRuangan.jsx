@@ -14,128 +14,164 @@ const initialRooms = [
     kapasitas: 30,
     fasilitas: "Proyektor, AC, Whiteboard, WiFi, TV LED",
     nomor_induk_pic: 22001,
-    pic: "Noper Ardi, S.T, M.Eng",
+    pic: "Noper Ardi, S.T., M.Eng",
     path_foto: "",
   },
   {
     id: 2,
     nama_ruangan: "Lab Motion Capture",
     kode_ruangan: "GU-607",
-    lokasi: "Gedung Utama - Lantai 3",
-    status: "tersedia",
+    id_gedung: "Gedung Utama",
+    nomor_lantai: "2",
+    status_ruangan: "tersedia",
     kapasitas: 20,
     fasilitas: "Motion Capture, PC, Green Screen",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22002,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 3,
-    nama: "Workspace Software Development",
-    kode: "GU-704",
-    lokasi: "Gedung Utama - Lantai 2",
-    status: "dipinjam",
+    nama_ruangan: "Workspace Software Development",
+    kode_ruangan: "GU-704",
+    id_gedung: "Gedung Utama",
+    nomor_lantai: "3",
+    status_ruangan: "dipinjam",
     kapasitas: 40,
     fasilitas: "32 PC, Proyektor, WiFi",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22001,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 4,
-    nama: "Cyber Physical Security Lab",
-    kode: "TA-X-3",
-    lokasi: "Gedung Utama - Lantai 4",
-    status: "perbaikan",
+    nama_ruangan: "Cyber Physical Security Lab",
+    kode_ruangan: "TA-X-3",
+    id_gedung: "Gedung Utama",
+    nomor_lantai: "4",
+    status_ruangan: "perbaikan",
     kapasitas: 25,
     fasilitas: "Server Rack, Firewall",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22001,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 5,
-    nama: "Workspace Cyber Forensic",
-    kode: "TA-XI-5A",
-    lokasi: "Gedung Utama - Lantai 4",
-    status: "tersedia",
+    nama_ruangan: "Workspace Cyber Forensic",
+    kode_ruangan: "TA-XI-5A",
+    id_gedung: "Tower A",
+    nomor_lantai: "11",
+    status_ruangan: "tersedia",
     kapasitas: 15,
     fasilitas: "PC Forensik, Write Blocker",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22002,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 6,
-    nama: "Lab Clay Modeling",
-    kode: "GT-L1-006",
-    lokasi: "Gedung Utama - Lantai 1",
-    status: "tersedia",
+    nama_ruangan: "Lab Clay Modeling",
+    kode_ruangan: "GT-L1-006",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "1",
+    status_ruangan: "tersedia",
     kapasitas: 20,
     fasilitas: "Oven Keramik, Meja Kerja",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22002,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 7,
-    nama: "Workspace Remote Sensing",
-    kode: "GT-L3-007",
-    lokasi: "Gedung Utama - Lantai 3",
-    status: "dipinjam",
+    nama_ruangan: "Workspace Remote Sensing",
+    kode_ruangan: "GT-L3-007",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "3",
+    status_ruangan: "dipinjam",
     kapasitas: 30,
     fasilitas: "Drone, GPS Tools",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22001,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 8,
-    nama: "Hydrographic Survey Lab",
-    kode: "GT-L1-008",
-    lokasi: "Gedung Technopreneur - Lantai 1",
-    status: "tersedia",
+    nama_ruangan: "Hydrographic Survey Lab",
+    kode_ruangan: "GT-L1-008",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "1",
+    status_ruangan: "tersedia",
     kapasitas: 18,
     fasilitas: "Sonar, Survey Tools",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22003,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 9,
-    nama: "Studio Podcast & Broadcasting",
-    kode: "GT-L3-009",
-    lokasi: "Gedung Technopreneur - Lantai 3",
-    status: "tersedia",
+    nama_ruangan: "Studio Podcast & Broadcasting",
+    kode_ruangan: "GT-L3-009",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "3",
+    status_ruangan: "tersedia",
     kapasitas: 8,
     fasilitas: "Mic, Kamera, Lighting",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22003,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 10,
-    nama: "Ruang Inkubator Startup",
-    kode: "GT-L4-010",
-    lokasi: "Gedung Technopreneur - Lantai 4",
-    status: "tersedia",
+    nama_ruangan: "Ruang Inkubator Startup",
+    kode_ruangan: "GT-L4-010",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "4",
+    status_ruangan: "tersedia",
     kapasitas: 35,
     fasilitas: "Sofa, Standing Desk",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22001,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 11,
-    nama: "Lab Augmented Reality",
-    kode: "GT-L2-011",
-    lokasi: "Gedung Technopreneur - Lantai 2",
-    status: "perbaikan",
+    nama_ruangan: "Lab Augmented Reality",
+    kode_ruangan: "GT-L2-011",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "2",
+    status_ruangan: "perbaikan",
     kapasitas: 22,
     fasilitas: "AR Headset, PC",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22003,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 12,
-    nama: "Workspace IoT Development",
-    kode: "GT-L1-012",
-    lokasi: "Gedung Technopreneur - Lantai 1",
-    status: "tersedia",
+    nama_ruangan: "Workspace IoT Development",
+    kode_ruangan: "GT-L1-012",
+    id_gedung: "Gedung Technopreneur",
+    nomor_lantai: "1",
+    status_ruangan: "tersedia",
     kapasitas: 28,
     fasilitas: "Arduino, Raspberry Pi",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22002,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
   {
     id: 13,
-    nama: "GDS Rempang Multimedia",
-    kode: "GU-L1-013",
-    lokasi: "Gedung Utama - Lantai 1",
-    status: "tersedia",
+    nama_ruangan: "GDS Rempang Multimedia",
+    kode_ruangan: "GU-L1-013",
+    id_gedung: "Gedung Utama",
+    nomor_lantai: "1",
+    status_ruangan: "tersedia",
     kapasitas: 50,
     fasilitas: "Sound System, TV LED",
-    pic: "Noper Ardi, S.T, M.Eng",
+    nomor_induk_pic: 22001,
+    pic: "Noper Ardi, S.T., M.Eng",
+    path_foto: "",
   },
 ];
 
@@ -158,18 +194,18 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
       {/* IMAGE */}
       <div className="relative rounded-xl overflow-hidden h-[200px]">
         <img
-          src={room.foto || gedung_utama}
+          src={room.path_foto || gedung_utama}
           className="w-full h-full object-cover"
         />
 
         <div
-          className={`absolute top-3 right-3 ${statusStyles[room.status]} text-white text-[11px] px-4 py-1 rounded-full font-semibold`}
+          className={`absolute top-3 right-3 ${statusStyles[room.status_ruangan]} text-white text-[11px] px-4 py-1 rounded-full font-semibold`}
         >
-          {statusText[room.status]}
+          {statusText[room.status_ruangan]}
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
-          <h2 className="font-bold text-[18px] leading-tight">{room.nama}</h2>
+          <h2 className="font-bold text-[18px] leading-tight">{room.nama_ruangan}</h2>
 
           <div className="flex items-center gap-1 text-[12px] opacity-90">
             <Icon icon="mdi:map-marker" width={14} />
@@ -188,7 +224,7 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
           <div className="flex gap-2 items-start">
             <Icon icon="mdi:account" className="text-pink-500 mt-[2px]" />
             <span>
-              <b>PIC</b> : {room.pic}
+              <b>PIC</b> : {room.pic} ({room.nomor_induk_pic}) {/* nanti disesuaiin lagi*/}
             </span>
           </div>
 
@@ -234,16 +270,25 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
 
 /* MODAL */
 const ModalRuangan = ({ onClose, onSave, editData }) => {
+
+  const picMap = {
+    22001: "Noper Ardi, S.T., M.Eng",
+    22002: "Budi Santoso",
+    22003: "Andi Wijaya",
+  };
+
   const [form, setForm] = useState(
     editData || {
       kode_ruangan: "",
-      nama: "",
-      lokasi: "",
+      nama_ruangan: "",
+      id_gedung: "Gedung Utama",
+      nomor_lantai: "",
       kapasitas: "",
       fasilitas: "",
-      status: "tersedia",
-      pic: "",
-      foto: null,
+      status_ruangan: "tersedia",
+      nomor_induk_pic: 22001,
+      pic: "Noper Ardi, S.T., M.Eng",
+      path_foto: null,
     },
   );
 
@@ -265,7 +310,7 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
 
         {/* BODY */}
         <div className="p-4 flex flex-col gap-3 overflow-y-auto">
-          <label classname="text-[12px] font-semibold">Kode Ruangan</label>
+          <label className="text-[12px] font-semibold">Kode Ruangan</label>
           <input
             name="kode_ruangan"
             value={form.kode_ruangan}
@@ -274,36 +319,61 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
           />
           <label className="text-[12px] font-semibold">Nama Ruangan:</label>
           <input
-            name="nama"
-            value={form.nama}
+            name="nama_ruangan"
+            value={form.nama_ruangan}
             onChange={handleChange}
             className="border p-2 rounded text-[12px]"
           />
-          <label className="text-[12px] font-semibold">Lokasi:</label>
+          <label className="text-[12px] font-semibold">Gedung</label>
+          <select
+            name="id_gedung"
+            value={form.id_gedung}
+            onChange={handleChange}
+            className="border p-2 rounded text-[12px]"
+          >
+            <option value="Gedung Utama">Gedung Utama</option>
+            <option value="Tower A">Tower A</option>
+            <option value="Gedung Technopreneur">Gedung Technopreneur</option>
+          </select>
+          <label className="text-[12px] font-semibold">Lantai</label>
           <input
-            name="lokasi"
-            value={form.lokasi}
+            type="number"
+            name="nomor_lantai"
+            value={form.nomor_lantai}
             onChange={handleChange}
             className="border p-2 rounded text-[12px]"
           />
           <label className="text-[12px] font-semibold">Kapasitas</label>
           <input
+            type="number"
             name="kapasitas"
             value={form.kapasitas}
             onChange={handleChange}
             className="border p-2 rounded text-[12px]"
           />
           <label className="text-[12px] font-semibold">PIC</label>
-          <input
-            name="pic"
-            value={form.pic}
-            onChange={handleChange}
+          <select
+            name="nomor_induk_pic"
+            value={form.nomor_induk_pic}
+            onChange={(e) => {
+              const nomorPIC = Number(e.target.value);
+
+              setForm({
+                ...form,
+                nomor_induk_pic: nomorPIC,
+                pic: picMap[nomorPIC],
+              });
+            }}
             className="border p-2 rounded text-[12px]"
-          />
+          >
+            <option value="22001">Noper Ardi, S.T., M.Eng</option>
+            <option value="22002">Budi Santoso</option>
+            <option value="22003">Andi Wijaya</option>
+          </select>
           <label className="text-[12px] font-semibold">Status</label>
           <select
-            name="status"
-            value={form.status}
+            name="status_ruangan"
+            value={form.status_ruangan}
             onChange={handleChange}
             className="border p-2 rounded text-[12px]"
           >
@@ -335,14 +405,14 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  foto: URL.createObjectURL(e.target.files[0]),
+                  path_foto: URL.createObjectURL(e.target.files[0]),
                 })
               }
               className="hidden"
             />{" "}
-            {form.foto && (
+            {form.path_foto && (
               <img
-                src={form.foto}
+                src={form.path_foto}
                 className="mt-2 h-20 rounded-lg object-cover"
               />
             )}
@@ -399,9 +469,9 @@ const KelolaRuangan = () => {
   };
 
   /* STATS */
-  const tersedia = rooms.filter((r) => r.status === "tersedia").length;
-  const dipinjam = rooms.filter((r) => r.status === "dipinjam").length;
-  const perbaikan = rooms.filter((r) => r.status === "perbaikan").length;
+  const tersedia = rooms.filter((r) => r.status_ruangan === "tersedia").length;
+  const dipinjam = rooms.filter((r) => r.status_ruangan === "dipinjam").length;
+  const perbaikan = rooms.filter((r) => r.status_ruangan === "perbaikan").length;
   const totalPages = Math.ceil(rooms.length / ITEMS_PER_PAGE);
 
   const paginatedRooms = rooms.slice(
