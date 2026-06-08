@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/peminjaman', [PeminjamanController::class, 'create']);
     Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
+    Route::get('/peminjaman-all', [PeminjamanController::class, 'getAllPeminjaman']);
 
     Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
 
@@ -29,4 +30,5 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
     Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
+
 });

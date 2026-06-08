@@ -228,7 +228,7 @@ class PeminjamanController extends Controller
             'persetujuan' => new PersetujuanResource($persetujuan),
         ]);
     }
-    public function riwayatPeminjaman()
+    public function getAllPeminjaman()
     {
         $riwayat = Peminjaman::with('persetujuans')
             ->where('id_peminjam', request()->user()->nomor_induk)
