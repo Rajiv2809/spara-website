@@ -6,18 +6,21 @@ import gedung_utama from "../assets/gu601.jpeg";
 const initialRooms = [
   {
     id: 1,
-    nama: "Workspace Multimedia",
-    kode: "GU-604",
-    lokasi: "Gedung Utama - Lantai 2",
-    status: "tersedia",
+    nama_ruangan: "Workspace Multimedia",
+    kode_ruangan: "GU-604",
+    id_gedung: "Gedung Utama",
+    nomor_lantai: "1",
+    status_ruangan: "tersedia",
     kapasitas: 30,
     fasilitas: "Proyektor, AC, Whiteboard, WiFi, TV LED",
+    nomor_induk_pic: 22001,
     pic: "Noper Ardi, S.T, M.Eng",
+    path_foto: "",
   },
   {
     id: 2,
-    nama: "Lab Motion Capture",
-    kode: "GU-607",
+    nama_ruangan: "Lab Motion Capture",
+    kode_ruangan: "GU-607",
     lokasi: "Gedung Utama - Lantai 3",
     status: "tersedia",
     kapasitas: 20,
@@ -170,14 +173,14 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
 
           <div className="flex items-center gap-1 text-[12px] opacity-90">
             <Icon icon="mdi:map-marker" width={14} />
-            {room.lokasi}
+            {room.id_gedung} - Lantai {room.nomor_lantai}
           </div>
         </div>
       </div>
 
       <div className="p-3 text-[13px] text-[#3D0C1F]">
         <div className="inline-block border-2 border-gray-400 rounded-full px-3 py-0.5 text-[11px] mb-3 font-semibold">
-          {room.kode}
+          {room.kode_ruangan}
         </div>
 
         {/* DETAIL */}
@@ -233,6 +236,7 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
 const ModalRuangan = ({ onClose, onSave, editData }) => {
   const [form, setForm] = useState(
     editData || {
+      kode_ruangan: "",
       nama: "",
       lokasi: "",
       kapasitas: "",
@@ -261,6 +265,13 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
 
         {/* BODY */}
         <div className="p-4 flex flex-col gap-3 overflow-y-auto">
+          <label classname="text-[12px] font-semibold">Kode Ruangan</label>
+          <input
+            name="kode_ruangan"
+            value={form.kode_ruangan}
+            onChange={handleChange}
+            className="border p-2 rounded text-[12px]"
+          />
           <label className="text-[12px] font-semibold">Nama Ruangan:</label>
           <input
             name="nama"

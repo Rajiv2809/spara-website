@@ -16,7 +16,12 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::get('/get-ruangan', [RuanganController::class, 'getRuangan']);
+    Route::get('/ruangan/{id}', [RuanganController::class, 'show']);
     Route::get('/jadwal-ruangan/{id}/{tanggal}', [RuanganController::class, 'jadwalRuangan']);
+
+    Route::post('/ruangan', [RuanganController::class, 'store']);
+    Route::put('/ruangan/{id}', [RuanganController::class, 'update']);
+    Route::delete('/ruangan/{id}', [RuanganController::class, 'destroy']);
 
 
     Route::post('/peminjaman', [PeminjamanController::class, 'create']);
@@ -30,5 +35,4 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
     Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
-
 });
