@@ -12,7 +12,7 @@ class PegawaiSbumSeeder extends Seeder
         // Tambahkan user terlebih dahulu (role admin di users)
         DB::table('users')->insert([
             [
-                'nomor_induk' => 10000002,
+                'nomor_induk' => 1000005,
                 'nama'        => 'Ketua SBUM',
                 'email'       => 'ketua.sbum@kampus.ac.id',
                 'no_telepon'  => '081200000010',

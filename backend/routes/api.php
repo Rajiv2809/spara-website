@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AuthController, PeminjamanController, RuanganController};
+use App\Http\Controllers\{AuthController, PeminjamanController, RuanganController, AlatController};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -23,6 +23,11 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/ruangan/{id}', [RuanganController::class, 'update']);
     Route::delete('/ruangan/{id}', [RuanganController::class, 'destroy']);
 
+    Route::get('/get-alat', [AlatController::class, 'getAlat']);
+    Route::get('/alat/{id}', [AlatController::class, 'show']);
+    Route::post('/alat', [AlatController::class, 'store']);
+    Route::put('/alat/{id}', [AlatController::class, 'update']);
+    Route::delete('/alat/{id}', [AlatController::class, 'destroy']);
 
     Route::post('/peminjaman', [PeminjamanController::class, 'create']);
     Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
