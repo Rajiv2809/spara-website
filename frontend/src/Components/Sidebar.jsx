@@ -111,6 +111,11 @@ const menuByRole = {
       label: "Kelola Admin",
       href: "/kelola-admin",
     },
+    
+  ],
+  loading: [
+
+    {label: "loading"},  
   ],
 };
 
@@ -120,8 +125,8 @@ const Sidebar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const role = currentUser?.role?.toLowerCase() || "mahasiswa";
-  const menus = menuByRole[role] || menuByRole["mahasiswa"];
+  const role = currentUser?.role?.toLowerCase() || "laoding";
+  const menus = menuByRole[role] || menuByRole["loading"];
   const currentPath = window.location.pathname;
 
   // Tutup sidebar saat resize ke desktop

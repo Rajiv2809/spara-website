@@ -21,13 +21,13 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
     <div className="bg-[#F5EDED] rounded-2xl p-3 shadow-md border border-pink-100">
       <div className="relative rounded-xl overflow-hidden h-[200px]">
         <img
-          src={room.foto || gedung_utama}
+          src={room.path_foto || gedung_utama}
           className="w-full h-full object-cover"
         />
         <div
-          className={`absolute top-3 right-3 ${statusStyles[room.status]} text-white text-[11px] px-4 py-1 rounded-full font-semibold`}
+          className={`absolute top-3 right-3 ${statusStyles[room.status_ruangan]} text-white text-[11px] px-4 py-1 rounded-full font-semibold`}
         >
-          {statusText[room.status]}
+          {statusText[room.status_ruangan]}
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
           <h2 className="font-bold text-[18px] leading-tight">{room.nama}</h2>
@@ -47,7 +47,7 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
           <div className="flex gap-2 items-start">
             <Icon icon="mdi:account" className="text-pink-500 mt-[2px]" />
             <span>
-              <b>PIC</b> : {room.pic}
+              <b>PIC</b> : {room.pic} ({room.nomor_induk_pic}) {/* nanti disesuaiin lagi*/}
             </span>
           </div>
           <div className="flex gap-2 items-start">
@@ -85,6 +85,13 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
 };
 
 const ModalRuangan = ({ onClose, onSave, editData }) => {
+
+  const picMap = {
+    22001: "Noper Ardi, S.T., M.Eng",
+    22002: "Budi Santoso",
+    22003: "Andi Wijaya",
+  };
+
   const [form, setForm] = useState(
     editData || {
       kode_ruangan: "",
@@ -124,8 +131,8 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
 
           <label className="text-[12px] font-semibold">Nama Ruangan</label>
           <input
-            name="nama"
-            value={form.nama}
+            name="nama_ruangan"
+            value={form.nama_ruangan}
             onChange={handleChange}
             className="border p-2 rounded text-[12px]"
           />
@@ -148,6 +155,7 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
 
           <label className="text-[12px] font-semibold">Kapasitas</label>
           <input
+            type="number"
             name="kapasitas"
             value={form.kapasitas}
             onChange={handleChange}
@@ -155,17 +163,25 @@ const ModalRuangan = ({ onClose, onSave, editData }) => {
           />
 
           <label className="text-[12px] font-semibold">PIC</label>
-          <input
-            name="pic"
-            value={form.pic}
-            onChange={handleChange}
+          <select
+            name="nomor_induk_pic"
+            value={form.nomor_induk_pic}
+            onChange={(e) => {
+              const nomorPIC = Number(e.target.value);
+
+              setForm({
+                ...form,
+                nomor_induk_pic: nomorPIC,
+                pic: picMap[nomorPIC],
+              });
+            }}
             className="border p-2 rounded text-[12px]"
           />
 
           <label className="text-[12px] font-semibold">Status</label>
           <select
-            name="status"
-            value={form.status}
+            name="status_ruangan"
+            value={form.status_ruangan}
             onChange={handleChange}
             className="border p-2 rounded text-[12px]"
           >

@@ -16,7 +16,6 @@ const DefaultLayout = () => {
         axiosClient.get('/me')
         .then(({data}) => {
             setCurrentUser(data.user);
-     
         })
         .catch(({res}) => {
             console.log(res);

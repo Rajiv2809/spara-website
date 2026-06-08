@@ -21,7 +21,7 @@ class RuanganController extends Controller
     /**
      * Menampilkan detail ruangan
      */
-    public function show($id)
+    public function show(int $id)
     {
         $ruangan = Ruangan::findOrFail($id);
 
@@ -31,7 +31,7 @@ class RuanganController extends Controller
     /**
      * Menampilkan jadwal ruangan berdasarkan tanggal
      */
-    public function jadwalRuangan($id, $tanggal)
+    public function jadwalRuangan(int $id, string $tanggal)
     {
         $peminjaman = Peminjaman::where('id_ruangan', $id)
             ->whereDate('hari_tanggal', $tanggal)
@@ -69,7 +69,7 @@ class RuanganController extends Controller
     /**
      * Mengubah data ruangan
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $ruangan = Ruangan::findOrFail($id);
 
@@ -97,7 +97,7 @@ class RuanganController extends Controller
     /**
      * Menghapus ruangan
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $ruangan = Ruangan::findOrFail($id);
 
