@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import ModalPengajuan from "../Components/ModalPengajuanPeralatan";
+import axiosClient from "../axios";
 import peralatanImg from "../assets/peralatan.jpg";
 
 const statusStyles = {
@@ -83,18 +84,18 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan}) => {
 /* =========================
    DATA
 ========================= */
-const equipments = [
-  { nama: "Kamera Luminux", kode: "KMR-001", deskripsi: "Kamera Lumix GH5 Lensa Kit dengan 1 baterai", status: "tersedia", jenis: "FOTOGRAFI",stok: 2 },
-  { nama: "Kamera Sony FX 3", kode: "KMR-002", deskripsi: "Kamera Sony FX 3, Body Only - Lensa Terpisah.", status: "tersedia", jenis: "FOTOGRAFI",stok:1  },
-  { nama: "GPS Handheld 73", kode: "GPS-001", deskripsi: "Alat Survey Terestris", status: "maintenance", jenis: "PROG PK",stok: 2 },
-  { nama: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK",stok:0  },
-  { nama: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI",stok: 0 },
-  { nama: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI",stok: 2},
-  { nama: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK",stok: 2 },
-  { nama: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK",stok: 2 },
-  { nama: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK",stok: 0 },
-  { nama: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK",stok: 4 },
-  { nama: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM",stok: 1 },
+const initialEquipments = [
+  { id: 1, nama: "Kamera Luminux", kode: "KMR-001", deskripsi: "Kamera Lumix GH5 Lensa Kit dengan 1 baterai", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
+  { id: 2, nama: "Kamera Sony FX 3", kode: "KMR-002", deskripsi: "Kamera Sony FX 3, Body Only - Lensa Terpisah.", status: "tersedia", jenis: "FOTOGRAFI", stok: 1 },
+  { id: 3, nama: "GPS Handheld 73", kode: "GPS-001", deskripsi: "Alat Survey Terestris", status: "maintenance", jenis: "PROG PK", stok: 2 },
+  { id: 4, nama: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK", stok: 0 },
+  { id: 5, nama: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI", stok: 0 },
+  { id: 6, nama: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
+  { id: 7, nama: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK", stok: 2 },
+  { id: 8, nama: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK", stok: 2 },
+  { id: 9, nama: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK", stok: 0 },
+  { id: 10, nama: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK", stok: 4 },
+  { id: 11, nama: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM", stok: 1 },
 ];
 
 /* MAIN PAGE */
@@ -106,9 +107,9 @@ const PeminjamanPeralatan = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const [equipments, setEquipments] = useState(initialEquipments);
   const [filterStatus, setFilterStatus] = useState(null);
   const [filterJenis, setFilterJenis] = useState(null);
-
 
   const ITEMS_PER_PAGE = 6;
 
@@ -132,13 +133,31 @@ const matchJenis =
     currentPage * ITEMS_PER_PAGE
   );
 
+  useEffect(() => {
+    axiosClient
+      .get("/get-alat")
+      .then(({ data }) => {
+        if (Array.isArray(data.data)) {
+          const mapped = data.data.map((item) => ({
+            id: item.id,
+            nama: item.nama_alat,
+            kode: item.kode_alat,
+            deskripsi: item.deskripsi_alat,
+            status: item.status_alat,
+            jenis: item.jenis || "Peralatan",
+          }));
+          setEquipments(mapped);
+        }
+      })
+      .catch((err) => console.error("Gagal memuat peralatan:", err));
+  }, []);
+
 const statusOptions = [
   ...new Set(equipments.map((item) => item.status))
-  
 ];
 
 const jenisOptions = [
-  ...new Set(equipments.map((item) => item.jenis))
+  ...new Set(equipments.map((item) => item.jenis || "Peralatan"))
 ];
 
   return (
@@ -404,11 +423,11 @@ const jenisOptions = [
       </div>
       {showModal && (
         <ModalPengajuan
-        ruangan={selectedItem}
-        onClose={() => setShowModal(false)}
-        onSuccess={() => {
-          setShowModal(false);
-        }}
+          peralatan={selectedItem}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => {
+            setShowModal(false);
+          }}
         />
       )}
 

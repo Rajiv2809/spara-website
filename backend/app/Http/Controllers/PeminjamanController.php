@@ -9,6 +9,8 @@ use App\Models\{Peminjaman, Persetujuan};
 use App\Http\Resources\PeminjamanResource;
 use App\Http\Resources\PersetujuanResource;
 use App\Http\Resources\ListPersetujuanResource;
+use App\Models\Ruangan;
+use App\Models\Alat;
 
 class PeminjamanController extends Controller
 {
@@ -230,14 +232,75 @@ class PeminjamanController extends Controller
     }
     public function getAllPeminjaman()
     {
-        $riwayat = Peminjaman::with('persetujuans')
+        $riwayat = Peminjaman::with(['persetujuans','ruangan','alat','peminjam'])
             ->where('id_peminjam', request()->user()->nomor_induk)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
 
         return response()->json([
             'message' => 'Riwayat peminjaman berhasil diambil.',
-            'data' => $riwayat,
+            'data' => PeminjamanResource::collection($riwayat),
+        ]);
+    }
+
+    public function riwayat()
+    {
+        $user = request()->user();
+
+        $query = Peminjaman::with(['persetujuans','ruangan','alat','peminjam']);
+
+        if ($user->role === 'mahasiswa') {
+            $query->where('id_peminjam', $user->nomor_induk);
+        } elseif ($user->role === 'pic') {
+            $ruanganIds = Ruangan::where('nomor_induk_pic', $user->nomor_induk)->pluck('id_ruangan')->toArray();
+            $query->where(function ($q) use ($ruanganIds, $user) {
+                $q->whereIn('id_ruangan', $ruanganIds)
+                    ->orWhereHas('persetujuans', function ($q2) use ($user) {
+                        $q2->where('nomor_induk_penyetuju', $user->nomor_induk);
+                    });
+            });
+        } elseif ($user->role === 'dosen') {
+            $query->where(function ($q) use ($user) {
+                $q->where('id_peminjam', $user->nomor_induk)
+                    ->orWhereHas('persetujuans', function ($q2) use ($user) {
+                        $q2->where('nomor_induk_penyetuju', $user->nomor_induk);
+                    });
+            });
+        } else {
+            $query->where('id_peminjam', $user->nomor_induk);
+        }
+
+        $riwayat = $query->orderBy('dibuat_pada', 'desc')->get();
+
+        return response()->json([
+            'message' => 'Riwayat peminjaman berhasil diambil.',
+            'data' => PeminjamanResource::collection($riwayat),
+        ]);
+    }
+
+    public function riwayatDebug(Request $request)
+    {
+        if (!app()->environment('local')) {
+            return response()->json([
+                'message' => 'Debug route hanya tersedia di environment local.',
+            ], 403);
+        }
+
+        $nomor = $request->query('nomor');
+        if (!$nomor) {
+            return response()->json([
+                'message' => 'Parameter nomor diperlukan.',
+            ], 400);
+        }
+
+        $riwayat = Peminjaman::with(['persetujuans','ruangan','alat','peminjam'])
+            ->where('id_peminjam', $nomor)
+            ->orderBy('dibuat_pada', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Riwayat debug berhasil diambil.',
+            'data' => PeminjamanResource::collection($riwayat),
         ]);
     }
 }

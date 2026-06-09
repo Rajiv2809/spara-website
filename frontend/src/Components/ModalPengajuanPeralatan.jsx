@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
+import axiosClient from "../axios";
 
 const Input = ({
   label,
@@ -54,6 +55,145 @@ const Select = ({
   </div>
 );
 
+const SearchableSelect = ({ label, name, value, onChange, required }) => {
+  const [query, setQuery] = useState("");
+  const [options, setOptions] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState("");
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    setLoading(true);
+    axiosClient
+      .get("/penanggung-jawab")
+      .then(({ data }) => {
+        setOptions(data.penanggung_jawab ?? []);
+        setFiltered(data.penanggung_jawab ?? []);
+      })
+      .catch((err) => console.error("Gagal memuat penanggung jawab:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    setFiltered(
+      options.filter((o) =>
+        o.nama.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [query, options]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleSelect = (item) => {
+    setSelectedLabel(item.nama);
+    setQuery("");
+    setOpen(false);
+    onChange({ target: { name, value: item.nomor_induk } });
+  };
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
+    setOpen(true);
+    if (!e.target.value) {
+      setSelectedLabel("");
+      onChange({ target: { name, value: "" } });
+    }
+  };
+
+  const handleClear = () => {
+    setSelectedLabel("");
+    setQuery("");
+    setOpen(false);
+    onChange({ target: { name, value: "" } });
+  };
+
+  return (
+    <div className="flex flex-col gap-1" ref={wrapperRef}>
+      <label className="text-[13px] font-medium text-[#3D0C1F]">
+        {label} {required && "*"}
+      </label>
+
+      <div
+        className={`flex items-center border rounded-md px-3 py-2 bg-white transition-all ${
+          open ? "border-[#C0254A]" : "border-gray-300"
+        }`}
+      >
+        <Icon icon="mdi:magnify" className="text-gray-400 mr-2 text-base flex-shrink-0" />
+
+        <input
+          type="text"
+          className="flex-1 text-sm outline-none bg-transparent text-gray-800 placeholder-gray-400"
+          placeholder={selectedLabel || "Cari penanggung jawab..."}
+          value={selectedLabel ? selectedLabel : query}
+          onChange={handleInputChange}
+          onFocus={() => setOpen(true)}
+          autoComplete="off"
+        />
+
+        {(selectedLabel || query) && (
+          <button type="button" onClick={handleClear} className="text-gray-400 hover:text-gray-600 ml-1">
+            <Icon icon="mdi:close" className="text-base" />
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="text-gray-400 hover:text-gray-600 ml-1"
+        >
+          <Icon
+            icon="mdi:chevron-down"
+            className={`text-base transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      </div>
+
+      {open && (
+        <div className="relative z-50">
+          <div className="absolute top-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+            {loading ? (
+              <div className="flex items-center justify-center py-5 text-sm text-gray-400">
+                <Icon icon="mdi:loading" className="animate-spin mr-2" />
+                Memuat data...
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="py-5 text-center text-sm text-gray-400">
+                Tidak ada hasil ditemukan
+              </div>
+            ) : (
+              filtered.map((item) => (
+                <button
+                  key={item.nomor_induk}
+                  type="button"
+                  onClick={() => handleSelect(item)}
+                  className={`w-full text-left px-4 py-2.5 text-sm flex justify-between items-center hover:bg-pink-50 transition-colors ${
+                    value === item.nomor_induk
+                      ? "bg-pink-50 text-[#A3264C] font-medium"
+                      : "text-gray-700"
+                  }`}
+                >
+                  <span>{item.nama}</span>
+                  <span className="text-xs text-gray-400 font-mono">{item.nomor_induk}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,26 +223,25 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   ]);
 
   const [form, setForm] = useState({
-    jenisKegiatan: "",
-    namaKegiatan: "",
-    penanggungJawab: "",
-    tanggalPinjam: "",
-    jamMulai: "",
-    jamSelesai: "",
+    jenis_kegiatan: "",
+    nama_kegiatan: "",
+    nomor_induk_penanggungjawab: "",
+    hari_tanggal: "",
+    jam_mulai: "",
+    jam_selesai: "",
+    id_alat: peralatan?.id || "",
+    keterangan: "",
   });
 
   useEffect(() => {
-    if (peralatan?.nama) {
-      setForm((prev) => ({
-        ...prev,
-        peralatan: peralatan.nama,
-      }));
-    }
+    setForm((prev) => ({
+      ...prev,
+      id_alat: peralatan?.id || "",
+    }));
   }, [peralatan]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: value,
@@ -115,29 +254,51 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
 
   const handleSubmit = () => {
     if (
-      !form.jenisKegiatan ||
-      !form.namaKegiatan ||
-      !form.penanggungJawab ||
-      !form.tanggalPinjam ||
-      !form.jamMulai ||
-      !form.jamSelesai
+      !form.jenis_kegiatan ||
+      !form.nama_kegiatan ||
+      !form.nomor_induk_penanggungjawab ||
+      !form.hari_tanggal ||
+      !form.jam_mulai ||
+      !form.jam_selesai ||
+      !form.id_alat
     ) {
       alert("Harap lengkapi data wajib");
       return;
     }
 
+    const payload = {
+      nama_kegiatan: form.nama_kegiatan,
+      jenis_kegiatan: form.jenis_kegiatan,
+      hari_tanggal: form.hari_tanggal,
+      jam_mulai: form.jam_mulai,
+      jam_selesai: form.jam_selesai,
+      id_alat: form.id_alat,
+      nomor_induk_penanggungjawab: form.nomor_induk_penanggungjawab,
+      keterangan: form.keterangan || null,
+    };
+
     setShowConfirm(false);
     setIsSubmitting(true);
     setStep(3);
 
-    setTimeout(() => setIsSuccess(true), 1800);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(false);
-      onClose();
-      if (onSuccess) onSuccess();
-    }, 3500);
+    axiosClient
+      .post("/peminjaman", payload)
+      .then(() => {
+        setIsSuccess(true);
+        setTimeout(() => {
+          setIsSubmitting(false);
+          setIsSuccess(false);
+          onClose();
+          if (onSuccess) onSuccess();
+        }, 1800);
+      })
+      .catch((err) => {
+        console.error("Gagal submit:", err);
+        setIsSubmitting(false);
+        setStep(2);
+        const message = err?.response?.data?.message || "Gagal mengirim pengajuan, coba lagi.";
+        alert(message);
+      });
   };
 
   return (
@@ -281,44 +442,43 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <Select
                     label="Jenis Kegiatan"
-                    name="jenisKegiatan"
-                    value={form.jenisKegiatan}
+                    name="jenis_kegiatan"
+                    value={form.jenis_kegiatan}
                     onChange={handleChange}
                     required
                     options={[
-                      "Akademik",
-                      "Non Akademik",
-                      "Seminar",
-                      "Rapat",
+                      "akademik",
+                      "non akademik",
+                      "seminar",
+                      "rapat",
                     ]}
                   />
 
                   <Input
                     label="Nama Kegiatan"
-                    name="namaKegiatan"
-                    value={form.namaKegiatan}
+                    name="nama_kegiatan"
+                    value={form.nama_kegiatan}
                     onChange={handleChange}
                     required
                   />
                 </div>
 
                 <div className="mt-4">
-                  <Select
+                  <SearchableSelect
                     label="Penanggung Jawab"
-                    name="penanggungJawab"
-                    value={form.penanggungJawab}
+                    name="nomor_induk_penanggungjawab"
+                    value={form.nomor_induk_penanggungjawab}
                     onChange={handleChange}
                     required
-                    options={["Ketua", "Wakil", "Staff", "Lainnya"]}
                   />
                 </div>
 
                 <div className="mt-4">
                   <Input
                     label="Tanggal Peminjaman"
-                    name="tanggalPinjam"
+                    name="hari_tanggal"
                     type="date"
-                    value={form.tanggalPinjam}
+                    value={form.hari_tanggal}
                     onChange={handleChange}
                     required
                   />
@@ -327,20 +487,29 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                 <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <Input
                     label="Jam Mulai"
-                    name="jamMulai"
+                    name="jam_mulai"
                     type="time"
-                    value={form.jamMulai}
+                    value={form.jam_mulai}
                     onChange={handleChange}
                     required
                   />
 
                   <Input
                     label="Jam Selesai"
-                    name="jamSelesai"
+                    name="jam_selesai"
                     type="time"
-                    value={form.jamSelesai}
+                    value={form.jam_selesai}
                     onChange={handleChange}
                     required
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <Input
+                    label="Keterangan"
+                    name="keterangan"
+                    value={form.keterangan}
+                    onChange={handleChange}
                   />
                 </div>
               </>
