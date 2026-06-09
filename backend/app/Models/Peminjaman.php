@@ -49,6 +49,11 @@ class Peminjaman extends Model
         return $this->belongsTo(Ruangan::class, 'id_ruangan', 'id_ruangan');
     }
 
+    public function persetujuans(): HasMany
+    {
+        return $this->hasMany(Persetujuan::class, 'id_peminjaman', 'id_peminjaman');
+    }
+
     // public function persetujuan(): BelongsTo
     // {
     //     return $this->belongsTo(Persetujuan::class, 'id_peminjaman', 'id_peminjaman');

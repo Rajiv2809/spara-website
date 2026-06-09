@@ -8,6 +8,7 @@ use App\Http\Controllers\{AuthController, PeminjamanController, RuanganControlle
 // })->middleware('auth:sanctum');
 //init untuk auth
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/riwayat-debug', [PeminjamanController::class, 'riwayatDebug']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/test', [AuthController::class, 'test']);
@@ -32,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/peminjaman', [PeminjamanController::class, 'create']);
     Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
     Route::get('/peminjaman-all', [PeminjamanController::class, 'getAllPeminjaman']);
+    Route::get('/riwayat', [PeminjamanController::class, 'riwayat']);
 
     Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
 
