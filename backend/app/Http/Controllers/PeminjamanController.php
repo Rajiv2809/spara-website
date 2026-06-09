@@ -247,30 +247,10 @@ class PeminjamanController extends Controller
     {
         $user = request()->user();
 
-        $query = Peminjaman::with(['persetujuans','ruangan','alat','peminjam']);
-
-        if ($user->role === 'mahasiswa') {
-            $query->where('id_peminjam', $user->nomor_induk);
-        } elseif ($user->role === 'pic') {
-            $ruanganIds = Ruangan::where('nomor_induk_pic', $user->nomor_induk)->pluck('id_ruangan')->toArray();
-            $query->where(function ($q) use ($ruanganIds, $user) {
-                $q->whereIn('id_ruangan', $ruanganIds)
-                    ->orWhereHas('persetujuans', function ($q2) use ($user) {
-                        $q2->where('nomor_induk_penyetuju', $user->nomor_induk);
-                    });
-            });
-        } elseif ($user->role === 'dosen') {
-            $query->where(function ($q) use ($user) {
-                $q->where('id_peminjam', $user->nomor_induk)
-                    ->orWhereHas('persetujuans', function ($q2) use ($user) {
-                        $q2->where('nomor_induk_penyetuju', $user->nomor_induk);
-                    });
-            });
-        } else {
-            $query->where('id_peminjam', $user->nomor_induk);
-        }
-
-        $riwayat = $query->orderBy('dibuat_pada', 'desc')->get();
+        $riwayat = Peminjaman::with(['persetujuans','ruangan','alat','peminjam'])
+            ->where('id_peminjam', $user->nomor_induk)
+            ->orderBy('dibuat_pada', 'desc')
+            ->get();
 
         return response()->json([
             'message' => 'Riwayat peminjaman berhasil diambil.',
