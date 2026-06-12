@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AuthController, PeminjamanController, RuanganController, AlatController};
+use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -42,4 +42,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
     Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
+
+    Route::get('/get-admin', [AdminController::class, 'getAdmin']);
+    Route::get('/admin/{nomor_induk}', [AdminController::class, 'show']);
+    Route::post('/admin', [AdminController::class, 'store']);
+    Route::put('/admin/{nomor_induk}', [AdminController::class, 'update']);
+    Route::delete('/admin/{nomor_induk}', [AdminController::class, 'destroy']);
 });
