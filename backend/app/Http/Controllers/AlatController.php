@@ -28,7 +28,14 @@ class AlatController extends Controller
             'deskripsi_alat'   => 'nullable|string',
             'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
             'nomor_induk_pic'  => 'nullable|exists:users,nomor_induk',
+            'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        if ($request->hasFile('foto')) {
+            $validated['path_foto'] = $request->file('foto')
+                ->store('alat', 'public');
+        }
+        unset($validated['foto']);
 
         $alat = Alat::create($validated);
 
@@ -48,7 +55,17 @@ class AlatController extends Controller
             'deskripsi_alat'   => 'nullable|string',
             'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
             'nomor_induk_pic'  => 'nullable|exists:users,nomor_induk',
+            'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        if ($request->hasFile('foto')) {
+            if ($alat->path_foto) {
+                Storage::disk('public')->delete($alat->path_foto);
+            }
+            $validated['path_foto'] = $request->file('foto')
+                ->store('alat', 'public');
+        }
+        unset($validated['foto']);
 
         $alat->update($validated);
 

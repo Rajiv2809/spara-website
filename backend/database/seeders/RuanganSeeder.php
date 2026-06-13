@@ -204,7 +204,7 @@ class RuanganSeeder extends Seeder
                 'kapasitas'         => 25,
                 'fasilitas'         => 'Peralatan Lab Kimia, Lemari Asam, AC',
                 'deskripsi_ruangan' => 'Laboratorium kimia dasar lantai 2',
-                'status_ruangan'    => 'tidak tersedia',
+                'status_ruangan'    => 'tidak_tersedia',
                 'path_foto'         => 'ruangan/b202.jpg',
                 'id_gedung'         => 2,
                 'nomor_induk_pic'   => 20230001,

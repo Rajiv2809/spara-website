@@ -24,6 +24,9 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/ruangan/{id}', [RuanganController::class, 'update']);
     Route::delete('/ruangan/{id}', [RuanganController::class, 'destroy']);
 
+    Route::get('/get-gedung', [RuanganController::class, 'getGedung']);
+    Route::get('/get-lantai', [RuanganController::class, 'getLantai']);
+
     Route::get('/get-alat', [AlatController::class, 'getAlat']);
     Route::get('/alat/{id}', [AlatController::class, 'show']);
     Route::post('/alat', [AlatController::class, 'store']);

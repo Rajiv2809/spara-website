@@ -16,6 +16,10 @@ class AlatResource extends JsonResource
             'deskripsi_alat' => $this->deskripsi_alat,
             'status_alat' => $this->status_alat,
             'pic'         => $this->penanggungJawab?->nama ?? '-',
+            'nomor_induk_pic' => $this->nomor_induk_pic,
+            'path_foto'      => $this->path_foto
+            ? asset('storage/' . $this->path_foto)
+            : null,
         ];
     }
 }

@@ -15,12 +15,12 @@ class Alat extends Model
         'nama_alat',
         'deskripsi_alat',
         'status_alat',
+        'nomor_induk_pic',
+        'path_foto',
     ];
 
     public function peminjaman(): HasMany
     {
         return $this->hasMany(Peminjaman::class, 'id_alat', 'id_alat');
     }
-
-    
 }

@@ -1,76 +1,133 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import peralatanImg from "../assets/peralatan.jpg";
 import axiosClient from "../axios";
 
-const AlatCard = ({ alat, onEdit, onDelete }) => {
-  const statusStyles = {
-    tersedia: "bg-green-500",
-    dipinjam: "bg-orange-400",
-    rusak: "bg-red-500",
-    maintenance: "bg-red-500",
-  };
+const STATUS_STYLES = {
+  tersedia:    { badge: "bg-emerald-500",  label: "Tersedia" },
+  dipinjam:    { badge: "bg-orange-400",   label: "Dalam Peminjaman" },
+  rusak:       { badge: "bg-red-500",      label: "Rusak" },
+  maintenance: { badge: "bg-red-500",      label: "Maintenance" },
+};
 
-  const statusText = {
-    tersedia: "Tersedia",
-    dipinjam: "Dalam Peminjaman",
-    rusak: "Rusak",
-    maintenance: "Maintenance",
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3500);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  const colors = {
+    success: "bg-emerald-600",
+    error:   "bg-red-600",
+    info:    "bg-blue-600",
   };
 
   return (
-    <div className="bg-[#F5EDED] rounded-2xl p-3 shadow-md border border-pink-100">
-      <div className="relative rounded-xl overflow-hidden h-[200px]">
+    <div
+      className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 ${colors[type]} text-white px-5 py-3 rounded-xl shadow-2xl text-[13px] font-medium animate-fade-in`}
+    >
+      <Icon
+        icon={
+          type === "success"
+            ? "mdi:check-circle-outline"
+            : type === "error"
+            ? "mdi:alert-circle-outline"
+            : "mdi:information-outline"
+        }
+        width={18}
+      />
+      {message}
+      <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100">
+        <Icon icon="mdi:close" width={14} />
+      </button>
+    </div>
+  );
+};
+
+const ConfirmDialog = ({ message, onConfirm, onCancel }) => (
+  <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+    <div className="bg-white rounded-2xl w-[340px] shadow-2xl overflow-hidden">
+      <div className="bg-red-600 p-4 flex items-center gap-3 text-white">
+        <Icon icon="mdi:alert-outline" width={22} />
+        <h3 className="font-bold text-[16px]">Konfirmasi Hapus</h3>
+      </div>
+      <div className="p-5 text-[13px] text-gray-600">{message}</div>
+      <div className="px-5 pb-5 flex gap-2">
+        <button
+          onClick={onCancel}
+          className="flex-1 border border-gray-300 text-gray-600 rounded-full py-2 text-[12px] hover:bg-gray-50 transition"
+        >
+          Batal
+        </button>
+        <button
+          onClick={onConfirm}
+          className="flex-1 bg-red-600 text-white rounded-full py-2 text-[12px] hover:bg-red-700 transition"
+        >
+          Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+const AlatCard = ({ alat, onEdit, onDelete }) => {
+  const statusCfg = STATUS_STYLES[alat.status] ?? STATUS_STYLES.tersedia;
+
+  return (
+    <div className="bg-[#F5EDED] rounded-2xl shadow-md border border-pink-100 flex flex-col overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+      <div className="relative h-[180px] overflow-hidden">
         <img
           src={alat.foto || peralatanImg}
+          alt={alat.nama}
           className="w-full h-full object-cover"
         />
-        <div
-          className={`absolute top-3 right-3 ${statusStyles[alat.status]} text-white text-[11px] px-4 py-1 rounded-full font-semibold`}
+        <span
+          className={`absolute top-3 right-3 ${statusCfg.badge} text-white text-[10px] px-3 py-1 rounded-full font-bold shadow`}
         >
-          {statusText[alat.status]}
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
-          <h2 className="font-bold text-[18px] leading-tight">{alat.nama}</h2>
-          <div className="flex items-center gap-1 text-[12px] opacity-90">
-            <Icon icon="mdi:tools" width={14} />
-            {alat.kode}
+          {statusCfg.label}
+        </span>
+        <div className="absolute bottom-0 left-0 right-0 px-3 py-3 bg-gradient-to-t from-black/70 to-transparent text-white">
+          <h2 className="font-bold text-[15px] leading-tight truncate">{alat.nama}</h2>
+          <div className="flex items-center gap-1 text-[11px] opacity-90 mt-0.5">
+            <Icon icon="mdi:tools" width={12} />
+            <span className="truncate">{alat.kode}</span>
           </div>
         </div>
       </div>
 
-      <div className="p-3 text-[13px] text-[#3D0C1F]">
-        <div className="inline-block border-2 border-gray-400 rounded-full px-3 py-0.5 text-[11px] mb-3 font-semibold">
+      <div className="p-3 flex flex-col flex-1 text-[12px] text-[#3D0C1F]">
+        <span className="inline-block self-start border border-gray-400 rounded-full px-3 py-0.5 text-[10px] font-semibold mb-2 truncate max-w-full">
           {alat.kode}
-        </div>
+        </span>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5 flex-1">
           <div className="flex gap-2 items-start">
-            <Icon icon="mdi:account" className="text-pink-500 mt-[2px]" />
-            <span>
-              <b>PIC</b> : {alat.pic}
-            </span>
+            <Icon icon="mdi:account" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
+            <p className="leading-snug line-clamp-1">
+              <b>PIC</b>: {alat.pic || "-"}
+            </p>
           </div>
           <div className="flex gap-2 items-start">
-            <Icon icon="mdi:information-outline" className="text-pink-500 mt-[2px]" />
-            <span>
-              <b>Deskripsi</b> : {alat.deskripsi}
-            </span>
+            <Icon icon="mdi:information-outline" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
+            <p className="leading-snug line-clamp-2">
+              <b>Deskripsi</b>: {alat.deskripsi || "-"}
+            </p>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 mt-4">
+        <div className="flex gap-2 mt-3 pt-3 border-t border-pink-100">
           <button
             onClick={() => onEdit(alat)}
-            className="flex items-center gap-1 bg-[#862440] text-white px-4 py-2 rounded-lg text-[12px] hover:scale-105 transition"
+            className="flex-1 flex items-center justify-center gap-1 bg-[#862440] text-white px-3 py-2 rounded-lg text-[11px] hover:bg-[#6e1d35] hover:scale-105 transition-all"
           >
-            <Icon icon="mdi:pencil-outline" width={14} />
-            Ubah Informasi
+            <Icon icon="mdi:pencil-outline" width={12} />
+            Ubah
           </button>
           <button
-            onClick={() => onDelete(alat.id)}
-            className="bg-[#862440] text-white p-2 rounded-lg hover:scale-105 transition"
+            onClick={() => onDelete(alat)}
+            className="bg-[#862440] text-white p-2 rounded-lg hover:bg-[#6e1d35] hover:scale-105 transition-all"
+            title="Hapus alat"
           >
             <Icon icon="mdi:delete-outline" width={14} />
           </button>
@@ -80,108 +137,300 @@ const AlatCard = ({ alat, onEdit, onDelete }) => {
   );
 };
 
-const ModalAlat = ({ onClose, onSave, editData }) => {
+const EMPTY_FORM = {
+  kode: "",
+  nama: "",
+  deskripsi: "",
+  status: "tersedia",
+  nomor_induk_pic: "",
+};
+
+const ModalAlat = ({ onClose, onSave, editData, saving }) => {
   const [form, setForm] = useState(
-    editData || {
-      kode: "",
-      nama: "",
-      deskripsi: "",
-      status: "tersedia",
-      pic: "",
-      foto: null,
-    }
+    editData
+      ? {
+          kode:            editData.kode ?? "",
+          nama:            editData.nama ?? "",
+          deskripsi:       editData.deskripsi ?? "",
+          status:          editData.status ?? "tersedia",
+          nomor_induk_pic: editData.nomor_induk_pic ?? "",
+        }
+      : { ...EMPTY_FORM }
   );
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [errors, setErrors]         = useState({});
+  const [picList, setPicList]       = useState([]);
+  const [picLoading, setPicLoading] = useState(true);
+  const [picError, setPicError]     = useState(false);
+
+  useEffect(() => {
+    setPicLoading(true);
+    setPicError(false);
+    axiosClient
+      .get("/penanggung-jawab")
+      .then(({ data }) => {
+        setPicList(data.penanggung_jawab ?? []);
+      })
+      .catch((err) => {
+        console.error("Gagal memuat daftar PIC:", err);
+        setPicError(true);
+      })
+      .finally(() => setPicLoading(false));
+  }, []);
+
+  const [fotoFile, setFotoFile]       = useState(null);
+  const [fotoPreview, setFotoPreview] = useState(editData?.foto ?? null);
+
+  const handleFotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFotoFile(file);
+    setFotoPreview(URL.createObjectURL(file));
   };
 
+  const handleRemoveFoto = (e) => {
+    e.preventDefault();
+    setFotoFile(null);
+    setFotoPreview(null);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.kode.trim()) e.kode = "Kode alat wajib diisi.";
+    if (!form.nama.trim()) e.nama = "Nama alat wajib diisi.";
+    if (!form.status)      e.status = "Status wajib dipilih.";
+    return e;
+  };
+
+  const handleSubmit = () => {
+    const e = validate();
+    if (Object.keys(e).length) { setErrors(e); return; }
+    onSave(form, fotoFile);
+  };
+
+  const inputBase =
+    "border border-gray-200 rounded-lg p-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-pink-300 transition bg-white";
+  const errorText = "text-red-500 text-[10px] mt-0.5";
+
+  const selectedPic = picList.find(
+    (p) => String(p.nomor_induk) === String(form.nomor_induk_pic)
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-2xl w-[480px] max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
-        <div className="bg-[#3D0C1F] p-4 text-white flex justify-between">
-          <h2 className="font-bold text-[18px]">
-            {editData ? "Edit Alat" : "Tambah Alat"}
-          </h2>
-          <button onClick={onClose}>×</button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-[480px] max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+        <div className="bg-[#3D0C1F] px-5 py-4 text-white flex justify-between items-center shrink-0">
+          <div className="flex items-center gap-2">
+            <Icon
+              icon={editData ? "mdi:pencil-circle-outline" : "mdi:plus-circle-outline"}
+              width={20}
+            />
+            <h2 className="font-bold text-[17px]">
+              {editData ? "Edit Alat" : "Tambah Alat Baru"}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            disabled={saving}
+            className="hover:bg-white/20 rounded-full p-1 transition disabled:opacity-50"
+          >
+            <Icon icon="mdi:close" width={18} />
+          </button>
         </div>
 
-        <div className="p-4 flex flex-col gap-3 overflow-y-auto">
-          <label className="text-[12px] font-semibold">Kode Alat</label>
-          <input
-            name="kode"
-            value={form.kode}
-            onChange={handleChange}
-            className="border p-2 rounded text-[12px]"
-          />
+        <div className="p-5 flex flex-col gap-4 overflow-y-auto">
+          <div>
+            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+              Kode Alat <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="kode"
+              value={form.kode}
+              onChange={handleChange}
+              placeholder="Contoh: ALT-001"
+              className={`${inputBase} w-full ${errors.kode ? "border-red-400" : ""}`}
+            />
+            {errors.kode && <p className={errorText}>{errors.kode}</p>}
+          </div>
 
-          <label className="text-[12px] font-semibold">Nama Peralatan</label>
-          <input
-            name="nama"
-            value={form.nama}
-            onChange={handleChange}
-            className="border p-2 rounded text-[12px]"
-          />
+          <div>
+            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+              Nama Peralatan <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="nama"
+              value={form.nama}
+              onChange={handleChange}
+              placeholder="Contoh: Obeng Set Philips"
+              className={`${inputBase} w-full ${errors.nama ? "border-red-400" : ""}`}
+            />
+            {errors.nama && <p className={errorText}>{errors.nama}</p>}
+          </div>
 
-          <label className="text-[12px] font-semibold">PIC</label>
-          <input
-            name="pic"
-            value={form.pic}
-            onChange={handleChange}
-            className="border p-2 rounded text-[12px]"
-          />
+          <div>
+            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+              PIC (Penanggung Jawab){" "}
+              <span className="text-gray-400 font-normal">(opsional)</span>
+            </label>
 
-          <label className="text-[12px] font-semibold">Status</label>
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="border p-2 rounded text-[12px]"
-          >
-            <option value="tersedia">Tersedia</option>
-            <option value="dipinjam">Dipinjam</option>
-            <option value="rusak">Rusak</option>
-            <option value="maintenance">Maintenance</option>
-          </select>
+            {picLoading ? (
+              <div className="border border-gray-200 rounded-lg p-2 flex items-center gap-2 bg-gray-50">
+                <Icon icon="mdi:loading" className="animate-spin text-gray-400" width={14} />
+                <span className="text-[12px] text-gray-400">Memuat daftar PIC...</span>
+              </div>
+            ) : picError ? (
+              <div className="border border-red-200 rounded-lg p-2 flex items-center gap-2 bg-red-50">
+                <Icon icon="mdi:alert-circle-outline" className="text-red-400" width={14} />
+                <span className="text-[12px] text-red-500">Gagal memuat daftar PIC.</span>
+                <button
+                  onClick={() => {
+                    setPicError(false);
+                    setPicLoading(true);
+                    axiosClient
+                      .get("/penanggung-jawab")
+                      .then(({ data }) => setPicList(data.penanggung_jawab ?? []))
+                      .catch(() => setPicError(true))
+                      .finally(() => setPicLoading(false));
+                  }}
+                  className="ml-auto text-[11px] text-red-500 underline hover:text-red-700"
+                >
+                  Coba lagi
+                </button>
+              </div>
+            ) : (
+              <div className="relative">
+                <select
+                  name="nomor_induk_pic"
+                  value={form.nomor_induk_pic}
+                  onChange={handleChange}
+                  className={`${inputBase} w-full pr-8 appearance-none cursor-pointer`}
+                >
+                  <option value="">— Tidak ada PIC —</option>
+                  {picList.map((pic) => (
+                    <option key={pic.nomor_induk} value={pic.nomor_induk}>
+                      {pic.nama} ({pic.nomor_induk})
+                    </option>
+                  ))}
+                </select>
+                <Icon
+                  icon="mdi:chevron-down"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  width={16}
+                />
+              </div>
+            )}
 
-          <label className="text-[12px] font-semibold">Deskripsi</label>
-          <textarea
-            name="deskripsi"
-            value={form.deskripsi}
-            onChange={handleChange}
-            className="border p-2 rounded text-[12px] min-h-[80px]"
-          />
+            {selectedPic && (
+              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-emerald-600">
+                <Icon icon="mdi:account-check-outline" width={13} />
+                <span>Terpilih: <b>{selectedPic.nama}</b></span>
+              </div>
+            )}
+          </div>
 
-          <label className="text-[12px] font-semibold">Foto Alat</label>
-          <label className="border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-pink-400 transition">
-            <Icon icon="mdi:cloud-upload-outline" className="text-3xl text-gray-400 mb-2" />
-            <p className="text-[12px] text-gray-500">Klik untuk upload foto</p>
-            <p className="text-[10px] text-gray-400">PNG / JPG</p>
+          <div>
+            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+              Status <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                className={`${inputBase} w-full pr-8 appearance-none cursor-pointer ${
+                  errors.status ? "border-red-400" : ""
+                }`}
+              >
+                <option value="tersedia">Tersedia</option>
+                <option value="dipinjam">Dipinjam</option>
+                <option value="rusak">Rusak</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+              <Icon
+                icon="mdi:chevron-down"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                width={16}
+              />
+            </div>
+            {errors.status && <p className={errorText}>{errors.status}</p>}
+          </div>
+
+          <div>
+            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+              Deskripsi
+            </label>
+            <textarea
+              name="deskripsi"
+              value={form.deskripsi}
+              onChange={handleChange}
+              placeholder="Deskripsi singkat tentang alat ini..."
+              rows={3}
+              className={`${inputBase} w-full resize-none`}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+            Foto Alat{" "}
+            <span className="text-gray-400 font-normal">(opsional)</span>
+          </label>
+          <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-pink-400 transition group">
+            {fotoPreview ? (
+              <div className="relative w-full">
+                <img
+                  src={fotoPreview}
+                  alt="Preview"
+                  className="w-full h-36 rounded-lg object-cover border border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveFoto}
+                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 transition shadow"
+                >
+                  <Icon icon="mdi:close" width={13} />
+                </button>
+                <p className="text-[10px] text-gray-400 mt-2">Klik untuk ganti foto</p>
+              </div>
+            ) : (
+              <>
+                <Icon icon="mdi:cloud-upload-outline" className="text-3xl text-gray-300 group-hover:text-pink-400 mb-2 transition" />
+                <p className="text-[12px] text-gray-500">Klik untuk upload foto</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">PNG / JPG, maks 2MB</p>
+              </>
+            )}
             <input
               type="file"
-              onChange={(e) =>
-                setForm({ ...form, foto: URL.createObjectURL(e.target.files[0]) })
-              }
+              accept="image/png,image/jpeg,image/jpg"
+              onChange={handleFotoChange}
               className="hidden"
             />
-            {form.foto && (
-              <img src={form.foto} className="mt-2 w-full h-32 rounded-lg object-cover border" />
-            )}
           </label>
         </div>
 
-        <div className="p-4 flex gap-2">
+        <div className="px-5 py-4 flex gap-2 border-t border-gray-100 shrink-0">
           <button
             onClick={onClose}
-            className="flex-1 border border-pink-300 text-[#C0254A] rounded-full py-2 text-[12px]"
+            disabled={saving}
+            className="flex-1 border border-pink-300 text-[#C0254A] rounded-full py-2.5 text-[12px] font-semibold hover:bg-pink-50 transition disabled:opacity-50"
           >
             Batal
           </button>
           <button
-            onClick={() => onSave(form)}
-            className="flex-1 bg-[#C0254A] text-white rounded-full py-2 text-[12px]"
+            onClick={handleSubmit}
+            disabled={saving}
+            className="flex-1 bg-[#C0254A] text-white rounded-full py-2.5 text-[12px] font-semibold hover:bg-[#a01e3e] transition disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            Simpan
+            {saving && (
+              <Icon icon="mdi:loading" className="animate-spin" width={14} />
+            )}
+            {saving ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </div>
@@ -190,200 +439,366 @@ const ModalAlat = ({ onClose, onSave, editData }) => {
 };
 
 const KelolaPeralatan = () => {
-  const [alat, setAlat] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [editData, setEditData] = useState(null);
+  const [alat, setAlat]               = useState([]);
+  const [showModal, setShowModal]     = useState(false);
+  const [editData, setEditData]       = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]         = useState(true);
+  const [saving, setSaving]           = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [toast, setToast]             = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const ITEMS_PER_PAGE = 8;
 
-  useEffect(() => {
+  const showToast = useCallback((message, type = "success") => {
+    setToast({ message, type });
+  }, []);
+
+  const fetchAlat = useCallback(() => {
+    setLoading(true);
     axiosClient
       .get("/get-alat")
       .then(({ data }) => {
         const mapped = data.data.map((item) => ({
-          id: item.id,
-          kode: item.kode_alat,
-          nama: item.nama_alat,
-          deskripsi: item.deskripsi_alat,
-          status: item.status_alat,
-          pic: item.pic,
-          foto: null,
+          id:              item.id,
+          kode:            item.kode_alat,
+          nama:            item.nama_alat,
+          deskripsi:       item.deskripsi_alat,
+          status:          item.status_alat,
+          pic:             item.pic ?? "-",
+          nomor_induk_pic: item.nomor_induk_pic != null ? String(item.nomor_induk_pic) : "",
+          foto:            item.path_foto ?? null,
         }));
         setAlat(mapped);
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Gagal memuat data alat:", err);
+        showToast("Gagal memuat data peralatan. Silakan muat ulang halaman.", "error");
       })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      .finally(() => setLoading(false));
+  }, [showToast]);
 
-  const handleSave = (data) => {
-    if (editData) {
-      setAlat(alat.map((a) => (a.id === editData.id ? { ...data, id: a.id } : a)));
-    } else {
-      setAlat([...alat, { ...data, id: Date.now() }]);
+  useEffect(() => {
+    fetchAlat();
+  }, [fetchAlat]);
+
+  const handleSave = (formData, fotoFile) => {
+    const payload = new FormData();
+    payload.append("kode_alat",       formData.kode.trim());
+    payload.append("nama_alat",       formData.nama.trim());
+    payload.append("deskripsi_alat",  formData.deskripsi.trim());
+    payload.append("status_alat",     formData.status);
+    payload.append("nomor_induk_pic", formData.nomor_induk_pic || "");
+    if (fotoFile) {
+      payload.append("foto", fotoFile);
     }
-    setShowModal(false);
-    setEditData(null);
+    if (editData) {
+      payload.append("_method", "PUT");
+    }
+
+    setSaving(true);
+
+    const url = editData ? `/alat/${editData.id}` : "/alat";
+    axiosClient.post(url, payload, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then(() => {
+        showToast(editData ? "Alat berhasil diperbarui." : "Alat berhasil ditambahkan.", "success");
+        fetchAlat();
+        closeModal();
+      })
+      .catch((err) => {
+        if (err.response?.data?.errors) {
+          const messages = Object.values(err.response.data.errors).flat().join("\n");
+          showToast("Validasi gagal: " + messages, "error");
+        } else if (err.response?.data?.message) {
+          showToast(err.response.data.message, "error");
+        } else {
+          showToast("Gagal menyimpan data. Silakan coba lagi.", "error");
+        }
+      })
+      .finally(() => setSaving(false));
   };
 
-  const handleDelete = (id) => {
-    setAlat(alat.filter((a) => a.id !== id));
+  const handleDeleteConfirmed = () => {
+    if (!confirmDelete) return;
+    const { id, nama } = confirmDelete;
+    setConfirmDelete(null);
+
+    axiosClient
+      .delete(`/alat/${id}`)
+      .then(() => {
+        setAlat((prev) => {
+          const updated = prev.filter((a) => a.id !== id);
+          const maxPage = Math.max(1, Math.ceil(updated.length / ITEMS_PER_PAGE));
+          setCurrentPage((p) => Math.min(p, maxPage));
+          return updated;
+        });
+        showToast(`Alat "${nama}" berhasil dihapus.`, "success");
+      })
+      .catch((err) => {
+        console.error("Gagal menghapus alat:", err);
+        showToast("Gagal menghapus alat. Silakan coba lagi.", "error");
+      });
   };
 
-  const tersedia = alat.filter((a) => a.status === "tersedia").length;
-  const dipinjam = alat.filter((a) => a.status === "dipinjam").length;
-  const maintenance = alat.filter((a) => a.status === "maintenance" || a.status === "rusak").length;
+  const openEdit = (data) => {
+    setEditData(data);
+    setShowModal(true);
+  };
 
-  const totalPages = Math.ceil(alat.length / ITEMS_PER_PAGE);
-  const paginatedAlat = alat.slice(
+  const closeModal = () => {
+    if (!saving) {
+      setShowModal(false);
+      setEditData(null);
+    }
+  };
+
+  const filtered = alat.filter(
+    (a) =>
+      a.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.kode.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.pic ?? "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages    = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginatedAlat = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const tersedia    = alat.filter((a) => a.status === "tersedia").length;
+  const dipinjam    = alat.filter((a) => a.status === "dipinjam").length;
+  const maintenance = alat.filter(
+    (a) => a.status === "maintenance" || a.status === "rusak"
+  ).length;
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+    (p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1
   );
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#FFF6F1] via-[#FFE4E6] to-[#FFD1D1]">
       <Sidebar />
 
-      <div className="ml-[300px] flex flex-col flex-1 p-10">
+      <div className="ml-[300px] flex flex-col flex-1 p-6 lg:p-10 min-w-0">
+
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-[#2D0A18] text-[32px] font-extrabold">
-              Halaman Kelola Peralatan
+            <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
+              Kelola Peralatan
             </h1>
-            <p className="text-gray-500 text-[14px] mt-1">
+            <p className="text-gray-500 text-[13px] mt-1">
               Lihat dan kelola seluruh alat yang dapat dipinjam dalam sistem
             </p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-orange-400 text-white px-6 py-2 rounded-lg text-sm"
+            className="self-start sm:self-auto flex items-center gap-2 bg-orange-400 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold transition shadow-md hover:shadow-lg"
           >
-            + Tambah Alat
+            <Icon icon="mdi:plus" width={16} />
+            Tambah Alat
           </button>
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-r from-[#8B1E3F] to-[#C0254A] text-white p-6 rounded-3xl flex justify-between items-center shadow-lg">
-            <div>
-              <p className="text-sm font-semibold">PERALATAN TERSEDIA</p>
-              <h2 className="text-5xl font-extrabold">{tersedia}</h2>
-              <p className="text-xs opacity-80 italic">Dapat dipinjam</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          {[
+            {
+              label: "Peralatan Tersedia",
+              value: tersedia,
+              sub: "Dapat dipinjam",
+              from: "#8B1E3F",
+              to: "#C0254A",
+              icon: "mdi:check-circle-outline",
+            },
+            {
+              label: "Dalam Peminjaman",
+              value: dipinjam,
+              sub: "Sedang dipinjam",
+              from: "#C0254A",
+              to: "#FF4D8D",
+              icon: "mdi:clock-outline",
+            },
+            {
+              label: "Tidak Tersedia",
+              value: maintenance,
+              sub: "Rusak / Maintenance",
+              from: "#FF4D8D",
+              to: "#F8BFA6",
+              icon: "mdi:tools",
+            },
+          ].map((s) => (
+            <div
+              key={s.label}
+              style={{ background: `linear-gradient(135deg, ${s.from}, ${s.to})` }}
+              className="text-white p-5 rounded-2xl flex justify-between items-center shadow-lg"
+            >
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wide opacity-90">
+                  {s.label}
+                </p>
+                <h2 className="text-[42px] font-extrabold leading-none my-1">{s.value}</h2>
+                <p className="text-[11px] opacity-75 italic">{s.sub}</p>
+              </div>
+              <Icon icon={s.icon} width={40} className="opacity-30" />
             </div>
-          </div>
-          <div className="bg-gradient-to-r from-[#C0254A] to-[#FF4D8D] text-white p-6 rounded-3xl flex justify-between items-center shadow-lg">
-            <div>
-              <p className="text-sm font-semibold">DALAM PEMINJAMAN</p>
-              <h2 className="text-5xl font-extrabold">{dipinjam}</h2>
-              <p className="text-xs opacity-80 italic">Sedang dipinjam</p>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-[#FF4D8D] to-[#F8BFA6] text-white p-6 rounded-3xl flex justify-between items-center shadow-lg">
-            <div>
-              <p className="text-sm font-semibold">PERALATAN TIDAK TERSEDIA</p>
-              <h2 className="text-5xl font-extrabold">{maintenance}</h2>
-              <p className="text-xs opacity-80 italic">Rusak / Maintenance</p>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* LOADING / EMPTY / GRID */}
+        {/* SEARCH */}
+        <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-2.5 shadow-sm border border-pink-100 mb-6 max-w-md">
+          <Icon icon="mdi:magnify" className="text-gray-400" width={18} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Cari nama, kode, atau PIC..."
+            className="flex-1 text-[13px] outline-none text-gray-700 placeholder-gray-400 bg-transparent"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery("")}>
+              <Icon icon="mdi:close-circle" className="text-gray-400 hover:text-gray-600" width={16} />
+            </button>
+          )}
+        </div>
+
+        {/* GRID */}
         {loading ? (
-          <div className="flex justify-center items-center h-40 text-[#C0254A] font-semibold text-lg">
-            Memuat data peralatan...
+          <div className="flex flex-col justify-center items-center h-48 gap-3">
+            <Icon icon="mdi:loading" className="animate-spin text-[#C0254A]" width={36} />
+            <p className="text-[#C0254A] font-semibold text-[14px]">
+              Memuat data peralatan...
+            </p>
           </div>
-        ) : alat.length === 0 ? (
-          <div className="flex justify-center items-center h-40 text-gray-400 text-sm">
-            Tidak ada data peralatan.
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col justify-center items-center h-48 gap-2 text-gray-400">
+            <Icon icon="mdi:tool-off-outline" width={40} />
+            <p className="text-[14px]">
+              {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : "Tidak ada data peralatan."}
+            </p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Responsive grid: 1 → 2 → 3 → 4 cols */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
               {paginatedAlat.map((item) => (
                 <AlatCard
                   key={item.id}
                   alat={item}
-                  onEdit={(data) => {
-                    setEditData(data);
-                    setShowModal(true);
-                  }}
-                  onDelete={handleDelete}
+                  onEdit={openEdit}
+                  onDelete={(a) => setConfirmDelete(a)}
                 />
               ))}
             </div>
 
             {/* PAGINATION */}
-            <div className="flex justify-center mt-8">
-              {totalPages > 1 && (
-                <div className="flex items-center gap-2 flex-wrap">
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {/* First */}
                   <button
                     onClick={() => setCurrentPage(1)}
                     disabled={currentPage === 1}
-                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40"
+                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-30 hover:bg-[#a01e3e] transition"
                   >
                     <Icon icon="mdi:chevron-double-left" />
                   </button>
+                  {/* Prev */}
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40"
+                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-30 hover:bg-[#a01e3e] transition"
                   >
                     <Icon icon="mdi:chevron-left" />
                   </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter(
-                      (p) =>
-                        p === currentPage ||
-                        p === currentPage - 1 ||
-                        p === currentPage + 1
-                    )
-                    .map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setCurrentPage(p)}
-                        className={`w-9 h-9 rounded-full ${
-                          currentPage === p
-                            ? "bg-[#C0254A] text-white"
-                            : "text-[#C0254A] hover:bg-pink-100"
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
+
+                  {/* Page numbers with ellipsis */}
+                  {pageNumbers.map((p, idx) => {
+                    const prev = pageNumbers[idx - 1];
+                    const showEllipsis = prev && p - prev > 1;
+                    return (
+                      <React.Fragment key={p}>
+                        {showEllipsis && (
+                          <span className="w-9 h-9 flex items-center justify-center text-gray-400 text-[13px]">
+                            …
+                          </span>
+                        )}
+                        <button
+                          onClick={() => setCurrentPage(p)}
+                          className={`w-9 h-9 rounded-full text-[13px] font-semibold transition ${
+                            currentPage === p
+                              ? "bg-[#C0254A] text-white shadow"
+                              : "text-[#C0254A] hover:bg-pink-100"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      </React.Fragment>
+                    );
+                  })}
+
+                  {/* Next */}
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40"
+                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-30 hover:bg-[#a01e3e] transition"
                   >
                     <Icon icon="mdi:chevron-right" />
                   </button>
+                  {/* Last */}
                   <button
                     onClick={() => setCurrentPage(totalPages)}
                     disabled={currentPage === totalPages}
-                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40"
+                    className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-30 hover:bg-[#a01e3e] transition"
                   >
                     <Icon icon="mdi:chevron-double-right" />
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Result info */}
+            <p className="text-center text-[11px] text-gray-400 mt-3">
+              Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
+              {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} dari{" "}
+              {filtered.length} alat
+            </p>
           </>
         )}
       </div>
 
+      {/* MODAL */}
       {showModal && (
         <ModalAlat
-          onClose={() => {
-            setShowModal(false);
-            setEditData(null);
-          }}
+          onClose={closeModal}
           onSave={handleSave}
           editData={editData}
+          saving={saving}
+        />
+      )}
+
+      {/* CONFIRM DELETE */}
+      {confirmDelete && (
+        <ConfirmDialog
+          message={`Apakah kamu yakin ingin menghapus alat "${confirmDelete.nama}"? Tindakan ini tidak dapat dibatalkan.`}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
+      {/* TOAST */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

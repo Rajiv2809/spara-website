@@ -12,7 +12,7 @@ const menuByRole = {
     {
       icon: "octicon:checklist-16",
       label: "Peminjaman Ruangan",
-      href: "/pengajuanruangan",
+      href: "/pengajuan-ruangan",
     },
     {
       icon: "material-symbols:monitor-outline",
@@ -26,7 +26,7 @@ const menuByRole = {
     {
       icon: "octicon:checklist-16",
       label: "Peminjaman Ruangan",
-      href: "/pengajuanruangan",
+      href: "/pengajuan-ruangan",
     },
     {
       icon: "material-symbols:monitor-outline",
@@ -52,11 +52,11 @@ const menuByRole = {
   ],
   admin: [
     { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
-    {
-      icon: "octicon:checklist-16",
-      label: "Peminjaman",
-      href: "/pengajuanruangan",
-    },
+    // {
+    //   icon: "octicon:checklist-16",
+    //   label: "Peminjaman",
+    //   href: "/pengajuan-ruangan",
+    // },
     {
       icon: "material-symbols:devices-outline",
       label: "Kelola Alat",
@@ -79,7 +79,7 @@ const menuByRole = {
     {
       icon: "octicon:checklist-16",
       label: "Peminjaman Ruangan",
-      href: "/pengajuanruangan",
+      href: "/pengajuan-ruangan",
     },
     {
       icon: "material-symbols:monitor-outline",
@@ -98,7 +98,7 @@ const menuByRole = {
     {
       icon: "octicon:checklist-16",
       label: "Peminjaman",
-      href: "/pengajuanruangan",
+      href: "/pengajuan-ruangan",
     },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {

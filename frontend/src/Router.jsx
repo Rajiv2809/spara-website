@@ -28,7 +28,7 @@ const router = createBrowserRouter([
                 element: <Dashboard />
             },
             {
-                path: "/pengajuanruangan",
+                path: "/pengajuan-ruangan",
                 element: <PengajuanRuangan />
             },
             {
