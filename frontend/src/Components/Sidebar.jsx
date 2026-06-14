@@ -93,7 +93,7 @@ const menuByRole = {
       href: "/persetujuan-peminjaman",
     },
   ],
-  kepala: [
+  ketua: [
     { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
     {
       icon: "octicon:checklist-16",
@@ -125,7 +125,7 @@ const Sidebar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const role = currentUser?.role?.toLowerCase() || "laoding";
+  const role = currentUser?.role?.toLowerCase() || "loading";
   const menus = menuByRole[role] || menuByRole["loading"];
   const currentPath = window.location.pathname;
 
