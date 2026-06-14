@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Alat;
+use App\Models\Peminjaman;
 use App\Http\Resources\AlatResource;
+use App\Http\Resources\JadwaRuanganResource;
 
 class AlatController extends Controller
 {
@@ -73,6 +75,16 @@ class AlatController extends Controller
             'message' => 'Alat berhasil diperbarui',
             'data'    => $alat
         ]);
+    }
+
+    public function jadwalAlat(int $id, string $tanggal)
+    {
+        $peminjaman = Peminjaman::with('persetujuans')
+            ->where('id_alat', $id)
+            ->whereDate('hari_tanggal', $tanggal)
+            ->get();
+
+        return JadwaRuanganResource::collection($peminjaman);
     }
 
     public function destroy($id)

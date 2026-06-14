@@ -30,6 +30,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/get-alat', [AlatController::class, 'getAlat']);
     Route::get('/alat/{id}', [AlatController::class, 'show']);
+    Route::get('/jadwal-alat/{id}/{tanggal}', [AlatController::class, 'jadwalAlat']);
     Route::post('/alat', [AlatController::class, 'store']);
     Route::put('/alat/{id}', [AlatController::class, 'update']);
     Route::delete('/alat/{id}', [AlatController::class, 'destroy']);

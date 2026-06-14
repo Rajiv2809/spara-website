@@ -98,16 +98,23 @@ class PeminjamanController extends Controller
             'diubah_pada'        => null,
         ]);
 
-        // ── Ambil nomor_induk PIC dari ruangan ──────────────────────────────
+        // ── Ambil nomor_induk PIC dari ruangan / alat ────────────────────────
         $nomorIndukPic = null;
         if ($request->id_ruangan) {
             $ruangan = DB::table('ruangans')
                 ->where('id_ruangan', $request->id_ruangan)
                 ->first();
 
-            // nomor_induk_pic langsung refer ke users.nomor_induk
             if ($ruangan && $ruangan->nomor_induk_pic) {
                 $nomorIndukPic = $ruangan->nomor_induk_pic;
+            }
+        } elseif ($request->id_alat) {
+            $alat = DB::table('alats')
+                ->where('id_alat', $request->id_alat)
+                ->first();
+
+            if ($alat && $alat->nomor_induk_pic) {
+                $nomorIndukPic = $alat->nomor_induk_pic;
             }
         }
 

@@ -401,7 +401,11 @@ const PersetujuanPeminjaman = () => {
         ));
         setModalSetujui(null);
       })
-      .catch((err) => console.error("Gagal menyetujui:", err))
+      .catch((err) => {
+        setModalSetujui(null);
+        const msg = err?.response?.data?.message || "Gagal menyetujui";
+        alert(msg);
+      })
       .finally(() => setActionLoading(false));
   };
 
@@ -414,7 +418,11 @@ const PersetujuanPeminjaman = () => {
         ));
         setModalTolak(null);
       })
-      .catch((err) => console.error("Gagal menolak:", err))
+      .catch((err) => {
+        setModalTolak(null);
+        const msg = err?.response?.data?.message || "Gagal menolak";
+        alert(msg);
+      })
       .finally(() => setActionLoading(false));
   };
 
