@@ -8,6 +8,7 @@ use App\Http\Controllers\{AdminController, AuthController, PeminjamanController,
 // })->middleware('auth:sanctum');
 //init untuk auth
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 Route::get('/riwayat-debug', [PeminjamanController::class, 'riwayatDebug']);
 
 Route::middleware('auth:api')->group(function () {

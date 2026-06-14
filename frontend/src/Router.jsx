@@ -14,75 +14,76 @@ import Riwayat from "./Pages/Riwayat.jsx";
 import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
 import KelolaAdmin from "./Pages/KelolaAdmin";
 import AllListPeminjaman from "./Pages/AllLlistPeminjman.jsx";
+import Register from "./Pages/Register.jsx";
 const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <DefaultLayout />,
-        children: [
-            {
-                path: "/home",
-                element: <Home />
-            },
-            {
-                path: "/dashboard",
-                element: <Dashboard />
-            },
-            {
-                path: "/pengajuan-ruangan",
-                element: <PengajuanRuangan />
-            },
-            {
-                path: "/peminjaman-peralatan",
-                element: <PengajuanPeralatan />
-            },
-            {
-                path: "/kelola-ruangan",
-                element: <KelolaRuangan />
-            },
-            {
-                path: "/riwayat",
-                element: <Riwayat/>
-             },
-             {
-                path: "/persetujuan-peminjaman",
-                element: <PersetujuanPeminjaman/>
-            },
-            {
-                path: "/kelola-peralatan",
-                element: <KelolaPeralatan />
-            },
-            {
-                path: "/kelola-admin",
-                element: <KelolaAdmin />
-            },
-            // {
-            //     path: "/semua-peminjaman",
-            //     element: <AllListPeminjaman />
-            // }
-
-        ]
-    },
-    {
-        path: "/",
-        element: <GuestLayout />,
-        children: [
-            {
-                path: "/login",
-                element: <Login />
-
-            },
-            {
-                path: "/landing-page",
-                element: <LandingPage />
-
-            },
-            {
-                path: "/tentangkami",
-                element: <TentangKami />
-
-            },
-        ]
-    }
+  {
+    path: "/",
+    element: <DefaultLayout />,
+    children: [
+      {
+        path: "/home",
+        element: <Home />,
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/pengajuanruangan",
+        element: <PengajuanRuangan />,
+      },
+      {
+        path: "/peminjaman-peralatan",
+        element: <PengajuanPeralatan />,
+      },
+      {
+        path: "/kelola-ruangan",
+        element: <KelolaRuangan />,
+      },
+      {
+        path: "/riwayat",
+        element: <Riwayat />,
+      },
+      {
+        path: "/persetujuan-peminjaman",
+        element: <PersetujuanPeminjaman />,
+      },
+      {
+        path: "/kelola-peralatan",
+        element: <KelolaPeralatan />,
+      },
+      {
+        path: "/kelola-admin",
+        element: <KelolaAdmin />,
+      },
+      // {
+      //     path: "/semua-peminjaman",
+      //     element: <AllListPeminjaman />
+      // }
+    ],
+  },
+  {
+    path: "/",
+    element: <GuestLayout />,
+    children: [
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/landing-page",
+        element: <LandingPage />,
+      },
+      {
+        path: "/tentangkami",
+        element: <TentangKami />,
+      },
+    ],
+  },
 ]);
 
 export default router;
