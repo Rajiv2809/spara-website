@@ -21,37 +21,16 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const jurusanProdi = {
-  "Teknik Informatika": [
-    "D3 Teknik Informatika",
-    "D3 Teknologi Geomatika",
-    "D4 Rekayasa Keamanan Siber",
-    "D4 Teknologi Permainan",
-    "D4 Animasi",
-    "D4 Rekayasa Perangkat Lunak",
-  ],
+    "Teknik Informatika": [
+    { id: 101, nama: "S1 Teknik Informatika" },
+    { id: 102, nama: "D3 Teknik Informatika" },
+    { id: 201, nama: "S1 Sistem Informasi" },
+    ],
 
-  "Teknik Elektro": [
-    "D3 Teknik Elektronika Manufaktur",
-    "D3 Teknik Instrumentasi ",
-    "D4 Teknik Mekatronika",
-    "D4 Teknologi Rekayasa Elektronika",
-  ],
-
-  "Teknik Mesin": [
-    "D3 Teknik Mesin",
-    "D4 Teknik Perawatan Pesawat Udara",
-    "Teknonologi Rekayasa Konstruksi Perkapalan",
-    "D4 Teknologi Rekayasa Pengelasan dan Fabrikasi",
-    "D4  Teknologi Rekayasa Metalurgi",
-  ],
-
-  "Manajemen Bisnis": [
-    "D3 Akuntansi",
-    "D4 Akuntansi Manajerial",
-    "D4 Administrasi Bisnis Terapan",
-    "D4 Logistik Perdagangan Internasional",
-  ],
-};
+    "Teknik Elektro": [
+    { id: 301, nama: "S1 Teknik Elektro" },
+    ],
+  };
 
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -59,6 +38,16 @@ export default function Register() {
   const register = (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+ console.log({
+    nomor_induk: nomorInduk,
+    nama,
+    email,
+    no_telepon: telepon,
+    id_prodi: prodi,
+  });
+
+  setIsLoading(true);
 
     axiosClient
       .post("/register", {
@@ -75,9 +64,11 @@ export default function Register() {
         navigate("/register");
       })
       .catch((err) => {
-        console.log(err);
-        showToast("Register gagal", "red");
-      })
+  console.log("STATUS:", err.response?.status);
+  console.log("DATA:", err.response?.data);
+
+  showToast("Register gagal", "red");
+})
       .finally(() => {
         setIsLoading(false);
       });
@@ -87,7 +78,6 @@ export default function Register() {
     const token = Cookies.get("accesstoken");
     console.log(token);
   }, []);
-
 
   return (
     <div className="register-container flex items-center justify-center bg-gradient-to-b from-[#DC4C75] to-[#862440] h-screen overflow-hidden relative">
@@ -194,22 +184,22 @@ export default function Register() {
               className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
             />
             <select
-  value={jurusan}
-  onChange={(e) => {
-    setJurusan(e.target.value);
-    setProdi("");
-  }}
-  disabled={isLoading}
-  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
->
-  <option value="">Pilih Jurusan</option>
+              value={jurusan}
+              onChange={(e) => {
+                setJurusan(e.target.value);
+                setProdi("");
+              }}
+              disabled={isLoading}
+              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+            >
+              <option value="">Pilih Jurusan</option>
 
-  {Object.keys(jurusanProdi).map((item) => (
-    <option key={item} value={item}>
-      {item}
-    </option>
-  ))}
-</select>
+              {Object.keys(jurusanProdi).map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
           </div>
 
           {jurusan && (
@@ -227,10 +217,10 @@ export default function Register() {
                 <option value="">Pilih Program Studi</option>
 
                 {jurusanProdi[jurusan]?.map((item) => (
-  <option key={item} value={item}>
-    {item}
-  </option>
-))}
+                  <option key={item.id} value={item.id}>
+                    {item.nama}
+                  </option>
+                ))}
               </select>
             </div>
           )}

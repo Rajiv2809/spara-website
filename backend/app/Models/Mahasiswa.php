@@ -3,57 +3,41 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Mahasiswa extends Model
 {
-    protected $table = 'peminjaman';
-    protected $primaryKey = 'id_peminjaman';
+    protected $table = 'mahasiswas';
+
+    protected $primaryKey = 'nomor_induk';
+
+    public $incrementing = false;
+
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'nama_kegiatan',
-        'jenis_kegiatan',
-        'hari_tanggal',
-        'jam',
-        'keterangan',
-        'status_persetujuan',
-        'id_peminjam',
-        'id_alat',
-        'id_ruangan',
-        'dibuat_pada',
-        'diubah_pada',
+        'nomor_induk',
+        'kelas',
+        'angkatan',
+        'status',
+        'id_prodi'
     ];
 
-    protected function casts(): array
+    public function user(): BelongsTo
     {
-        return [
-            'hari_tanggal' => 'date',
-            'dibuat_pada'  => 'datetime',
-            'diubah_pada'  => 'datetime',
-        ];
+        return $this->belongsTo(
+            User::class,
+            'nomor_induk',
+            'nomor_induk'
+        );
     }
 
-    public function peminjam(): BelongsTo
+    public function programStudi(): BelongsTo
     {
-        return $this->belongsTo(Peminjam::class, 'id_peminjam', 'id_pengguna');
-    }
-
-    public function alat(): BelongsTo
-    {
-        return $this->belongsTo(Alat::class, 'id_alat', 'id_alat');
-    }
-
-    public function ruangan(): BelongsTo
-    {
-        return $this->belongsTo(Ruangan::class, 'id_ruangan', 'id_ruangan');
-    }
-
-    public function tahapPersetujuan(): HasOne
-    {
-        return $this->hasOne(TahapPersetujuan::class, 'id_peminjaman', 'id_peminjaman');
-    }
-
-    public function persetujuan(): HasMany
-    {
-        return $this->hasMany(Persetujuan::class, 'id_peminjaman', 'id_peminjaman');
+        return $this->belongsTo(
+            ProgramStudi::class,
+            'id_prodi',
+            'id_prodi'
+        );
     }
 }
