@@ -39,16 +39,6 @@ export default function Register() {
     e.preventDefault();
     setIsLoading(true);
 
- console.log({
-    nomor_induk: nomorInduk,
-    nama,
-    email,
-    no_telepon: telepon,
-    id_prodi: prodi,
-  });
-
-  setIsLoading(true);
-
     axiosClient
       .post("/register", {
         nomor_induk: nomorInduk,
@@ -64,11 +54,9 @@ export default function Register() {
         navigate("/register");
       })
       .catch((err) => {
-  console.log("STATUS:", err.response?.status);
-  console.log("DATA:", err.response?.data);
-
-  showToast("Register gagal", "red");
-})
+        console.log(err);
+        showToast("Register gagal", "red");
+      })
       .finally(() => {
         setIsLoading(false);
       });
