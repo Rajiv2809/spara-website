@@ -281,8 +281,8 @@ const PeminjamanRuangan = () => {
     axiosClient.get('/get-ruangan')
       .then(({ data }) => {
         const mapped = data.data.map((r) => ({
-          id         : r.id_ruangan,
-          id_ruangan : r.id_ruangan,  // ✅ Fix: tambah field id_ruangan agar ModalPengajuan bisa akses via ruangan?.id_ruangan
+          id         : r.id,
+          id_ruangan : r.id,
           kode       : r.kode_ruangan,
           nama       : r.nama_ruangan,
           gedung     : r.nama_gedung,

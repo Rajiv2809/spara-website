@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import DefaultLayout from "./Layout/DefaultLayout.jsx";
 import GuestLayout from "./Layout/GuestLayout.jsx";
 import Login from "./Pages/Login.jsx";
@@ -21,6 +21,10 @@ const router = createBrowserRouter([
     element: <DefaultLayout />,
     children: [
       {
+        index: true,
+        element: <Navigate to="/dashboard" replace />,
+      },
+      {
         path: "/home",
         element: <Home />,
       },
@@ -29,7 +33,7 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "/pengajuanruangan",
+        path: "/pengajuan-ruangan",
         element: <PengajuanRuangan />,
       },
       {

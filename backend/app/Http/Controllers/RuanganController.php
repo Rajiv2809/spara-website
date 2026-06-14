@@ -24,7 +24,8 @@ class RuanganController extends Controller
 
     public function jadwalRuangan(int $id, string $tanggal)
     {
-        $peminjaman = Peminjaman::where('id_ruangan', $id)
+        $peminjaman = Peminjaman::with('persetujuans')
+            ->where('id_ruangan', $id)
             ->whereDate('hari_tanggal', $tanggal)
             ->get();
 

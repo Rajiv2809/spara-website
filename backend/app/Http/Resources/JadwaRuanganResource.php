@@ -14,11 +14,16 @@ class JadwaRuanganResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $persetujuans = $this->persetujuans ?? collect();
+        $allDisetujui = $persetujuans->isNotEmpty() && $persetujuans->every(fn($p) => $p->status_persetujuan === 'disetujui');
+        $hasDitolak = $persetujuans->contains(fn($p) => $p->status_persetujuan === 'ditolak');
+
         return [
             'jam_mulai' => $this->jam_mulai,
             'jam_selesai' => $this->jam_selesai,
             'nama_kegiatan' => $this->nama_kegiatan,
             'jenis_kegiatan' => $this->jenis_kegiatan,
+            'status_konfirmasi' => $allDisetujui ? 'disetujui' : ($hasDitolak ? 'ditolak' : 'pending'),
         ];
     }
 }

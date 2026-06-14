@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
 
-const Input = ({ label, name, type = "text", required = false, value, onChange }) => (
+const Input = ({ label, name, type = "text", required = false, value, onChange, ...props }) => (
   <div className="flex flex-col gap-1">
     <label className="text-[13px] font-medium text-[#3D0C1F]">
       {label} {required && "*"}
@@ -12,7 +12,12 @@ const Input = ({ label, name, type = "text", required = false, value, onChange }
       name={name}
       value={value}
       onChange={onChange}
-      className="border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-[#C0254A]"
+      {...props}
+      className={`border border-gray-300 rounded-md px-3 py-2 text-sm outline-none focus:border-[#C0254A] ${
+      props.disabled
+        ? "bg-gray-100 cursor-not-allowed"
+        : ""
+      }`}
     />
   </div>
 );
@@ -200,6 +205,19 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   const [isLoadingJadwal, setIsLoadingJadwal] = useState(false);
   const [tanggalCek, setTanggalCek] = useState("");
 
+  const [jamMulaiCek, setJamMulaiCek] = useState("");
+  const [jamSelesaiCek, setJamSelesaiCek] = useState("");
+
+  const [showPendingWarning, setShowPendingWarning] = useState(false);
+
+  const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  const minDate = today.toISOString().split("T")[0];
+
+  const now = new Date();
+  const currentTime = now.toTimeString().slice(0, 5);
+  const isToday = tanggalCek === minDate;
+
   const [form, setForm] = useState({
     nama_kegiatan: "",
     jenis_kegiatan: "",
@@ -212,7 +230,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   });
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, id_ruangan: ruangan?.id_ruangan || "" }));
+    setForm((prev) => ({ ...prev, id_ruangan: ruangan?.id || "" }));
   }, [ruangan]);
 
   useEffect(() => {
@@ -239,6 +257,21 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   };
 
   const formatJamDisplay = (jam) => (!jam ? "-" : jam.slice(0, 5));
+
+  const jadwalConfirmed = jadwalTerpakai.filter(
+    (item) => !item.status_konfirmasi || item.status_konfirmasi === "disetujui"
+  );
+  const jadwalPending = jadwalTerpakai.filter(
+    (item) => item.status_konfirmasi === "pending"
+  );
+
+  const cekBentrok = (list) => {
+    if (!jamMulaiCek || !jamSelesaiCek) return false;
+    return list.some((item) => jamMulaiCek < item.jam_selesai && jamSelesaiCek > item.jam_mulai);
+  };
+
+  const isBentrokConfirmed = cekBentrok(jadwalConfirmed);
+  const isBentrokPending = cekBentrok(jadwalPending);
 
   const handleSubmit = () => {
     if (
@@ -364,36 +397,76 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     label="Cek Ketersediaan Ruangan"
                     type="date"
                     value={tanggalCek}
+                    min={minDate}
                     onChange={(e) => setTanggalCek(e.target.value)}
                   />
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    
+                    <Input
+                    label="Jam Mulai"
+                    type="time"
+                    value={jamMulaiCek}
+                    min={isToday ? currentTime : undefined}
+                    onChange={(e) => setJamMulaiCek(e.target.value)}
+                    />
+
+                    <Input
+                    label="Jam Selesai"
+                    type="time"
+                    value={jamSelesaiCek}
+                    min={jamMulaiCek || (isToday ? currentTime : undefined)}
+                    onChange={(e) => setJamSelesaiCek(e.target.value)}
+                    />
+
+                  </div>
+                  {isBentrokConfirmed ? (
+                    <p className="text-red-600 text-sm mt-2 font-medium">
+                      Jadwal yang dipilih bertabrakan dengan peminjaman lain yang sudah dikonfirmasi.
+                    </p>
+                  ) : isBentrokPending ? (
+                    <p className="text-amber-600 text-sm mt-2 font-medium">
+                      Ada peminjaman yang diajukan di jam yang sama (belum disetujui). Anda tetap bisa melanjutkan.
+                    </p>
+                  ) : (
+                    jamMulaiCek &&
+                    jamSelesaiCek && (
+                      <p className="text-green-600 text-sm mt-2 font-medium">
+                        Jadwal tersedia.
+                      </p>
+                    )
+                  )}
+
                   <div className="mt-4 space-y-2">
                     {isLoadingJadwal ? (
                       <p className="text-sm text-gray-400">Memuat jadwal...</p>
-                    ) : jadwalTerpakai.length > 0 ? (
-                      jadwalTerpakai.map((item, i) => (
-                        <div
-                          key={i}
-                          className="bg-white border rounded-lg px-4 py-3 flex justify-between items-center"
-                        >
-                          <span className="text-sm font-medium text-gray-700">
-                            {item.jam_mulai && item.jam_selesai
-                              ? `${formatJamDisplay(item.jam_mulai)} - ${formatJamDisplay(item.jam_selesai)}`
-                              : "Jam belum ditentukan"}
-                          </span>
-                          <div className="text-right">
-                            <p className="text-sm text-gray-700">{item.nama_kegiatan}</p>
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                                item.jenis_kegiatan === "akademik"
-                                  ? "bg-blue-100 text-blue-700"
-                                  : "bg-orange-100 text-orange-700"
-                              }`}
-                            >
-                              {item.jenis_kegiatan}
+                    ) : jadwalConfirmed.length > 0 ? (
+                      <>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Jadwal Terkonfirmasi</p>
+                        {jadwalConfirmed.map((item, i) => (
+                          <div
+                            key={i}
+                            className="bg-white border rounded-lg px-4 py-3 flex justify-between items-center"
+                          >
+                            <span className="text-sm font-medium text-gray-700">
+                              {item.jam_mulai && item.jam_selesai
+                                ? `${formatJamDisplay(item.jam_mulai)} - ${formatJamDisplay(item.jam_selesai)}`
+                                : "Jam belum ditentukan"}
                             </span>
+                            <div className="text-right">
+                              <p className="text-sm text-gray-700">{item.nama_kegiatan}</p>
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                  item.jenis_kegiatan === "akademik"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "bg-orange-100 text-orange-700"
+                                }`}
+                              >
+                                {item.jenis_kegiatan}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </>
                     ) : (
                       <p className="text-sm text-gray-400">
                         {tanggalCek
@@ -409,6 +482,22 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
             {/* Step 2 - Isi Form */}
             {step === 2 && (
               <>
+                {/* Jadwal Summary */}
+                <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-6">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Jadwal yang Dipilih</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Icon icon="mdi:calendar" className="text-[#A3264C]" />
+                      <span>{form.hari_tanggal}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Icon icon="mdi:clock-outline" className="text-[#A3264C]" />
+                      <span>{form.jam_mulai.slice(0, 5)} - {form.jam_selesai.slice(0, 5)}</span>
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-[#A3264C] mt-2">{ruangan?.nama}</p>
+                </div>
+
                 <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Detail Pengajuan</h3>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -418,7 +507,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     value={form.jenis_kegiatan}
                     onChange={handleChange}
                     required
-                    options={["akademik", "non akademik"]}
+                    options={["akademik", "non-akademik"]}
                   />
                   <Input
                     label="Nama Kegiatan"
@@ -445,8 +534,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     name="hari_tanggal"
                     type="date"
                     value={form.hari_tanggal}
-                    onChange={handleChange}
-                    required
+                    disabled
                   />
                 </div>
 
@@ -456,16 +544,14 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     name="jam_mulai"
                     type="time"
                     value={form.jam_mulai}
-                    onChange={handleChange}
-                    required
+                    disabled
                   />
                   <Input
                     label="Jam Selesai"
                     name="jam_selesai"
                     type="time"
                     value={form.jam_selesai}
-                    onChange={handleChange}
-                    required
+                    disabled
                   />
                 </div>
 
@@ -495,8 +581,43 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
               )}
               <button
                 onClick={() => {
-                  if (step === 1) setStep(2);
-                  else setShowConfirm(true);
+                  if (step === 1) {
+                    if (!tanggalCek || !jamMulaiCek || !jamSelesaiCek) {
+                      alert("Silahkan pilih tanggal dan jam terlebih dahulu.");
+                      return;
+                    }
+
+                    if (jamMulaiCek >= jamSelesaiCek) {
+                      alert("Jam selesai harus lebih besar dari jam mulai.");
+                      return;
+                    }
+
+                    if (tanggalCek === minDate && jamMulaiCek < currentTime) {
+                      alert("Jam mulai tidak boleh lebih kecil dari waktu saat ini.");
+                      return;
+                    }
+
+                    if (isBentrokConfirmed) {
+                      alert("Jam yang dipilih sudah digunakan oleh peminjaman yang sudah dikonfirmasi.");
+                      return;
+                    }
+
+                    if (isBentrokPending) {
+                      setShowPendingWarning(true);
+                      return;
+                    }
+
+                    setForm((prev) => ({
+                      ...prev,
+                      hari_tanggal: tanggalCek,
+                      jam_mulai: jamMulaiCek,
+                      jam_selesai: jamSelesaiCek,
+                    }));
+
+                    setStep(2);
+                  } else {
+                    setShowConfirm(true);
+                  }
                 }}
                 className="bg-[#3D0C1F] text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm"
               >
@@ -507,6 +628,44 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
           </div>
         </div>
       </div>
+
+      {/* Modal Peringatan Pending */}
+      {showPendingWarning && (
+        <div className="fixed inset-0 bg-black/40 z-[70] flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 w-[420px] text-center shadow-xl">
+            <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
+              <span className="text-3xl text-amber-600">!</span>
+            </div>
+            <h2 className="text-xl font-bold text-[#3D0C1F] mt-4">Peringatan</h2>
+            <p className="text-sm text-gray-500 mt-3">
+              Sudah ada orang lain yang mengajukan peminjaman diwaktu yang sama, apakah anda tetap mau pinjam?
+            </p>
+            <div className="flex gap-3 justify-center mt-6">
+              <button
+                onClick={() => setShowPendingWarning(false)}
+                className="px-6 py-2 border rounded-lg text-sm"
+              >
+                Tidak
+              </button>
+              <button
+                onClick={() => {
+                  setShowPendingWarning(false);
+                  setForm((prev) => ({
+                    ...prev,
+                    hari_tanggal: tanggalCek,
+                    jam_mulai: jamMulaiCek,
+                    jam_selesai: jamSelesaiCek,
+                  }));
+                  setStep(2);
+                }}
+                className="px-6 py-2 bg-[#A3264C] text-white rounded-lg text-sm font-semibold"
+              >
+                Ya, Pinjam
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Konfirmasi */}
       {showConfirm && (

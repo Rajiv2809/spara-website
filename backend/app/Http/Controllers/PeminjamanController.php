@@ -35,7 +35,7 @@ class PeminjamanController extends Controller
             ], 422);
         }
 
-        // Cek konflik jadwal ruangan
+        // Cek konflik jadwal ruangan — hanya blokir jika sudah disetujui 3 tahap
         if ($request->id_ruangan && $request->jam_mulai && $request->jam_selesai) {
             $konflik = Peminjaman::where('id_ruangan', $request->id_ruangan)
                 ->where('hari_tanggal', $request->hari_tanggal)
@@ -47,7 +47,12 @@ class PeminjamanController extends Controller
                             $q->where('jam_mulai', '<=', $request->jam_mulai)
                                 ->where('jam_selesai', '>=', $request->jam_selesai);
                         });
-                })->exists();
+                })
+                ->whereDoesntHave('persetujuans', function ($q) {
+                    $q->where('status_persetujuan', '!=', 'disetujui');
+                })
+                ->whereHas('persetujuans')
+                ->exists();
 
             if ($konflik) {
                 return response()->json([
@@ -100,13 +105,9 @@ class PeminjamanController extends Controller
                 ->where('id_ruangan', $request->id_ruangan)
                 ->first();
 
+            // nomor_induk_pic langsung refer ke users.nomor_induk
             if ($ruangan && $ruangan->nomor_induk_pic) {
-                // pics.nomor_induk → users.nomor_induk
-                $pic = DB::table('pics')
-                    ->where('nomor_induk', $ruangan->nomor_induk_pic)
-                    ->first();
-
-                $nomorIndukPic = $pic?->nomor_induk ?? null;
+                $nomorIndukPic = $ruangan->nomor_induk_pic;
             }
         }
 
@@ -171,7 +172,12 @@ class PeminjamanController extends Controller
     }
     public function getPersetujuan()
     {
-        $persetujuan = Persetujuan::where('nomor_induk_penyetuju', request()->user()->nomor_induk)
+        $persetujuan = Persetujuan::where(function ($q) {
+            $q->where('nomor_induk_penyetuju', request()->user()->nomor_induk);
+            if (request()->user()->role === 'admin') {
+                $q->orWhereNull('nomor_induk_penyetuju');
+            }
+        })
             ->latest()
             ->take(5)
             ->get();
@@ -183,7 +189,12 @@ class PeminjamanController extends Controller
 
     public function getPersetujuanList()
     {
-        $persetujuanList = Persetujuan::where('nomor_induk_penyetuju', request()->user()->nomor_induk)
+        $persetujuanList = Persetujuan::where(function ($q) {
+            $q->where('nomor_induk_penyetuju', request()->user()->nomor_induk);
+            if (request()->user()->role === 'admin') {
+                $q->orWhereNull('nomor_induk_penyetuju');
+            }
+        })
             ->latest()
             ->get();
 
@@ -197,33 +208,78 @@ class PeminjamanController extends Controller
         $persetujuan = Persetujuan::find($id);
 
         if (!$persetujuan) {
-            return response()->json([
-                'message' => 'Persetujuan tidak ditemukan.',
-            ], 404);
+            return response()->json(['message' => 'Persetujuan tidak ditemukan.'], 404);
+        }
+
+        $peminjaman = Peminjaman::with('persetujuans')->find($persetujuan->id_peminjaman);
+        if (!$peminjaman) {
+            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
+        }
+
+        if ($peminjaman->status_persetujuan === 'ditolak') {
+            return response()->json(['message' => 'Peminjaman sudah ditolak.'], 422);
+        }
+
+        if ($peminjaman->status_persetujuan === 'disetujui') {
+            return response()->json(['message' => 'Peminjaman sudah disetujui sebelumnya.'], 422);
+        }
+
+        // Cek urutan persetujuan (berdasarkan id)
+        $allPersetujuan = $peminjaman->persetujuans->sortBy('id');
+        $currentIndex = $allPersetujuan->search(fn($item) => (int) $item->id === (int) $id);
+
+        if ($currentIndex === false) {
+            return response()->json(['message' => 'Data tidak valid.'], 422);
+        }
+
+        // Semua tahap sebelumnya harus sudah disetujui
+        for ($i = 0; $i < $currentIndex; $i++) {
+            if ($allPersetujuan[$i]->status_persetujuan !== 'disetujui') {
+                return response()->json([
+                    'message' => 'Tahap sebelumnya belum disetujui.',
+                ], 422);
+            }
         }
 
         $persetujuan->status_persetujuan = 'disetujui';
         $persetujuan->updated_at = Carbon::now();
         $persetujuan->save();
 
+        // Cek apakah semua 3 tahap sudah disetujui
+        $semuaDisetujui = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
+            ->where('status_persetujuan', '!=', 'disetujui')
+            ->doesntExist();
+
+        if ($semuaDisetujui) {
+            $peminjaman->status_persetujuan = 'disetujui';
+            $peminjaman->save();
+        }
+
         return response()->json([
             'message' => 'Peminjaman disetujui.',
             'persetujuan' => new PersetujuanResource($persetujuan),
         ]);
     }
+
     public function tolakPeminjaman($id)
     {
         $persetujuan = Persetujuan::find($id);
 
         if (!$persetujuan) {
-            return response()->json([
-                'message' => 'Persetujuan tidak ditemukan.',
-            ], 404);
+            return response()->json(['message' => 'Persetujuan tidak ditemukan.'], 404);
         }
+
+        $peminjaman = Peminjaman::find($persetujuan->id_peminjaman);
 
         $persetujuan->status_persetujuan = 'ditolak';
         $persetujuan->updated_at = Carbon::now();
         $persetujuan->save();
+
+        // Kalau ada yang tolak, peminjaman langsung ditolak
+        if ($peminjaman && $peminjaman->status_persetujuan !== 'ditolak') {
+            $peminjaman->status_persetujuan = 'ditolak';
+            $peminjaman->save();
+        }
 
         return response()->json([
             'message' => 'Peminjaman ditolak.',
