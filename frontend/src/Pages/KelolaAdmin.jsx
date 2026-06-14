@@ -1,28 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
+import axiosClient from "../axios";
 
 /* =========================
    DATA AWAL
 ========================= */
-const initialAdmin = [
-  {
-    id: 1,
-    nama: "Admin Utama",
-    nomorInduk: "10000001",
-    email: "admin@kampus.ac.id",
-    telepon: "081200000001",
-    status: "aktif",
-  },
-  {
-    id: 2,
-    nama: "Admin Akademik",
-    nomorInduk: "10000002",
-    email: "admin2@kampus.ac.id",
-    telepon: "081200000002",
-    status: "aktif",
-  },
-];
+const initialAdmin = [];
 
 /* =========================
    MODAL
@@ -33,12 +17,29 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
     nomorInduk: "",
     email: "",
     telepon: "",
+    password: "",
     status: "aktif",
   });
 
   useEffect(() => {
     if (editData) {
-      setForm(editData);
+      setForm({
+        nama: editData.nama || "",
+        nomorInduk: editData.nomorInduk || "",
+        email: editData.email || "",
+        telepon: editData.telepon || "",
+        status: editData.status || "aktif",
+        password: "",
+      });
+    } else {
+      setForm({
+        nama: "",
+        nomorInduk: "",
+        email: "",
+        telepon: "",
+        password: "",
+        status: "aktif",
+      });
     }
   }, [editData]);
 
@@ -52,7 +53,8 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
       !form.nama.trim() ||
       !form.nomorInduk.trim() ||
       !form.email.trim() ||
-      !form.telepon.trim()
+      !form.telepon.trim() ||
+      (!editData && !form.password.trim())
     ) {
       alert("Semua field wajib diisi!");
       return;
@@ -95,6 +97,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
               type="text"
               name="nomorInduk"
               value={form.nomorInduk}
+              readOnly={!!editData}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "");
                 setForm((prev) => ({
@@ -145,6 +148,23 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
             />
           </div>
 
+          {!editData && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                Password <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Masukkan password admin"
+                className="border border-gray-300 p-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#862440]"
+                required
+              />
+            </div>
+          )}
+
           {/* Status */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -186,24 +206,95 @@ const KelolaAdmin = () => {
   const [admins, setAdmins] = useState(initialAdmin);
   const [showModal, setShowModal] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = (data) => {
+  const normalizeAdmin = (admin) => ({
+    ...admin,
+    id: admin.nomor_induk?.toString() || admin.id?.toString() || Date.now().toString(),
+    nomorInduk: admin.nomor_induk?.toString() || admin.nomorInduk?.toString(),
+    telepon: admin.no_telepon || admin.telepon,
+    status: admin.status || "aktif",
+  });
+
+  const fetchAdmins = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await axiosClient.get("/get-admin");
+      const data = response.data || [];
+      setAdmins(data.map(normalizeAdmin));
+    } catch (error) {
+      console.error(error);
+      alert("Gagal memuat admin. Pastikan backend berjalan dan Anda sudah login.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  const handleSave = async (data) => {
     if (editData) {
-      setAdmins((prev) =>
-        prev.map((a) =>
-          a.id === editData.id ? { ...data, id: editData.id } : a,
-        ),
-      );
+      try {
+        const payload = {
+          nama: data.nama,
+          email: data.email,
+          no_telepon: data.telepon,
+        };
+
+        await axiosClient.put(`/admin/${editData.nomorInduk}`, payload);
+        setAdmins((prev) =>
+          prev.map((a) =>
+            a.nomorInduk === editData.nomorInduk
+              ? { ...a, ...data, status: a.status || "aktif" }
+              : a,
+          ),
+        );
+      } catch (error) {
+        console.error(error);
+        alert("Gagal memperbarui admin.");
+        return;
+      }
     } else {
-      setAdmins((prev) => [...prev, { ...data, id: Date.now() }]);
+      try {
+        const payload = {
+          nomor_induk: data.nomorInduk,
+          nama: data.nama,
+          email: data.email,
+          no_telepon: data.telepon,
+          password: data.password,
+        };
+
+        const response = await axiosClient.post("/admin", payload);
+        const createdAdmin = normalizeAdmin(response.data.data);
+
+        setAdmins((prev) => [...prev, createdAdmin]);
+      } catch (error) {
+        console.error(error);
+        alert("Gagal menambahkan admin.");
+        return;
+      }
     }
 
     setShowModal(false);
     setEditData(null);
   };
 
-  const handleDelete = (id) => {
-    setAdmins((prev) => prev.filter((a) => a.id !== id));
+  const handleDelete = async (nomorInduk) => {
+    const confirmed = window.confirm("Hapus admin ini?");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await axiosClient.delete(`/admin/${nomorInduk}`);
+      setAdmins((prev) => prev.filter((a) => a.nomorInduk !== nomorInduk));
+    } catch (error) {
+      console.error(error);
+      alert("Gagal menghapus admin.");
+    }
   };
 
   const totalAdmin = admins.length;
@@ -301,50 +392,53 @@ const KelolaAdmin = () => {
               <span className="text-center">Aksi</span>
             </div>
 
-            {/* ROW TABLE */}
-            {admins.map((admin) => (
-              <div
-                key={admin.id}
-                className="grid grid-cols-6 items-center py-4 border-b last:border-none"
-              >
-                <span className="font-semibold text-[#C0254A]">
-                  {admin.nama}
-                </span>
-
-                <span>{admin.nomorInduk}</span>
-                <span className="truncate">{admin.email}</span>
-                <span>{admin.telepon}</span>
-
-                <div className="flex justify-center">
-                  <span
-                    className={`text-white text-xs px-3 py-1 rounded-full ${
-                      admin.status === "aktif" ? "bg-green-500" : "bg-red-500"
-                    }`}
-                  >
-                    {admin.status.toUpperCase()}
+            {isLoading ? (
+              <div className="py-8 text-center text-gray-500">Memuat admin...</div>
+            ) : (
+              admins.map((admin) => (
+                <div
+                  key={admin.id}
+                  className="grid grid-cols-6 items-center py-4 border-b last:border-none"
+                >
+                  <span className="font-semibold text-[#C0254A]">
+                    {admin.nama}
                   </span>
-                </div>
 
-                <div className="flex justify-center gap-2">
-                  <button
-                    onClick={() => {
-                      setEditData(admin);
-                      setShowModal(true);
-                    }}
-                    className="bg-[#862440] text-white p-2 rounded-lg"
-                  >
-                    <Icon icon="mdi:pencil" />
-                  </button>
+                  <span>{admin.nomorInduk}</span>
+                  <span className="truncate">{admin.email}</span>
+                  <span>{admin.telepon}</span>
 
-                  <button
-                    onClick={() => handleDelete(admin.id)}
-                    className="bg-red-500 text-white p-2 rounded-lg"
-                  >
-                    <Icon icon="mdi:delete" />
-                  </button>
+                  <div className="flex justify-center">
+                    <span
+                      className={`text-white text-xs px-3 py-1 rounded-full ${
+                        admin.status === "aktif" ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    >
+                      {admin.status.toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditData(admin);
+                        setShowModal(true);
+                      }}
+                      className="bg-[#862440] text-white p-2 rounded-lg"
+                    >
+                      <Icon icon="mdi:pencil" />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(admin.nomorInduk)}
+                      className="bg-red-500 text-white p-2 rounded-lg"
+                    >
+                      <Icon icon="mdi:delete" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 

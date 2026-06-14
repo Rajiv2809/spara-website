@@ -8,8 +8,17 @@ use App\Models\User;
 
 class AdminController extends Controller
 {
+    private function checkKetua()
+    {
+        if (auth()->user()->role !== 'ketua') {
+            abort(403, 'Akses ditolak');
+        }
+    }
+
     public function getAdmin()
     {
+        $this->checkKetua();
+
         $admins = User::where('role', 'admin')->get();
 
         return response()->json($admins);
@@ -17,6 +26,8 @@ class AdminController extends Controller
 
     public function show($nomor_induk)
     {
+        $this->checkKetua();
+
         $admin = User::where('role', 'admin')
             ->where('nomor_induk', $nomor_induk)
             ->firstOrFail();
@@ -26,6 +37,8 @@ class AdminController extends Controller
 
     public function store(Request $request)
     {
+        $this->checkKetua();
+
         $validated = $request->validate([
             'nomor_induk' => 'required|unique:users,nomor_induk',
             'nama' => 'required|string|max:255',
@@ -47,6 +60,8 @@ class AdminController extends Controller
 
     public function update(Request $request, $nomor_induk)
     {
+        $this->checkKetua();
+
         $admin = User::where('role', 'admin')
             ->where('nomor_induk', $nomor_induk)
             ->firstOrFail();
@@ -67,6 +82,8 @@ class AdminController extends Controller
 
     public function destroy($nomor_induk)
     {
+        $this->checkKetua();
+
         $admin = User::where('role', 'admin')
             ->where('nomor_induk', $nomor_induk)
             ->firstOrFail();
