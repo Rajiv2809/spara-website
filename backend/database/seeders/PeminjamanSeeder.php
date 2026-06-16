@@ -14,7 +14,8 @@ class PeminjamanSeeder extends Seeder
         $alats = DB::table('alats')->pluck('id_alat')->toArray();
 
         $jenisKegiatan = [
-           'akademik', 'non-akademik'
+            'akademik',
+            'non-akademik'
         ];
 
         $keteranganList = [
@@ -29,41 +30,75 @@ class PeminjamanSeeder extends Seeder
 
         $data = [];
 
+        $today = Carbon::today();
+
+        // Maksimal tanggal = 15 hari ke depan atau akhir bulan (mana yang lebih dulu)
+        $maxDate = Carbon::createFromTimestamp(
+            min(
+                $today->copy()->addDays(15)->timestamp,
+                $today->copy()->endOfMonth()->timestamp
+            )
+        );
+
         foreach ($users as $nomorInduk) {
             $jumlah = rand(2, 3);
 
             for ($j = 0; $j < $jumlah; $j++) {
 
-                $hariTanggal = Carbon::create(2026, 5, rand(1, 31))->toDateString();
+                $hariTanggal = Carbon::createFromTimestamp(
+                    rand(
+                        $today->timestamp,
+                        $maxDate->timestamp
+                    )
+                )->toDateString();
 
-                $mulaiHour   = rand(7, 16);
+                $mulaiHour = rand(7, 16);
                 $mulaiMinute = [0, 15, 30, 45][rand(0, 3)];
 
-                $selesaiHour   = min($mulaiHour + rand(1, 3), 20);
+                $selesaiHour = min($mulaiHour + rand(1, 3), 20);
                 $selesaiMinute = $mulaiMinute;
 
-                $jamMulai   = sprintf('%02d:%02d:00', $mulaiHour, $mulaiMinute);
-                $jamSelesai = sprintf('%02d:%02d:00', $selesaiHour, $selesaiMinute);
+                $jamMulai = sprintf(
+                    '%02d:%02d:00',
+                    $mulaiHour,
+                    $mulaiMinute
+                );
 
-                $statusList = ['menunggu', 'disetujui', 'ditolak'];
-                $status     = $statusList[rand(0, 2)];
+                $jamSelesai = sprintf(
+                    '%02d:%02d:00',
+                    $selesaiHour,
+                    $selesaiMinute
+                );
+
+                $statusList = [
+                    'menunggu',
+                    'disetujui',
+                    'ditolak'
+                ];
+
+                $status = $statusList[rand(0, 2)];
 
                 $pinjamRuangan = rand(0, 1) === 0;
-                $idRuangan     = $pinjamRuangan ? rand(1, 10) : null;
-                $idAlat        = !$pinjamRuangan && !empty($alats)
-                    ? $alats[rand(0, count($alats) - 1)]
+
+                $idRuangan = $pinjamRuangan
+                    ? rand(1, 10)
+                    : null;
+
+                $idAlat = !$pinjamRuangan && !empty($alats)
+                    ? $alats[array_rand($alats)]
                     : null;
 
                 $now = Carbon::now();
 
                 $data[] = [
-                    'nama_kegiatan'      => $jenisKegiatan[rand(0, count($jenisKegiatan) - 1)]
-                                            . ' ' . strtoupper(substr(md5(uniqid()), 0, 4)),
-                    'jenis_kegiatan'     => $jenisKegiatan[rand(0, count($jenisKegiatan) - 1)],
+                    'nama_kegiatan'      => $jenisKegiatan[array_rand($jenisKegiatan)]
+                                            . ' ' .
+                                            strtoupper(substr(md5(uniqid()), 0, 4)),
+                    'jenis_kegiatan'     => $jenisKegiatan[array_rand($jenisKegiatan)],
                     'hari_tanggal'       => $hariTanggal,
                     'jam_mulai'          => $jamMulai,
                     'jam_selesai'        => $jamSelesai,
-                    'keterangan'         => $keteranganList[rand(0, count($keteranganList) - 1)],
+                    'keterangan'         => $keteranganList[array_rand($keteranganList)],
                     'status_persetujuan' => $status,
                     'id_peminjam'        => $nomorInduk,
                     'id_alat'            => $idAlat,

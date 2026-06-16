@@ -93,7 +93,7 @@ const menuByRole = {
       href: "/persetujuan-peminjaman",
     },
   ],
-  ketua: [
+  kepala: [
     { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
     {
       icon: "octicon:checklist-16",
@@ -136,9 +136,9 @@ const Sidebar = () => {
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-    console.log(role);
+ 
   }, []);
-
+  
   const handleLogoutClick = (e) => {
     e.preventDefault();
     setShowLogoutModal(true);

@@ -10,7 +10,7 @@ class AdminController extends Controller
 {
     private function checkKetua()
     {
-        if (auth()->user()->role !== 'ketua') {
+        if (auth()->user()->role !== 'kepala') {
             abort(403, 'Akses ditolak');
         }
     }

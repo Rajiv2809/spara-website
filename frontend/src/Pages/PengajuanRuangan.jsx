@@ -294,7 +294,8 @@ const PeminjamanRuangan = () => {
           path_foto  : r.path_foto,
           nama_pic   : r.nomor_induk_pic,
         }));
-
+        
+        
         const gedungSet = [...new Set(mapped.map((r) => r.gedung))];
 
         const lantaiMap = {};
