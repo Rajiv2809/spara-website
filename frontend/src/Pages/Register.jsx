@@ -11,6 +11,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const { showToast } = useStateContext();
+
+  const [step, setStep] = useState(1);
+
   const [nomorInduk, setNomorInduk] = useState("");
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
@@ -22,18 +25,46 @@ export default function Register() {
 
   const jurusanProdi = {
     "Teknik Informatika": [
-    { id: 101, nama: "S1 Teknik Informatika" },
-    { id: 102, nama: "D3 Teknik Informatika" },
-    { id: 201, nama: "S1 Sistem Informasi" },
+      { id: 101, nama: "S1 Teknik Informatika" },
+      { id: 102, nama: "D3 Teknik Informatika" },
+      { id: 201, nama: "S1 Sistem Informasi" },
     ],
 
-    "Teknik Elektro": [
-    { id: 301, nama: "S1 Teknik Elektro" },
-    ],
+    "Teknik Elektro": [{ id: 301, nama: "S1 Teknik Elektro" }],
   };
 
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const nextStep = () => {
+    if (step === 1) {
+      const missing = [];
+      if (!nomorInduk) missing.push("NIM");
+      if (!nama) missing.push("Nama Lengkap");
+
+      if (missing.length > 0) {
+        // Menggabungkan pesan jika ada lebih dari 1 data yang kosong
+        const message = missing.join(" dan ") + " wajib diisi!";
+        showToast(message, "red");
+        return;
+      }
+      setStep(2);
+    } else if (step === 2) {
+      const missing = [];
+      if (!email) missing.push("Email");
+      if (!telepon) missing.push("No Telepon");
+      if (!jurusan) missing.push("Jurusan");
+      if (!prodi) missing.push("Program Studi");
+
+      if (missing.length > 0) {
+        const message =
+          missing.join(", ").replace(/,([^,]*)$/, " dan$1") + " wajib diisi!";
+        showToast(message, "red");
+        return;
+      }
+      setStep(3);
+    }
+  };
 
   const register = (e) => {
     e.preventDefault();
@@ -92,171 +123,223 @@ export default function Register() {
         </div>
       )}
 
-      <div className="card-register rounded-[44px] h-[70 0px] bg-white min-w-[900px] z-10 grid grid-cols-5">
+      {/* SESUDAH */}
+      <div className="card-register rounded-[44px] h-[500px] bg-white min-w-[900px] z-10 grid grid-cols-5 overflow-hidden">
         <div className="logo col-span-2 flex items-center justify-center bg-[#862440] rounded-l-[44px]">
           <img src={logo1} className="w-[200px]" alt="Logo" />
         </div>
 
         <form
-          className="form-register col-span-3 flex flex-col gap-4 items-center gap-4 px-[50px] py-8 overflow-y-auto"
+          className="form-register col-span-3 flex flex-col items-center justify-center gap-3 px-[60px] py-6 overflow-y-auto"
           method="post"
           onSubmit={register}
         >
-          <h1 className="text-[40px] font-bold bg-gradient-to-b from-[#DC4C75] to-[#862440] bg-clip-text text-transparent">
+          <h1 className="text-[36px] font-bold bg-gradient-to-b from-[#DC4C75] to-[#862440] bg-clip-text text-transparent mb-1">
             REGISTER
           </h1>
 
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:account"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <input
-              type="text"
-              placeholder="NIM"
-              value={nomorInduk}
-              onChange={(e) => setNomorInduk(e.target.value)}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            />
-          </div>
+          {step === 1 && (
+            <div className="w-full flex flex-col gap-4 items-center">
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:account"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <input
+                  type="text"
+                  placeholder="NIM"
+                  value={nomorInduk}
+                  onChange={(e) => setNomorInduk(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                />
+              </div>
 
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:account-circle"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <input
-              type="text"
-              placeholder="Nama Lengkap"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            />
-          </div>
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:account-circle"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <input
+                  type="text"
+                  placeholder="Nama Lengkap"
+                  value={nama}
+                  onChange={(e) => setNama(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                />
+              </div>
 
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:email"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            />
-          </div>
-
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:phone"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <input
-              type="text"
-              placeholder="No Telepon"
-              value={telepon}
-              onChange={(e) => setTelepon(e.target.value)}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            />
-          </div>
-
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:domain"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <select
-              value={jurusan}
-              onChange={(e) => {
-                setJurusan(e.target.value);
-                setProdi("");
-              }}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            >
-              <option value="">Pilih Jurusan</option>
-
-              {Object.keys(jurusanProdi).map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {jurusan && (
-            <div className="w-full relative">
-              <Icon
-                icon="mdi:school"
-                className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-              />
-              <select
-                value={prodi}
-                onChange={(e) => setProdi(e.target.value)}
-                disabled={isLoading}
-                className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none bg-transparent disabled:opacity-50"
+              <button
+                type="button"
+                onClick={nextStep}
+                className="w-[185px] mt-4 bg-[#DC4C75] text-white font-bold py-2 rounded-full hover:bg-[#862440] transition duration-100"
               >
-                <option value="">Pilih Program Studi</option>
-
-                {jurusanProdi[jurusan]?.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nama}
-                  </option>
-                ))}
-              </select>
+                Selanjutnya
+              </button>
             </div>
           )}
 
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:lock"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            />
-          </div>
+          {step === 2 && (
+            <div className="w-full flex flex-col gap-2.5 items-center">
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:email"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                />
+              </div>
 
-          <div className="w-full relative">
-            <Icon
-              icon="mdi:lock-check"
-              className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
-            />
-            <input
-              type="password"
-              placeholder="Konfirmasi Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={isLoading}
-              className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
-            />
-          </div>
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:phone"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <input
+                  type="number"
+                  placeholder="No Telepon"
+                  value={telepon}
+                  onChange={(e) => setTelepon(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                />
+              </div>
 
-          <button
-            className="w-[185px] bg-[#DC4C75] text-white font-bold py-2 rounded-full hover:bg-[#862440] transition duration-100 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Loading...</span>
-              </>
-            ) : (
-              "Register"
-            )}
-          </button>
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:domain"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <select
+                  value={jurusan}
+                  onChange={(e) => {
+                    setJurusan(e.target.value);
+                    setProdi("");
+                  }}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                >
+                  <option value="">Pilih Jurusan</option>
+
+                  {Object.keys(jurusanProdi).map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {jurusan && (
+                <div className="w-full relative">
+                  <Icon
+                    icon="mdi:school"
+                    className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                  />
+                  <select
+                    value={prodi}
+                    onChange={(e) => setProdi(e.target.value)}
+                    disabled={isLoading}
+                    className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none bg-transparent disabled:opacity-50"
+                  >
+                    <option value="">Pilih Program Studi</option>
+
+                    {jurusanProdi[jurusan]?.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.nama}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="flex gap-4 mt-4 justify-center w-full">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  disabled={isLoading}
+                  className="w-[120px] border-2 border-[#DC4C75] text-[#DC4C75] font-bold py-1.5 rounded-full hover:bg-[#DC4C75] hover:text-white transition duration-100 disabled:opacity-50"
+                >
+                  Kembali
+                </button>
+
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={isLoading}
+                  className="w-[185px] bg-[#DC4C75] text-white font-bold py-2 rounded-full hover:bg-[#862440] transition duration-100"
+                >
+                  Selanjutnya
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="w-full flex flex-col gap-4 items-center">
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:lock"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                />
+              </div>
+
+              <div className="w-full relative">
+                <Icon
+                  icon="mdi:lock-check"
+                  className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
+                />
+                <input
+                  type="password"
+                  placeholder="Konfirmasi Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
+                />
+              </div>
+
+              <div className="flex gap-4 mt-2 justify-center w-full">
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  disabled={isLoading}
+                  className="w-[120px] border-2 border-[#DC4C75] text-[#DC4C75] font-bold py-1.5 rounded-full hover:bg-[#DC4C75] hover:text-white transition duration-100 disabled:opacity-50"
+                >
+                  Kembali
+                </button>
+
+                <button
+                  className="w-[185px] bg-[#DC4C75] text-white font-bold py-2 rounded-full hover:bg-[#862440] transition duration-100 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    "Register"
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div>
             <span className="text-sm font-light text-gray-500">
