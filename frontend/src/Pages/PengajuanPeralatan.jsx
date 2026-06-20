@@ -13,7 +13,7 @@ const statusStyles = {
 };
 
 
-const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan}) => {
+const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan }) => {
   const normalizedStatus = status?.toLowerCase();
   const s = statusStyles[normalizedStatus] || statusStyles.tersedia;
   const canApply = normalizedStatus === "tersedia";
@@ -22,11 +22,11 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan}) => {
     <div className="bg-white rounded-2xl overflow-hidden border border-pink-100 shadow-md hover:scale-[1.02] hover:shadow-xl transition duration-300">
 
       <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
-  <img
-    src={peralatanImg}
-    alt="equipment"
-    className="w-full h-full object-cover"
-  />
+        <img
+          src={peralatanImg}
+          alt="equipment"
+          className="w-full h-full object-cover"
+        />
 
         <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 ${s.bg} text-white text-[9px] font-bold px-3 py-1 rounded-full`}>
           {s.text}
@@ -59,9 +59,9 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan}) => {
           </button>
 
           {canApply ? (
-            <button 
-            onClick={onAjukan}
-            className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition">
+            <button
+              onClick={onAjukan}
+              className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition">
               <Icon icon="mdi:plus" width={11} />
               Ajukan
             </button>
@@ -117,13 +117,13 @@ const PeminjamanPeralatan = () => {
   const filtered = equipments.filter((item) => {
     const matchSearch = item.nama.toLowerCase().includes(search.toLowerCase());
     const matchStatus =
-  !filterStatus || item.status.toLowerCase() === filterStatus;
+      !filterStatus || item.status.toLowerCase() === filterStatus;
 
-const matchJenis =
-  !filterJenis || item.jenis.toLowerCase() === filterJenis.toLowerCase();
-  
+    const matchJenis =
+      !filterJenis || item.jenis.toLowerCase() === filterJenis.toLowerCase();
 
-    return matchSearch && matchStatus && matchJenis ;
+
+    return matchSearch && matchStatus && matchJenis;
   });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -152,13 +152,13 @@ const matchJenis =
       .catch((err) => console.error("Gagal memuat peralatan:", err));
   }, []);
 
-const statusOptions = [
-  ...new Set(equipments.map((item) => item.status))
-];
+  const statusOptions = [
+    ...new Set(equipments.map((item) => item.status))
+  ];
 
-const jenisOptions = [
-  ...new Set(equipments.map((item) => item.jenis || "Peralatan"))
-];
+  const jenisOptions = [
+    ...new Set(equipments.map((item) => item.jenis || "Peralatan"))
+  ];
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#FFF6F1] via-[#FFE4E6] to-[#FFD1D1]">
@@ -194,27 +194,27 @@ const jenisOptions = [
             </div>
 
             {/* BODY */}
-           <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
-  <img
-    src={peralatanImg}
-    alt="equipment"
-    className="w-full h-full object-cover"
-  />
-</div>
+            <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
+              <img
+                src={peralatanImg}
+                alt="equipment"
+                className="w-full h-full object-cover"
+              />
+            </div>
 
             <div className="p-4 flex flex-col gap-2.5">
-              
+
               <span className={`text-[10px] px-2 py-1 rounded-full w-fit ${statusStyles[selectedEquipment.status]?.bg || "bg-gray-400"} text-white`}>
                 {selectedEquipment.status}
               </span>
 
-{/* TAMBAHAN STOK */}
-<div className="flex items-center gap-1 text-[11px] text-[#3D0C1F] font-semibold">
-  <Icon icon="mdi:package-variant" width={14} className="text-pink-500" />
-  <span>
-    Stok: <span className="text-pink-500">{selectedEquipment.stok}</span>
-  </span>
-</div>
+              {/* TAMBAHAN STOK */}
+              <div className="flex items-center gap-1 text-[11px] text-[#3D0C1F] font-semibold">
+                <Icon icon="mdi:package-variant" width={14} className="text-pink-500" />
+                <span>
+                  Stok: <span className="text-pink-500">{selectedEquipment.stok}</span>
+                </span>
+              </div>
 
               <p className="text-[11px] text-gray-500 bg-pink-50 p-2.5 rounded-lg">
                 {selectedEquipment.deskripsi}
@@ -231,12 +231,12 @@ const jenisOptions = [
               </button>
 
               <button
-              onClick={() => onAjukan?.()}
+                onClick={() => onAjukan?.()}
                 className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition"
               >
-              <Icon icon="mdi:plus" width={11} />
-              Ajukan Peminjaman
-            </button>
+                <Icon icon="mdi:plus" width={11} />
+                Ajukan Peminjaman
+              </button>
             </div>
           </div>
         </div>
@@ -272,39 +272,39 @@ const jenisOptions = [
 
           {/* FILTER */}
           {/* FILTER */}
-<div className="flex gap-3 mb-6">
-  <select
-    value={filterStatus || ""}
-    onChange={(e) => {
-      setFilterStatus(e.target.value || null);
-      setCurrentPage(1);
-    }}
-    className="border border-pink-300 text-[#C0254A] bg-white rounded-full px-4 py-2 text-sm outline-none"
-  >
-    <option value="">Status</option>
-    {statusOptions.map((status) => (
-      <option key={status} value={status}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </option>
-    ))}
-  </select>
+          <div className="flex gap-3 mb-6">
+            <select
+              value={filterStatus || ""}
+              onChange={(e) => {
+                setFilterStatus(e.target.value || null);
+                setCurrentPage(1);
+              }}
+              className="border border-pink-300 text-[#C0254A] bg-white rounded-full px-4 py-2 text-sm outline-none"
+            >
+              <option value="">Status</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
 
-  <select
-    value={filterJenis || ""}
-    onChange={(e) => {
-      setFilterJenis(e.target.value || null);
-      setCurrentPage(1);
-    }}
-    className="border border-pink-300 text-[#C0254A] bg-white rounded-full px-4 py-2 text-sm outline-none"
-  >
-    <option value="">Jenis alat</option>
-    {jenisOptions.map((jenis) => (
-      <option key={jenis} value={jenis}>
-        {jenis}
-      </option>
-    ))}
-  </select>
-</div>
+            <select
+              value={filterJenis || ""}
+              onChange={(e) => {
+                setFilterJenis(e.target.value || null);
+                setCurrentPage(1);
+              }}
+              className="border border-pink-300 text-[#C0254A] bg-white rounded-full px-4 py-2 text-sm outline-none"
+            >
+              <option value="">Jenis alat</option>
+              {jenisOptions.map((jenis) => (
+                <option key={jenis} value={jenis}>
+                  {jenis}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
@@ -323,102 +323,101 @@ const jenisOptions = [
 
           {/* PAGINATION */}
           {totalPages > 1 && (
-  <div className="flex items-center justify-center gap-2 flex-wrap">
-    
-    {/* FIRST PAGE */}
-    <button
-      onClick={() => setCurrentPage(1)}
-      disabled={currentPage === 1}
-      className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
-    >
-      <Icon icon="mdi:chevron-double-left" />
-    </button>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
 
-    {/* PREV */}
-    <button
-      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-      disabled={currentPage === 1}
-      className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
-    >
-      <Icon icon="mdi:chevron-left" />
-    </button>
+              {/* FIRST PAGE */}
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
+              >
+                <Icon icon="mdi:chevron-double-left" />
+              </button>
 
-    {/* LEFT ELLIPSIS */}
-    {currentPage > 3 && (
-      <span className="text-[#C0254A] font-semibold">...</span>
-    )}
+              {/* PREV */}
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
+              >
+                <Icon icon="mdi:chevron-left" />
+              </button>
 
-    {/* PAGE NUMBERS (dynamic like teman kamu) */}
-    {Array.from({ length: totalPages }, (_, i) => i + 1)
-      .filter((p) => {
-        return (
-          p === currentPage ||
-          p === currentPage - 1 ||
-          p === currentPage + 1
-        );
-      })
-      .map((p) => (
-        <button
-          key={p}
-          onClick={() => setCurrentPage(p)}
-          className={`w-9 h-9 rounded-full text-[13px] font-semibold transition ${
-            currentPage === p
-              ? "bg-[#C0254A] text-white shadow-md"
-              : "text-[#C0254A] hover:bg-pink-100"
-          }`}
-        >
-          {p}
-        </button>
-      ))}
+              {/* LEFT ELLIPSIS */}
+              {currentPage > 3 && (
+                <span className="text-[#C0254A] font-semibold">...</span>
+              )}
 
-    {/* RIGHT ELLIPSIS */}
-    {currentPage < totalPages - 2 && (
-      <span className="text-[#C0254A] font-semibold">...</span>
-    )}
+              {/* PAGE NUMBERS (dynamic like teman kamu) */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  return (
+                    p === currentPage ||
+                    p === currentPage - 1 ||
+                    p === currentPage + 1
+                  );
+                })
+                .map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setCurrentPage(p)}
+                    className={`w-9 h-9 rounded-full text-[13px] font-semibold transition ${currentPage === p
+                        ? "bg-[#C0254A] text-white shadow-md"
+                        : "text-[#C0254A] hover:bg-pink-100"
+                      }`}
+                  >
+                    {p}
+                  </button>
+                ))}
 
-    {/* NEXT */}
-    <button
-      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-      disabled={currentPage === totalPages}
-      className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
-    >
-      <Icon icon="mdi:chevron-right" />
-    </button>
+              {/* RIGHT ELLIPSIS */}
+              {currentPage < totalPages - 2 && (
+                <span className="text-[#C0254A] font-semibold">...</span>
+              )}
 
-    {/* LAST PAGE */}
-    <button
-      onClick={() => setCurrentPage(totalPages)}
-      disabled={currentPage === totalPages}
-      className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
-    >
-      <Icon icon="mdi:chevron-double-right" />
-    </button>
+              {/* NEXT */}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
+              >
+                <Icon icon="mdi:chevron-right" />
+              </button>
 
-    {/* GO TO */}
-    <span className="text-[#3D0C1F] text-[13px] font-semibold ml-2">
-      Go To
-    </span>
+              {/* LAST PAGE */}
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="w-9 h-9 rounded-full bg-[#C0254A] text-white flex items-center justify-center disabled:opacity-40 hover:scale-105 transition"
+              >
+                <Icon icon="mdi:chevron-double-right" />
+              </button>
 
-    <input
-      type="number"
-      min={1}
-      max={totalPages}
-      className="w-16 rounded-full bg-[#3D0C1F] text-white text-center text-[13px] px-2 py-1 outline-none shadow-inner"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          const val = parseInt(e.target.value, 10);
-          if (val >= 1 && val <= totalPages) {
-            setCurrentPage(val);
-          }
-        }
-      }}
-    />
+              {/* GO TO */}
+              <span className="text-[#3D0C1F] text-[13px] font-semibold ml-2">
+                Go To
+              </span>
 
-    <span className="text-[#3D0C1F] text-[13px] font-semibold">
-      Page
-    </span>
-  </div>
-)}
+              <input
+                type="number"
+                min={1}
+                max={totalPages}
+                className="w-16 rounded-full bg-[#3D0C1F] text-white text-center text-[13px] px-2 py-1 outline-none shadow-inner"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const val = parseInt(e.target.value, 10);
+                    if (val >= 1 && val <= totalPages) {
+                      setCurrentPage(val);
+                    }
+                  }
+                }}
+              />
+
+              <span className="text-[#3D0C1F] text-[13px] font-semibold">
+                Page
+              </span>
+            </div>
+          )}
         </div>
       </div>
       {showModal && (

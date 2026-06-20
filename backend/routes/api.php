@@ -39,6 +39,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
     Route::get('/peminjaman-all', [PeminjamanController::class, 'getAllPeminjaman']);
     Route::get('/riwayat', [PeminjamanController::class, 'riwayat']);
+    Route::post('/peminjaman-rekapitulasi', [PeminjamanController::class, 'getPeminjamanRekapitulasi']);
 
     Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
 

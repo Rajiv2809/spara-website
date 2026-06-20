@@ -243,6 +243,29 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Peminjaman sudah disetujui sebelumnya.'], 422);
         }
 
+        // ─── Validasi role PIC: hanya bisa approve jika penanggung jawab sudah approve ───
+        $user = auth()->user();
+
+        if ($user->role === 'pic') {
+            // Cari persetujuan milik penanggung jawab pada peminjaman yang sama
+            $persetujuanPenanggungJawab = $peminjaman->persetujuans
+                ->filter(fn($p) => optional($p->penyetuju)->role === 'penanggung_jawab')
+                ->first();
+
+            if (!$persetujuanPenanggungJawab) {
+                return response()->json([
+                    'message' => 'Belum ada persetujuan dari penanggung jawab.',
+                ], 422);
+            }
+
+            if ($persetujuanPenanggungJawab->status_persetujuan !== 'disetujui') {
+                return response()->json([
+                    'message' => 'Penanggung jawab belum menyetujui peminjaman ini.',
+                ], 422);
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────────────────
+
         // Cek urutan persetujuan (berdasarkan id)
         $allPersetujuan = $peminjaman->persetujuans->sortBy('id');
         $currentIndex = $allPersetujuan->search(fn($item) => (int) $item->id === (int) $id);
@@ -264,7 +287,7 @@ class PeminjamanController extends Controller
         $persetujuan->updated_at = Carbon::now();
         $persetujuan->save();
 
-        // Cek apakah semua 3 tahap sudah disetujui
+        // Cek apakah semua tahap sudah disetujui
         $semuaDisetujui = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
             ->where('status_persetujuan', '!=', 'disetujui')
             ->doesntExist();
@@ -307,7 +330,7 @@ class PeminjamanController extends Controller
     }
     public function getAllPeminjaman()
     {
-        $riwayat = Peminjaman::with(['persetujuans','ruangan','alat','peminjam'])
+        $riwayat = Peminjaman::with(['persetujuans', 'ruangan', 'alat', 'peminjam'])
             ->where('id_peminjam', request()->user()->nomor_induk)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
@@ -346,7 +369,7 @@ class PeminjamanController extends Controller
     {
         $user = request()->user();
 
-        $riwayat = Peminjaman::with(['persetujuans','ruangan','alat','peminjam'])
+        $riwayat = Peminjaman::with(['persetujuans', 'ruangan', 'alat', 'peminjam'])
             ->where('id_peminjam', $user->nomor_induk)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
@@ -372,7 +395,7 @@ class PeminjamanController extends Controller
             ], 400);
         }
 
-        $riwayat = Peminjaman::with(['persetujuans','ruangan','alat','peminjam'])
+        $riwayat = Peminjaman::with(['persetujuans', 'ruangan', 'alat', 'peminjam'])
             ->where('id_peminjam', $nomor)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
@@ -381,5 +404,102 @@ class PeminjamanController extends Controller
             'message' => 'Riwayat debug berhasil diambil.',
             'data' => PeminjamanResource::collection($riwayat),
         ]);
+    }
+    /**
+     * GET /api/peminjaman-rekapitulasi
+     *
+     * Query params:
+     *  - filter    : 'seminggu' | 'sebulan' | (opsional, default tampil semua)
+     *  - tanggal   : 'YYYY-MM-DD' — titik acuan untuk seminggu/sebulan,
+     *                atau filter tepat satu hari jika tanpa `filter`
+     *  - dari      : 'YYYY-MM-DD' — range manual (bersama `sampai`)
+     *  - sampai    : 'YYYY-MM-DD' — range manual (bersama `dari`)
+     *  - status    : 'menunggu' | 'disetujui' | 'ditolak' (opsional)
+     *  - per_page  : integer (default 15, max 100)
+     */
+    public function getPeminjamanRekapitulasi(Request $request)
+    {
+        $request->validate([
+            'filter'   => 'nullable|in:seminggu,sebulan',
+            'tanggal'  => 'nullable|date_format:Y-m-d',
+            'dari'     => 'nullable|date_format:Y-m-d|required_with:sampai',
+            'sampai'   => 'nullable|date_format:Y-m-d|required_with:dari|after_or_equal:dari',
+            'status'   => 'nullable|in:menunggu,disetujui,ditolak',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $query = Peminjaman::with(['peminjam', 'alat', 'ruangan'])
+            ->orderBy('hari_tanggal', 'desc')
+            ->orderBy('jam_mulai', 'asc');
+
+        // ── Logika filter tanggal ──────────────────────────────────────────
+        $acuan = $request->filled('tanggal')
+            ? Carbon::parse($request->tanggal)
+            : Carbon::today();
+
+        if ($request->filled('filter')) {
+            match ($request->filter) {
+                'seminggu' => $query->whereBetween('hari_tanggal', [
+                    $acuan->copy()->startOfWeek(Carbon::MONDAY)->toDateString(),
+                    $acuan->copy()->endOfWeek(Carbon::SUNDAY)->toDateString(),
+                ]),
+                'sebulan'  => $query->whereBetween('hari_tanggal', [
+                    $acuan->copy()->startOfMonth()->toDateString(),
+                    $acuan->copy()->endOfMonth()->toDateString(),
+                ]),
+            };
+        } elseif ($request->filled('dari') && $request->filled('sampai')) {
+            // Range manual
+            $query->whereBetween('hari_tanggal', [
+                $request->dari,
+                $request->sampai,
+            ]);
+        } elseif ($request->filled('tanggal')) {
+            // Tepat satu hari
+            $query->whereDate('hari_tanggal', $request->tanggal);
+        }
+        // Tanpa parameter → tampil semua (tidak difilter)
+
+        // ── Filter status (opsional) ───────────────────────────────────────
+        if ($request->filled('status')) {
+            $query->where('status_persetujuan', $request->status);
+        }
+
+        $perPage = min((int) $request->input('per_page', 15), 100);
+        $data    = $query->paginate($perPage);
+
+        // ── Tambahkan meta rentang ke response ────────────────────────────
+        $meta = $this->buildMeta($request, $acuan);
+
+        return response()->json([
+            'success' => true,
+            'meta'    => $meta,
+            'data'    => $data,
+        ]);
+    }
+
+    // ── Helper: bangun info rentang untuk response ─────────────────────────
+    private function buildMeta(Request $request, Carbon $acuan): array
+    {
+        $meta = ['filter_aktif' => $request->input('filter', 'custom')];
+
+        if ($request->filled('filter')) {
+            $meta += match ($request->filter) {
+                'seminggu' => [
+                    'dari'   => $acuan->copy()->startOfWeek(Carbon::MONDAY)->toDateString(),
+                    'sampai' => $acuan->copy()->endOfWeek(Carbon::SUNDAY)->toDateString(),
+                ],
+                'sebulan'  => [
+                    'dari'   => $acuan->copy()->startOfMonth()->toDateString(),
+                    'sampai' => $acuan->copy()->endOfMonth()->toDateString(),
+                ],
+            };
+        } elseif ($request->filled('dari')) {
+            $meta += ['dari' => $request->dari, 'sampai' => $request->sampai];
+        } elseif ($request->filled('tanggal')) {
+            $meta += ['tanggal' => $request->tanggal];
+        }
+
+        return $meta;
     }
 }
