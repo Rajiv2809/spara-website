@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import Sidebar from "../Components/sidebar";
+import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import ModalPengajuan from "../Components/ModalPengajuanRuangan";
 import gedung_utama from '../assets/gu601.jpeg';

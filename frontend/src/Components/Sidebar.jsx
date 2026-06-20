@@ -5,6 +5,7 @@ import pakari from "../Pages/Assets/pakari.png";
 import { useStateContext } from "../Contexts/context.jsx";
 import axiosClient from "../axios";
 import { useNavigate } from "react-router-dom";
+import ModalProfile from "../Components/ModalProfile";
 
 const menuByRole = {
   mahasiswa: [
@@ -124,6 +125,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const role = currentUser?.role?.toLowerCase() || "loading";
   const menus = menuByRole[role] || menuByRole["loading"];
@@ -215,29 +217,46 @@ const Sidebar = () => {
 
       {/* Profile & Logout */}
       <div
-        onClick={handleLogoutClick}
-        className="mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors"
+        onClick={() => {
+          setShowProfileModal(true);
+          setIsOpen(false); // 
+        }}
+        className="mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors group"
       >
         <img
-          src={pakari}
+          src={currentUser?.fotoprofil || pakari}
           alt="Profile"
-          className="w-9 h-9 rounded-full object-cover"
+          className="w-9 h-9 rounded-full object-cover shrink-0"
         />
         <div className="text-left flex-1 min-w-0">
-          <h1 className="text-[15px] truncate">{currentUser.nama}</h1>
-          <h3 className="text-[8px] text-[#B1B1B1] truncate">
-            {currentUser.email}
+          <h1 className="text-[15px] truncate font-medium group-hover:underline">
+            {currentUser?.nama || "Nama Pengguna"}
+          </h1>
+          <h3 className="text-[10px] text-[#B1B1B1] truncate">
+            Lihat Profil
           </h3>
         </div>
-        <Icon className="ml-2 shrink-0" icon="uil:signout" width="36" />
+        
+        
+        <button 
+          onClick={(e) => {
+            e.stopPropagation(); 
+            handleLogoutClick(e); 
+          }}
+          className="p-1 rounded hover:bg-[#862440] text-[#FFEDDD] transition-colors shrink-0 ml-1 flex items-center justify-center"
+          title="Keluar Aplikasi"
+        >
+          <Icon icon="material-symbols:logout-rounded" width="24" />
+        </button>
       </div>
     </div>
   );
 
+
   return (
     <>
       {/* ── DESKTOP SIDEBAR (lg ke atas) ── */}
-      <div className="hidden lg:flex min-w-[300px] w-[300px] h-screen fixed top-0 left-0 overflow-y-auto bg-[#862440] text-white flex-col">
+      <div className="hidden lg:flex min-w-[300px] w-[300px] h-screen fixed top-0 left-0 overflow-y-auto bg-[#862440] text-white flex-col ">
         <SidebarContent />
       </div>
 
@@ -313,6 +332,9 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
+      )}
+      {showProfileModal && (
+        <ModalProfile onClose={() => setShowProfileModal(false)} />
       )}
     </>
   );

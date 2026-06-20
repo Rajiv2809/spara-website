@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import Sidebar from "../Components/sidebar";
+import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
 
