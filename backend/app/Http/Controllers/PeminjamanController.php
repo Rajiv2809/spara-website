@@ -185,6 +185,12 @@ class PeminjamanController extends Controller
                 $q->orWhereNull('nomor_induk_penyetuju');
             }
         })
+            ->whereRaw('NOT EXISTS (
+                SELECT 1 FROM persetujuans AS earlier
+                WHERE earlier.id_peminjaman = persetujuans.id_peminjaman
+                  AND earlier.id < persetujuans.id
+                  AND earlier.status_persetujuan != "disetujui"
+            )')
             ->latest()
             ->take(5)
             ->get();
@@ -202,6 +208,12 @@ class PeminjamanController extends Controller
                 $q->orWhereNull('nomor_induk_penyetuju');
             }
         })
+            ->whereRaw('NOT EXISTS (
+                SELECT 1 FROM persetujuans AS earlier
+                WHERE earlier.id_peminjaman = persetujuans.id_peminjaman
+                  AND earlier.id < persetujuans.id
+                  AND earlier.status_persetujuan != "disetujui"
+            )')
             ->latest()
             ->get();
 
