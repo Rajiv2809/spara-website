@@ -47,6 +47,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
     Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
+    Route::post('/peminjaman-batal/{id}', [PeminjamanController::class, 'cancelPeminjaman']);
 
     Route::get('/get-admin', [AdminController::class, 'getAdmin']);
     Route::get('/admin/{nomor_induk}', [AdminController::class, 'show']);

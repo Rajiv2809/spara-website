@@ -485,7 +485,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                 {/* Jadwal Summary */}
                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-6">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Jadwal yang Dipilih</p>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <Icon icon="mdi:calendar" className="text-[#A3264C]" />
                       <span>{form.hari_tanggal}</span>

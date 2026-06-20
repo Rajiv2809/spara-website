@@ -34,6 +34,9 @@ class ListPersetujuanResource extends JsonResource
             'email_peminjam' => $this->peminjaman?->peminjam?->email ?? null,
             'nomor_telephone_peminjam' => $this->peminjaman?->peminjam?->no_telepon ?? null,
             'role_peminjam' => $this->peminjaman?->peminjam?->role ?? null,
+            'keterangan' => $this->peminjaman?->keterangan ?? null,
+            'penyetuju' => $this->user?->nama ?? null,
+            'role_penyetuju' => $this->user?->role ?? null,
         ];
     }
 }

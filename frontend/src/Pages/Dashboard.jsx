@@ -141,7 +141,7 @@ const Dashboard = () => {
                   ) : (
                     peminjaman.map((item, index) => {
                       const { bg, label } = getStatusStyle(item.status_persetujuan);
-                      const isAlat = item.id_alat !== null;
+                      const isAlat = item.id_alat !== null && item.id_ruangan === null;
 
                       return (
                         <div
@@ -151,7 +151,7 @@ const Dashboard = () => {
                           <div className="flex items-center gap-4">
                             <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
                               <Icon
-                                icon={isAlat ? "la:tools" : "material-symbols:meeting-room-outline-rounded"}
+                                icon={isAlat ? "la:tools" : "ph:door-open-bold"}
                                 width="28"
                               />
                             </div>

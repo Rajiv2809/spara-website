@@ -17,6 +17,8 @@ class PeminjamanResource extends JsonResource
     {
         return [
             'id_peminjaman' => $this->id_peminjaman,
+            'id_alat' => $this->id_alat,
+            'id_ruangan' => $this->id_ruangan,
             'peminjam' => $this->peminjam?->nama ?? null,
             'nama_kegiatan' => $this->nama_kegiatan,
             'jenis_kegiatan' => $this->jenis_kegiatan,

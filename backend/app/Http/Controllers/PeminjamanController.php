@@ -306,6 +306,30 @@ class PeminjamanController extends Controller
         ]);
     }
 
+    public function cancelPeminjaman($id)
+    {
+        $peminjaman = Peminjaman::where('id_peminjaman', $id)
+            ->where('id_peminjam', request()->user()->nomor_induk)
+            ->first();
+
+        if (!$peminjaman) {
+            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
+        }
+
+        if ($peminjaman->status_persetujuan !== 'menunggu') {
+            return response()->json(['message' => 'Hanya peminjaman dengan status menunggu yang dapat dibatalkan.'], 422);
+        }
+
+        $peminjaman->status_persetujuan = 'dibatalkan';
+        $peminjaman->save();
+
+        Persetujuan::where('id_peminjaman', $id)
+            ->where('status_persetujuan', 'menunggu')
+            ->update(['status_persetujuan' => 'ditolak']);
+
+        return response()->json(['message' => 'Peminjaman berhasil dibatalkan.']);
+    }
+
     public function riwayat()
     {
         $user = request()->user();
