@@ -177,6 +177,49 @@ class PeminjamanController extends Controller
             'peminjaman' => PeminjamanResource::collection($peminjaman),
         ]);
     }
+    public function dashboard()
+    {
+        $totalAlat = Alat::count();
+        $totalRuangan = Ruangan::count();
+        $alatDipinjam = Peminjaman::whereNotNull('id_alat')
+            ->whereIn('status_persetujuan', ['menunggu', 'disetujui'])
+            ->distinct('id_alat')
+            ->count('id_alat');
+        $ruanganDipinjam = Peminjaman::whereNotNull('id_ruangan')
+            ->whereIn('status_persetujuan', ['menunggu', 'disetujui'])
+            ->distinct('id_ruangan')
+            ->count('id_ruangan');
+
+        $user = request()->user();
+        if (in_array($user->role, ['dosen', 'pic'])) {
+            $perluDisetujui = Persetujuan::where('nomor_induk_penyetuju', $user->nomor_induk)
+                ->where('status_persetujuan', 'menunggu')
+                ->count();
+        } elseif ($user->role === 'admin') {
+            $perluDisetujui = Persetujuan::whereNull('nomor_induk_penyetuju')
+                ->where('status_persetujuan', 'menunggu')
+                ->whereRaw('NOT EXISTS (
+                    SELECT 1 FROM persetujuans AS earlier
+                    WHERE earlier.id_peminjaman = persetujuans.id_peminjaman
+                      AND earlier.id < persetujuans.id
+                      AND earlier.status_persetujuan != "disetujui"
+                )')
+                ->count();
+        } else {
+            $perluDisetujui = Peminjaman::where('id_peminjam', $user->nomor_induk)
+                ->where('status_persetujuan', 'menunggu')
+                ->count();
+        }
+
+        return response()->json([
+            'total_alat'       => $totalAlat,
+            'total_ruangan'    => $totalRuangan,
+            'alat_dipinjam'    => $alatDipinjam,
+            'ruangan_dipinjam' => $ruanganDipinjam,
+            'perlu_disetujui'  => $perluDisetujui,
+        ]);
+    }
+
     public function getPersetujuan()
     {
         $persetujuan = Persetujuan::where(function ($q) {

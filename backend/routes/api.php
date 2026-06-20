@@ -42,6 +42,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/peminjaman-rekapitulasi', [PeminjamanController::class, 'getPeminjamanRekapitulasi']);
 
     Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
+    Route::get('/dashboard-stats', [PeminjamanController::class, 'dashboard']);
 
     Route::get('/persetujuan', [PeminjamanController::class, 'getPersetujuan']);
     Route::get('/list-persetujuan', [PeminjamanController::class, 'getPersetujuanList']);

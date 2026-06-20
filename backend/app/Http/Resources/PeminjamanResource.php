@@ -27,7 +27,9 @@ class PeminjamanResource extends JsonResource
             'jam_selesai' => $this->jam_selesai,
             'alat' => $this->alat?->nama_alat ?? ($this->id_alat ? 'Alat #' . $this->id_alat : null),
             'ruangan' => $this->ruangan?->nama_ruangan ?? $this->ruangan?->kode_ruangan ?? ($this->id_ruangan ? 'Ruangan #' . $this->id_ruangan : null),
-            'pic' => $this->ruangan?->pic?->user?->nama ?? null,
+            'pic' => $this->ruangan?->pic?->user?->nama
+                ?? $this->alat?->pic?->user?->nama
+                ?? null,
             'status_persetujuan' => $this->status_persetujuan,
             'persetujuans' => PersetujuanResource::collection($this->whenLoaded('persetujuans')),
             'dibuat_pada' => $this->dibuat_pada,
