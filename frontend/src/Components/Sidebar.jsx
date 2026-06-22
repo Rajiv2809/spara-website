@@ -99,7 +99,7 @@ const menuByRole = {
     {
       icon: "octicon:checklist-16",
       label: "Peminjaman",
-      href: "/pengajuan-ruangan",
+      href: "/peminjaman-ketua",
     },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {

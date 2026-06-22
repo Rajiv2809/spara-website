@@ -16,6 +16,7 @@ import KelolaAdmin from "./Pages/KelolaAdmin";
 import AllListPeminjaman from "./Pages/AllLlistPeminjman.jsx";
 import Register from "./Pages/Register.jsx";
 import Laporan from "./Pages/Laporan.jsx";
+import PeminjamanKetua from "./Pages/PeminjamanKetua.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
       {
         path:"/laporan",
         element: <Laporan/>
+      },
+      {
+        path:"/peminjaman-ketua",
+        element: <PeminjamanKetua/>
       }
       // {
       //     path: "/semua-peminjaman",
