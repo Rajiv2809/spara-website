@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController};
+use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -56,4 +56,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/admin', [AdminController::class, 'store']);
     Route::put('/admin/{nomor_induk}', [AdminController::class, 'update']);
     Route::delete('/admin/{nomor_induk}', [AdminController::class, 'destroy']);
+
+    Route::prefix('kepala')->group(function () {
+        Route::get('/monitoring-peminjaman', [KepalaController::class, 'getMonitoringPeminjaman']);
+        Route::post('/batalkan-peminjaman/{id}', [KepalaController::class, 'batalkanPeminjaman']);
+        Route::post('/jadwalkan-ulang/{id}', [KepalaController::class, 'jadwalkanUlang']);
+    });
 });

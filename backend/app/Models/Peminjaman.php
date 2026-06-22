@@ -23,7 +23,7 @@ class Peminjaman extends Model
         'id_ruangan',
         'dibuat_pada',
         'diubah_pada',
-        'alasan_ketua',
+        'alasan_kepala',
     ];
 
     protected function casts(): array
