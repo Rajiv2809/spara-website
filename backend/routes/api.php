@@ -67,5 +67,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/monitoring-peminjaman', [KepalaController::class, 'getMonitoringPeminjaman']);
         Route::post('/batalkan-peminjaman/{id}', [KepalaController::class, 'batalkanPeminjaman']);
         Route::post('/jadwalkan-ulang/{id}', [KepalaController::class, 'jadwalkanUlang']);
+        Route::post('/cek-ketersediaan', [KepalaController::class, 'cekKetersediaan']);
     });
 });

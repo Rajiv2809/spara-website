@@ -141,6 +141,9 @@ const Dropdown = ({ label, icon, options, value, onChange }) => {
   );
 };
 
+// ==========================================
+// ModalAksi — dengan cek ketersediaan real-time
+// ==========================================
 const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
   const [mode, setMode] = useState(null);
   const [alasan, setAlasan] = useState("");
@@ -153,6 +156,13 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // State cek ketersediaan
+  const [ketersediaan, setKetersediaan] = useState({
+    loading: false,
+    tersedia: true,
+    pesan: "",
+  });
+
   const isRuangan = peminjaman?.jenis === "ruangan";
   const isMenunggu = peminjaman?.status_persetujuan === "menunggu";
 
@@ -161,7 +171,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
       setNewTanggal(peminjaman.hari_tanggal || "");
       setNewJamMulai(formatJam(peminjaman.jam_mulai) || "");
       setNewJamSelesai(formatJam(peminjaman.jam_selesai) || "");
-      setIdRuanganBaru(peminjaman.id_ruangan?.toString() || "");
+      setIdRuanganBaru("");
     }
   }, [peminjaman]);
 
@@ -182,7 +192,66 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
         .catch(() => {})
         .finally(() => setLoadingRuangan(false));
     }
-  }, [mode, isRuangan]);
+  }, [mode, isRuangan, ruanganList.length]);
+
+  useEffect(() => {
+    if (mode !== "jadwalkan_ulang") return;
+    if (!newTanggal || !newJamMulai || !newJamSelesai) return;
+
+    if (newJamSelesai <= newJamMulai) {
+      setKetersediaan({
+        loading: false,
+        tersedia: false,
+        pesan: "Jam selesai harus lebih besar dari jam mulai.",
+      });
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setKetersediaan({ loading: true, tersedia: true, pesan: "" });
+
+      try {
+        const payload = {
+          jenis: peminjaman.jenis,
+          hari_tanggal: newTanggal,
+          jam_mulai: newJamMulai,
+          jam_selesai: newJamSelesai,
+          exclude_id: peminjaman.id_peminjaman,
+        };
+
+        if (isRuangan) {
+          payload.id_ruangan = idRuanganBaru
+            ? Number(idRuanganBaru)
+            : peminjaman.id_ruangan;
+        } else {
+          payload.id_alat = peminjaman.id_alat;
+        }
+
+        const { data } = await axiosClient.post("/kepala/cek-ketersediaan", payload);
+        setKetersediaan({
+          loading: false,
+          tersedia: data.tersedia,
+          pesan: data.pesan || "",
+        });
+      } catch (err) {
+        setKetersediaan({
+          loading: false,
+          tersedia: false,
+          pesan: "Gagal memeriksa ketersediaan. Silakan coba lagi.",
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [
+    newTanggal,
+    newJamMulai,
+    newJamSelesai,
+    idRuanganBaru,
+    mode,
+    peminjaman,
+    isRuangan,
+  ]);
 
   if (!peminjaman) return null;
 
@@ -193,6 +262,12 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
       if (!newTanggal) e.newTanggal = "Tanggal baru wajib diisi";
       if (!newJamMulai) e.newJamMulai = "Jam mulai wajib diisi";
       if (!newJamSelesai) e.newJamSelesai = "Jam selesai wajib diisi";
+      if (newJamSelesai && newJamMulai && newJamSelesai <= newJamMulai) {
+        e.newJamSelesai = "Jam selesai harus lebih besar dari jam mulai";
+      }
+      if (!ketersediaan.tersedia) {
+        e.global = ketersediaan.pesan;
+      }
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -371,6 +446,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                 onClick={() => {
                   setMode(null);
                   setErrors({});
+                  setKetersediaan({ loading: false, tersedia: true, pesan: "" });
                 }}
                 className="flex items-center gap-1 text-[12px] text-gray-400 hover:text-gray-600 transition mb-1 w-fit"
               >
@@ -456,7 +532,11 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                   </label>
                   {loadingRuangan ? (
                     <div className="flex items-center gap-2 text-[12px] text-gray-400 py-2">
-                      <Icon icon="mdi:loading" className="animate-spin" width={14} />
+                      <Icon
+                        icon="mdi:loading"
+                        className="animate-spin"
+                        width={14}
+                      />
                       Memuat daftar ruangan...
                     </div>
                   ) : (
@@ -468,7 +548,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                       }}
                       className="w-full border border-pink-200 rounded-xl px-3 py-2 text-[13px] outline-none focus:border-[#C0254A] bg-white"
                     >
-                      <option value="">Tetap gunakan ruangan saat ini</option>
+                      <option value="">Tetap gunakan {peminjaman?.nama_ruangan ? peminjaman.nama_ruangan : "ruangan saat ini"}</option>
                       {ruanganList.map((r) => (
                         <option key={r.id} value={String(r.id)}>
                           {r.label}
@@ -481,6 +561,26 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                       ID terpilih: {idRuanganBaru}
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* Banner ketersediaan */}
+              {ketersediaan.loading && (
+                <div className="flex items-center gap-2 text-[12px] text-blue-500 bg-blue-50 border border-blue-200 rounded-xl p-3">
+                  <Icon icon="mdi:loading" className="animate-spin" width={14} />
+                  Memeriksa ketersediaan...
+                </div>
+              )}
+              {!ketersediaan.loading && !ketersediaan.tersedia && (
+                <div className="flex items-start gap-2 text-[12px] text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">
+                  <Icon icon="mdi:alert-circle" className="flex-shrink-0 mt-0.5" width={15} />
+                  <span>{ketersediaan.pesan}</span>
+                </div>
+              )}
+              {!ketersediaan.loading && ketersediaan.tersedia && newTanggal && newJamMulai && newJamSelesai && (
+                <div className="flex items-start gap-2 text-[12px] text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                  <Icon icon="mdi:check-circle" className="flex-shrink-0 mt-0.5" width={15} />
+                  <span>Slot waktu tersedia.</span>
                 </div>
               )}
 
@@ -504,6 +604,11 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                     {errors.alasan}
                   </p>
                 )}
+                {errors.global && (
+                  <p className="text-[10px] text-red-400 mt-1">
+                    {errors.global}
+                  </p>
+                )}
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-start gap-2">
@@ -513,8 +618,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                   width={15}
                 />
                 <p className="text-[11px] text-blue-600 leading-relaxed">
-                  Jadwal peminjaman akan diperbarui. Alasan perubahan akan
-                  tersimpan dan dapat dilihat oleh peminjam.
+                  Jadwal peminjaman akan diperbarui dan persetujuan akan direset ke tahap awal (Penanggungjawab → PIC → Admin SBUM).
                 </p>
               </div>
             </div>
@@ -585,7 +689,11 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
             </button>
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={
+                loading ||
+                (mode === "jadwalkan_ulang" &&
+                  (!ketersediaan.tersedia || ketersediaan.loading))
+              }
               className={`flex-1 rounded-full py-2.5 text-[12px] font-bold transition flex items-center justify-center gap-2 ${
                 mode === "batalkan"
                   ? "bg-red-500 hover:bg-red-600 text-white"
@@ -614,7 +722,6 @@ const PeminjamanCard = ({ item, onAksi }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-pink-100 shadow-[0_4px_16px_rgba(0,0,0,0.06)] p-4 flex flex-col gap-3 hover:shadow-lg transition duration-200 hover:-translate-y-0.5">
-      {/* Header kartu */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
           <div
@@ -644,7 +751,6 @@ const PeminjamanCard = ({ item, onAksi }) => {
         <StatusBadge status={item.status_persetujuan} />
       </div>
 
-      {/* Nama kegiatan */}
       <p className="text-[11px] text-gray-500 bg-gray-50 rounded-lg px-2 py-1.5 line-clamp-2 leading-relaxed">
         <Icon
           icon="mdi:text-box-outline"
@@ -654,7 +760,6 @@ const PeminjamanCard = ({ item, onAksi }) => {
         {item.nama_kegiatan}
       </p>
 
-      {/* Info peminjam */}
       <div className="flex items-center gap-2 bg-pink-50 rounded-xl px-3 py-2">
         <div className="w-7 h-7 bg-gradient-to-br from-[#C0254A] to-[#3D0C1F] rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
           {(item.nama_peminjam || "?")[0].toUpperCase()}
@@ -669,7 +774,6 @@ const PeminjamanCard = ({ item, onAksi }) => {
         </div>
       </div>
 
-      {/* Waktu */}
       <div className="flex items-center justify-between text-[11px]">
         <span className="text-gray-400 flex items-center gap-1">
           <Icon icon="mdi:calendar" className="text-[#C0254A]" width={12} />
@@ -681,7 +785,6 @@ const PeminjamanCard = ({ item, onAksi }) => {
         </span>
       </div>
 
-      {/* Tombol kelola */}
       {canAksi && (
         <button
           onClick={() => onAksi(item)}
@@ -692,7 +795,6 @@ const PeminjamanCard = ({ item, onAksi }) => {
         </button>
       )}
 
-      {/* Alasan ketua (jika sudah dibatalkan) */}
       {item.status_persetujuan === "dibatalkan" && item.alasan_kepala && (
         <div className="rounded-xl p-2.5 text-[10px] leading-relaxed bg-red-50 text-red-600 border border-red-100">
           <Icon icon="mdi:comment-text-outline" className="inline mr-1" width={11} />
@@ -715,7 +817,6 @@ const MonitoringPeminjaman = () => {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
-  // ── Ambil data dari API ──────────────────────────────────────────────────
   const fetchData = useCallback(() => {
     setLoading(true);
     axiosClient
@@ -735,13 +836,11 @@ const MonitoringPeminjaman = () => {
     fetchData();
   }, [fetchData]);
 
-  // ── Toast ────────────────────────────────────────────────────────────────
   const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   };
 
-  // ── Submit aksi dari modal ────────────────────────────────────────────────
   const handleSubmitAksi = async ({
     id,
     mode,
@@ -751,77 +850,101 @@ const MonitoringPeminjaman = () => {
     jam_selesai_baru,
     id_ruangan_baru,
   }) => {
-    if (mode === "batalkan") {
-      await axiosClient.post(`/kepala/batalkan-peminjaman/${id}`, {
-        alasan_kepala,
-      });
+    try {
+      if (mode === "batalkan") {
+        await axiosClient.post(`/kepala/batalkan-peminjaman/${id}`, {
+          alasan_kepala,
+        });
 
-      // Update state lokal tanpa refetch
-      setData((prev) =>
-        prev.map((item) =>
-          item.id_peminjaman === id
-            ? { ...item, status_persetujuan: "dibatalkan", alasan_kepala }
-            : item
-        )
-      );
+        setData((prev) =>
+          prev.map((item) =>
+            item.id_peminjaman === id
+              ? { ...item, status_persetujuan: "dibatalkan", alasan_kepala }
+              : item
+          )
+        );
 
-      // Perbarui stats
-      setStats((prev) =>
-        prev
-          ? {
-              ...prev,
-              total: Math.max(0, prev.total - 1),
-              menunggu: data.find(
-                (d) =>
-                  d.id_peminjaman === id &&
-                  d.status_persetujuan === "menunggu"
-              )
-                ? Math.max(0, prev.menunggu - 1)
-                : prev.menunggu,
-              disetujui: data.find(
-                (d) =>
-                  d.id_peminjaman === id &&
-                  d.status_persetujuan === "disetujui"
-              )
-                ? Math.max(0, prev.disetujui - 1)
-                : prev.disetujui,
-            }
-          : prev
-      );
-
-      showToast("Peminjaman berhasil dibatalkan.");
-    } else {
-      await axiosClient.post(`/kepala/jadwalkan-ulang/${id}`, {
-        hari_tanggal_baru,
-        jam_mulai_baru,
-        jam_selesai_baru,
-        ...(id_ruangan_baru ? { id_ruangan_baru } : {}),
-        alasan_kepala,
-      });
-
-      // Update jadwal di state lokal
-      setData((prev) =>
-        prev.map((item) =>
-          item.id_peminjaman === id
+        const target = data.find((d) => d.id_peminjaman === id);
+        setStats((prev) =>
+          prev
             ? {
-                ...item,
-                hari_tanggal: hari_tanggal_baru,
-                jam_mulai: jam_mulai_baru,
-                jam_selesai: jam_selesai_baru,
-                alasan_kepala,
-                ...(id_ruangan_baru
-                  ? { id_ruangan: Number(id_ruangan_baru) }
-                  : {}),
+                ...prev,
+                total: Math.max(0, prev.total - 1),
+                menunggu:
+                  target?.status_persetujuan === "menunggu"
+                    ? Math.max(0, prev.menunggu - 1)
+                    : prev.menunggu,
+                disetujui:
+                  target?.status_persetujuan === "disetujui"
+                    ? Math.max(0, prev.disetujui - 1)
+                    : prev.disetujui,
               }
-            : item
-        )
-      );
+            : prev
+        );
 
-      showToast("Peminjaman berhasil dijadwalkan ulang.");
+        showToast("Peminjaman berhasil dibatalkan.");
+      } else {
+        const payload = {
+          hari_tanggal_baru,
+          jam_mulai_baru,
+          jam_selesai_baru,
+          alasan_kepala,
+        };
+
+        if (id_ruangan_baru && !isNaN(Number(id_ruangan_baru))) {
+          payload.id_ruangan_baru = Number(id_ruangan_baru);
+        }
+
+        await axiosClient.post(`/kepala/jadwalkan-ulang/${id}`, payload);
+
+        const target = data.find((d) => d.id_peminjaman === id);
+        const wasDisetujui = target?.status_persetujuan === "disetujui";
+
+        setData((prev) =>
+          prev.map((item) =>
+            item.id_peminjaman === id
+              ? {
+                  ...item,
+                  hari_tanggal: hari_tanggal_baru,
+                  jam_mulai: jam_mulai_baru,
+                  jam_selesai: jam_selesai_baru,
+                  alasan_kepala,
+                  status_persetujuan: "menunggu",
+                  ...(id_ruangan_baru
+                    ? { id_ruangan: Number(id_ruangan_baru) }
+                    : {}),
+                }
+              : item
+          )
+        );
+
+        setStats((prev) =>
+          prev
+            ? {
+                ...prev,
+                menunggu: prev.menunggu + 1,
+                disetujui: wasDisetujui
+                  ? Math.max(0, prev.disetujui - 1)
+                  : prev.disetujui,
+              }
+            : prev
+        );
+
+        showToast(
+          "Jadwal diperbarui. Persetujuan direset ke tahap awal.",
+          "success"
+        );
+      }
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Terjadi kesalahan. Silakan coba lagi.";
+      showToast(msg, "error");
+      throw err;
     }
   };
 
-  // ── Filter & pagination ───────────────────────────────────────────────────
   const filtered = useMemo(() => {
     return data.filter((item) => {
       const matchTab =
@@ -877,12 +1000,10 @@ const MonitoringPeminjaman = () => {
     setCurrentPage(1);
   };
 
-  // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#FFF6F1] via-[#FFE4E6] to-[#FFD1D1]">
       <Sidebar />
 
-      {/* Toast notifikasi */}
       {toast && (
         <div
           className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-white text-[13px] font-semibold animate-pulse ${
@@ -901,7 +1022,6 @@ const MonitoringPeminjaman = () => {
         </div>
       )}
 
-      {/* Modal Kelola Peminjaman */}
       {selectedItem && (
         <ModalAksi
           peminjaman={selectedItem}
@@ -911,7 +1031,6 @@ const MonitoringPeminjaman = () => {
       )}
 
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4 overflow-y-auto">
-        {/* Header halaman */}
         <div className="mb-8">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-gradient-to-br from-[#C0254A] to-[#3D0C1F] rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
@@ -933,7 +1052,6 @@ const MonitoringPeminjaman = () => {
           </div>
         </div>
 
-        {/* Stat Cards — data dari API */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
             icon="mdi:clipboard-list-outline"
@@ -965,10 +1083,7 @@ const MonitoringPeminjaman = () => {
           />
         </div>
 
-        {/* Panel utama */}
         <div className="bg-white/70 backdrop-blur-md border border-white/40 rounded-3xl p-6 shadow-lg">
-
-          {/* Tabs jenis */}
           <div className="flex gap-2 mb-5 flex-wrap">
             {[
               { key: "semua", label: "Semua", icon: "mdi:view-grid-outline" },
@@ -990,7 +1105,6 @@ const MonitoringPeminjaman = () => {
             ))}
           </div>
 
-          {/* Search + Filter status */}
           <div className="flex flex-col gap-3 mb-5">
             <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <input
@@ -1039,7 +1153,6 @@ const MonitoringPeminjaman = () => {
             </div>
           </div>
 
-          {/* Konten */}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
               <Icon
@@ -1077,7 +1190,6 @@ const MonitoringPeminjaman = () => {
             </div>
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 flex-wrap">
               <button
