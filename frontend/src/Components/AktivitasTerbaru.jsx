@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
 
 const AktivitasTerbaru = () => {
-  const navigate = useNavigate();
   const [notifs, setNotifs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,12 +36,7 @@ const AktivitasTerbaru = () => {
   return (
     <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl">
       <div className="relative z-10">
-        <div className="flex items-center justify-between">
-          <h3 className="text-[#471020] text-[24px] font-bold">Aktivitas Terbaru</h3>
-          <button onClick={() => navigate("/notifikasi")} className="border-2 border-[#F2A31A] text-[#F2A31A] px-4 py-1 rounded-xl font-semibold text-sm hover:bg-[#F2A31A] hover:text-white transition duration-300">
-            Lihat Semua
-          </button>
-        </div>
+        <h3 className="text-[#471020] text-[24px] font-bold">Aktivitas Terbaru</h3>
         <h1 className="text-[#BC8D9B] text-[14px] font-regular">Beberapa aktivitas terkini dalam sistem</h1>
         <div className="space-y-0">
           {loading ? (

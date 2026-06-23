@@ -18,7 +18,6 @@ import Register from "./Pages/Register.jsx";
 import Laporan from "./Pages/Laporan.jsx";
 import PeminjamanKepala from "./Pages/PeminjamanKepala.jsx";
 import KalenderPeminjaman from "./Pages/KalenderPeminjaman.jsx";
-import Notifikasi from "./Pages/Notifikasi.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -76,10 +75,6 @@ const router = createBrowserRouter([
         path:"/peminjaman-kepala",
         element: <PeminjamanKepala/>
       },
-      {
-        path:"/notifikasi",
-        element: <Notifikasi/>
-      }
       // {
       //     path: "/semua-peminjaman",
       //     element: <AllListPeminjaman />
