@@ -20,6 +20,7 @@ const menuByRole = {
       label: "Peminjaman Peralatan",
       href: "/peminjaman-peralatan",
     },
+    { icon: "material-symbols:notifications-outline", label: "Notifikasi", href: "/notifikasi" },
     { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
   ],
   pic: [
@@ -34,6 +35,7 @@ const menuByRole = {
       label: "Peminjaman Peralatan",
       href: "/peminjaman-peralatan",
     },
+    { icon: "material-symbols:notifications-outline", label: "Notifikasi", href: "/notifikasi" },
     { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
     {
       icon: "material-symbols:meeting-room-outline",
@@ -69,6 +71,7 @@ const menuByRole = {
       href: "/kelola-ruangan",
     },
     { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender-peminjaman" },
+    { icon: "material-symbols:notifications-outline", label: "Notifikasi", href: "/notifikasi" },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
@@ -88,6 +91,7 @@ const menuByRole = {
       label: "Peminjaman Peralatan",
       href: "/peminjaman-peralatan",
     },
+    { icon: "material-symbols:notifications-outline", label: "Notifikasi", href: "/notifikasi" },
     { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
     {
       icon: "material-symbols:check-circle-outline",
@@ -103,6 +107,7 @@ const menuByRole = {
       href: "/peminjaman-kepala",
     },
     { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender-peminjaman" },
+    { icon: "material-symbols:notifications-outline", label: "Notifikasi", href: "/notifikasi" },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
@@ -114,7 +119,6 @@ const menuByRole = {
       label: "Kelola Admin",
       href: "/kelola-admin",
     },
-    
   ],
   loading: [
 

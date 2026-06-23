@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController};
+use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -50,6 +50,12 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
     Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
     Route::post('/peminjaman-batal/{id}', [PeminjamanController::class, 'cancelPeminjaman']);
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
     Route::get('/get-admin', [AdminController::class, 'getAdmin']);
     Route::get('/admin/{nomor_induk}', [AdminController::class, 'show']);
