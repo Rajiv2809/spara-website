@@ -68,6 +68,7 @@ const menuByRole = {
       label: "Kelola Ruangan",
       href: "/kelola-ruangan",
     },
+    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender-peminjaman" },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
@@ -101,6 +102,7 @@ const menuByRole = {
       label: "Peminjaman",
       href: "/peminjaman-kepala",
     },
+    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender-peminjaman" },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
