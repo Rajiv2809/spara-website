@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
-use App\Models\{Peminjaman, Persetujuan};
+use App\Models\{Peminjaman, Persetujuan, Notification};
 
 class KepalaController extends Controller
 {
@@ -137,6 +137,18 @@ class KepalaController extends Controller
                 'status_persetujuan' => 'ditolak',
                 'updated_at'         => Carbon::now(),
             ]);
+
+        // ── Notifikasi ke peminjam ──────────────────────────────────────────
+        $itemName = $peminjaman->ruangan?->nama_ruangan
+            ?? $peminjaman->alat?->nama_alat
+            ?? 'Item';
+        Notification::create([
+            'nomor_induk'   => $peminjaman->id_peminjam,
+            'type'          => 'dibatalkan',
+            'judul'         => 'Peminjaman Dibatalkan Kepala SBUM',
+            'pesan'         => "Peminjaman {$itemName} dibatalkan oleh Kepala SBUM. Alasan: {$request->alasan_kepala}.",
+            'peminjaman_id' => $peminjaman->id_peminjaman,
+        ]);
 
         return response()->json([
             'message' => 'Peminjaman berhasil dibatalkan.',

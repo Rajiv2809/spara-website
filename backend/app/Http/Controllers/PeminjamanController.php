@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Validator};
 use Carbon\Carbon;
-use App\Models\{Peminjaman, Persetujuan};
+use App\Models\{Peminjaman, Persetujuan, Notification};
 use App\Http\Resources\PeminjamanResource;
 use App\Http\Resources\PersetujuanResource;
 use App\Http\Resources\ListPersetujuanResource;
@@ -148,6 +148,18 @@ class PeminjamanController extends Controller
 
         Persetujuan::insert($persetujuans);
 
+        // ── Notifikasi ke penanggung jawab ──────────────────────────────────
+        $itemName = $peminjaman->ruangan?->nama_ruangan
+            ?? $peminjaman->alat?->nama_alat
+            ?? 'Item';
+        Notification::create([
+            'nomor_induk'   => $request->nomor_induk_penanggungjawab,
+            'type'          => 'menunggu',
+            'judul'         => 'Peminjaman Baru',
+            'pesan'         => "{$itemName} diajukan oleh {$request->user()->nama}, perlu persetujuan Anda.",
+            'peminjaman_id' => $peminjaman->id_peminjaman,
+        ]);
+
         return response()->json([
             'message'      => 'Peminjaman berhasil diajukan.',
             'peminjaman'   => $peminjaman,
@@ -286,29 +298,6 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Peminjaman sudah disetujui sebelumnya.'], 422);
         }
 
-        // ─── Validasi role PIC: hanya bisa approve jika penanggung jawab sudah approve ───
-        $user = auth()->user();
-
-        if ($user->role === 'pic') {
-            // Cari persetujuan milik penanggung jawab pada peminjaman yang sama
-            $persetujuanPenanggungJawab = $peminjaman->persetujuans
-                ->filter(fn($p) => optional($p->penyetuju)->role === 'penanggung_jawab')
-                ->first();
-
-            if (!$persetujuanPenanggungJawab) {
-                return response()->json([
-                    'message' => 'Belum ada persetujuan dari penanggung jawab.',
-                ], 422);
-            }
-
-            if ($persetujuanPenanggungJawab->status_persetujuan !== 'disetujui') {
-                return response()->json([
-                    'message' => 'Penanggung jawab belum menyetujui peminjaman ini.',
-                ], 422);
-            }
-        }
-        // ─────────────────────────────────────────────────────────────────────────────────
-
         // Cek urutan persetujuan (berdasarkan id)
         $allPersetujuan = $peminjaman->persetujuans->sortBy('id');
         $currentIndex = $allPersetujuan->search(fn($item) => (int) $item->id === (int) $id);
@@ -330,6 +319,12 @@ class PeminjamanController extends Controller
         $persetujuan->updated_at = Carbon::now();
         $persetujuan->save();
 
+        // ── Notifikasi ─────────────────────────────────────────────────────
+        $itemName = $peminjaman->ruangan?->nama_ruangan
+            ?? $peminjaman->alat?->nama_alat
+            ?? 'Item';
+        $approverName = $persetujuan->user?->nama ?? auth()->user()->nama;
+
         // Cek apakah semua tahap sudah disetujui
         $semuaDisetujui = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
             ->where('status_persetujuan', '!=', 'disetujui')
@@ -338,6 +333,45 @@ class PeminjamanController extends Controller
         if ($semuaDisetujui) {
             $peminjaman->status_persetujuan = 'disetujui';
             $peminjaman->save();
+
+            // Notif ke peminjam
+            Notification::create([
+                'nomor_induk'   => $peminjaman->id_peminjam,
+                'type'          => 'disetujui',
+                'judul'         => 'Peminjaman Disetujui',
+                'pesan'         => "Peminjaman {$itemName} telah disetujui oleh semua pihak.",
+                'peminjaman_id' => $peminjaman->id_peminjaman,
+            ]);
+        } else {
+            // Notif ke penyetuju selanjutnya
+            $next = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
+                ->where('id', '>', $persetujuan->id)
+                ->orderBy('id')
+                ->first();
+
+            if ($next) {
+                if ($next->nomor_induk_penyetuju) {
+                    Notification::create([
+                        'nomor_induk'   => $next->nomor_induk_penyetuju,
+                        'type'          => 'menunggu',
+                        'judul'         => 'Perlu Persetujuan',
+                        'pesan'         => "{$itemName} telah disetujui oleh {$approverName}, menunggu persetujuan Anda.",
+                        'peminjaman_id' => $peminjaman->id_peminjaman,
+                    ]);
+                } else {
+                    // Admin — notif semua admin
+                    $admins = \App\Models\User::where('role', 'admin')->pluck('nomor_induk');
+                    foreach ($admins as $ni) {
+                        Notification::create([
+                            'nomor_induk'   => $ni,
+                            'type'          => 'menunggu',
+                            'judul'         => 'Perlu Persetujuan Admin',
+                            'pesan'         => "{$itemName} telah disetujui oleh {$approverName}, menunggu persetujuan Admin.",
+                            'peminjaman_id' => $peminjaman->id_peminjaman,
+                        ]);
+                    }
+                }
+            }
         }
 
         return response()->json([
@@ -365,6 +399,19 @@ class PeminjamanController extends Controller
             $peminjaman->status_persetujuan = 'ditolak';
             $peminjaman->save();
         }
+
+        // ── Notifikasi ke peminjam ──────────────────────────────────────────
+        $itemName = $peminjaman?->ruangan?->nama_ruangan
+            ?? $peminjaman?->alat?->nama_alat
+            ?? 'Item';
+        $penolak = auth()->user()->nama;
+        Notification::create([
+            'nomor_induk'   => $peminjaman->id_peminjam,
+            'type'          => 'ditolak',
+            'judul'         => 'Peminjaman Ditolak',
+            'pesan'         => "Peminjaman {$itemName} ditolak oleh {$penolak}.",
+            'peminjaman_id' => $peminjaman->id_peminjaman,
+        ]);
 
         return response()->json([
             'message' => 'Peminjaman ditolak.',
@@ -404,6 +451,35 @@ class PeminjamanController extends Controller
         Persetujuan::where('id_peminjaman', $id)
             ->where('status_persetujuan', 'menunggu')
             ->update(['status_persetujuan' => 'ditolak']);
+
+        // ── Notifikasi ke PJ, PIC, Admin ────────────────────────────────────
+        $itemName = $peminjaman->ruangan?->nama_ruangan
+            ?? $peminjaman->alat?->nama_alat
+            ?? 'Item';
+        $persetujuans = Persetujuan::where('id_peminjaman', $id)->get();
+
+        foreach ($persetujuans as $ps) {
+            $notifTargets = [];
+            if ($ps->nomor_induk_penyetuju) {
+                $notifTargets[] = $ps->nomor_induk_penyetuju;
+            } else {
+                $admins = \App\Models\User::where('role', 'admin')->pluck('nomor_induk');
+                $notifTargets = array_merge($notifTargets, $admins->toArray());
+            }
+
+            foreach (array_unique($notifTargets) as $ni) {
+                // Jangan notif ke peminjam sendiri
+                if ((string) $ni === (string) $peminjaman->id_peminjam) continue;
+
+                Notification::create([
+                    'nomor_induk'   => $ni,
+                    'type'          => 'dibatalkan',
+                    'judul'         => 'Peminjaman Dibatalkan',
+                    'pesan'         => "Peminjaman {$itemName} dibatalkan oleh peminjam.",
+                    'peminjaman_id' => $peminjaman->id_peminjaman,
+                ]);
+            }
+        }
 
         return response()->json(['message' => 'Peminjaman berhasil dibatalkan.']);
     }
