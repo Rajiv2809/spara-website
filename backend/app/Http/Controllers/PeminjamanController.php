@@ -298,29 +298,6 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Peminjaman sudah disetujui sebelumnya.'], 422);
         }
 
-        // ─── Validasi role PIC: hanya bisa approve jika penanggung jawab sudah approve ───
-        $user = auth()->user();
-
-        if ($user->role === 'pic') {
-            // Cari persetujuan milik penanggung jawab pada peminjaman yang sama
-            $persetujuanPenanggungJawab = $peminjaman->persetujuans
-                ->filter(fn($p) => optional($p->penyetuju)->role === 'penanggung_jawab')
-                ->first();
-
-            if (!$persetujuanPenanggungJawab) {
-                return response()->json([
-                    'message' => 'Belum ada persetujuan dari penanggung jawab.',
-                ], 422);
-            }
-
-            if ($persetujuanPenanggungJawab->status_persetujuan !== 'disetujui') {
-                return response()->json([
-                    'message' => 'Penanggung jawab belum menyetujui peminjaman ini.',
-                ], 422);
-            }
-        }
-        // ─────────────────────────────────────────────────────────────────────────────────
-
         // Cek urutan persetujuan (berdasarkan id)
         $allPersetujuan = $peminjaman->persetujuans->sortBy('id');
         $currentIndex = $allPersetujuan->search(fn($item) => (int) $item->id === (int) $id);
