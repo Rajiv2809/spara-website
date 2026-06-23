@@ -210,8 +210,8 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
           hari_tanggal_baru: newTanggal,
           jam_mulai_baru: newJamMulai,
           jam_selesai_baru: newJamSelesai,
-          ...(isRuangan && idRuanganBaru
-            ? { id_ruangan_baru: idRuanganBaru }
+          ...(isRuangan && idRuanganBaru && !isNaN(Number(idRuanganBaru))
+            ? { id_ruangan_baru: Number(idRuanganBaru) }
             : {}),
         }),
       });
@@ -447,39 +447,39 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                 </div>
               </div>
 
-              {/* Ruangan Pengganti (khusus jenis ruangan) */}
+              {/* Ruangan Pengganti */}
               {isRuangan && (
                 <div>
                   <label className="text-[11px] text-gray-500 font-semibold mb-1 block">
                     Ruangan Pengganti{" "}
-                    <span className="text-gray-300 font-normal">
-                      (opsional)
-                    </span>
+                    <span className="text-gray-300 font-normal">(opsional)</span>
                   </label>
                   {loadingRuangan ? (
                     <div className="flex items-center gap-2 text-[12px] text-gray-400 py-2">
-                      <Icon
-                        icon="mdi:loading"
-                        className="animate-spin"
-                        width={14}
-                      />
+                      <Icon icon="mdi:loading" className="animate-spin" width={14} />
                       Memuat daftar ruangan...
                     </div>
                   ) : (
                     <select
                       value={idRuanganBaru}
-                      onChange={(e) => setIdRuanganBaru(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setIdRuanganBaru(val && !isNaN(Number(val)) ? val : "");
+                      }}
                       className="w-full border border-pink-200 rounded-xl px-3 py-2 text-[13px] outline-none focus:border-[#C0254A] bg-white"
                     >
-                      <option value="">
-                        Tetap gunakan ruangan saat ini
-                      </option>
+                      <option value="">Tetap gunakan ruangan saat ini</option>
                       {ruanganList.map((r) => (
-                        <option key={r.id} value={r.id}>
+                        <option key={r.id} value={String(r.id)}>
                           {r.label}
                         </option>
                       ))}
                     </select>
+                  )}
+                  {idRuanganBaru && (
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      ID terpilih: {idRuanganBaru}
+                    </p>
                   )}
                 </div>
               )}
