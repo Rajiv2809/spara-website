@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Components/Sidebar";
+import AktivitasTerbaru from "../Components/AktivitasTerbaru";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios"
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [peminjaman, setPeminjaman] = useState([]);
   const [stats, setStats] = useState({ total_alat: 0, total_ruangan: 0, alat_dipinjam: 0, ruangan_dipinjam: 0, perlu_disetujui: 0 });
   const [loading, setLoading] = useState(true);
@@ -127,7 +130,7 @@ const Dashboard = () => {
                 <h3 className="text-[#471020] text-[24px] font-bold">
                   Peminjaman yang Diajukan
                 </h3>
-                <button className="absolute top-2 right-2 border-2 border-[#F2A31A] text-[#F2A31A] px-4 py-1 rounded-xl font-semibold hover:bg-[#F2A31A] hover:text-white transition duration-300">
+                <button onClick={() => navigate("/riwayat")} className="absolute top-2 right-2 border-2 border-[#F2A31A] text-[#F2A31A] px-4 py-1 rounded-xl font-semibold hover:bg-[#F2A31A] hover:text-white transition duration-300">
                   Lihat Semua
                 </button>
                 <h2 className="text-[#BC8D9B] text-[14px] font-regular">
@@ -182,60 +185,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Aktivitas Terbaru */}
-            <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl">
-              <div className="relative z-10">
-                <h3 className="text-[#471020] text-[24px] font-bold">
-                  Aktivitas Terbaru
-                </h3>
-                <h1 className="text-[#BC8D9B] text-[14px] font-regular">
-                  Beberapa aktivitas terkini dalam sistem
-                </h1>
-                <div className="space-y-0">
-                  {loading ? (
-                    <p className="text-center text-[#999] py-8">Memuat data...</p>
-                  ) : (
-                    peminjaman.slice(0, 5).map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start justify-between p-3 bg-[#EEEEEE]"
-                      >
-                        <div className="flex items-start gap-2">
-                          <Icon
-                            icon="zondicons:exclamation-outline"
-                            width="28"
-                            className={
-                              item.status_persetujuan === "disetujui"
-                                ? "text-[#4DB04A]"
-                                : item.status_persetujuan === "ditolak"
-                                ? "text-[#B16666]"
-                                : "text-[#999999]"
-                            }
-                          />
-                          <div>
-                            <h4 className="font-semibold text-[#471020]">
-                              Peminjaman {item.ruangan || item.alat || (item.id_ruangan ? "Ruangan #" + item.id_ruangan : item.id_alat ? "Alat #" + item.id_alat : "-")}{" "}
-                              {item.status_persetujuan === "disetujui"
-                                ? "disetujui"
-                                : item.status_persetujuan === "ditolak"
-                                ? "ditolak"
-                                : "menunggu persetujuan"}
-                              {item.pic ? ` oleh ${item.pic}` : ""}
-                            </h4>
-                            <div className="flex items-center gap-[2px] mt-1">
-                              <Icon icon="mingcute:time-fill" className="text-[#A3A3A3]" />
-                              <p className="text-[12px] text-[#A3A3A3]">
-                                {formatTanggal(item.hari_tanggal)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
+            <AktivitasTerbaru />
           </div>
         </div>
       </div>

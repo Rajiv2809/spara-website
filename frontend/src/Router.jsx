@@ -17,6 +17,7 @@ import AllListPeminjaman from "./Pages/AllLlistPeminjman.jsx";
 import Register from "./Pages/Register.jsx";
 import Laporan from "./Pages/Laporan.jsx";
 import PeminjamanKepala from "./Pages/PeminjamanKepala.jsx";
+import KalenderPeminjaman from "./Pages/KalenderPeminjaman.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -67,9 +68,13 @@ const router = createBrowserRouter([
         element: <Laporan/>
       },
       {
+        path:"/kalender-peminjaman",
+        element: <KalenderPeminjaman/>
+      },
+      {
         path:"/peminjaman-kepala",
         element: <PeminjamanKepala/>
-      }
+      },
       // {
       //     path: "/semua-peminjaman",
       //     element: <AllListPeminjaman />
