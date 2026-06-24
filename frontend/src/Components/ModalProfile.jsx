@@ -173,28 +173,6 @@ const ModalProfile = ({ onClose }) => {
               </span>
             </div>
           </div>
-
-          {/* Baris Kondisional 3: Program Studi ( jika Mahasiswa) */}
-          {role === "mahasiswa" && currentUser.prodi && (
-            <div className="flex items-center gap-3 text-gray-700">
-              <Icon icon="academicons:education" width="20" className="text-[#862440] shrink-0" />
-              <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Program Studi</span>
-                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.prodi}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Baris Kondisional 4: Jurusan */}
-          {currentUser.jurusan && (
-            <div className="flex items-center gap-3 text-gray-700">
-              <Icon icon="teal:building-columns" width="20" className="text-[#862440] shrink-0" />
-              <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Jurusan</span>
-                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.jurusan}</span>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Tombol Aksi di bagian bawah */}
