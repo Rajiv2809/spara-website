@@ -8,31 +8,31 @@ import pak_gilang from "../assets/foto/pak_gilang.jpg";
 
 const member_suki = [
   {
-    nama: "Zaky Alamsyah Putra Ifgabrata",
+    name: "Zaky Alamsyah Putra Ifgabrata",
     nim: "4342501029",
     instagram: "https://instagram.com/alamsyhz_",
     foto: zaky
   },
   {
-    nama: "Rajiv Tajusa David",
+    name: "Rajiv Tajusa David",
     nim: "4342501028",
     instagram: "https://instagram.com/jiibb_td",
     foto: rajiv
   },
   {
-    nama: "Stevan Akbar",
+    name: "Stevan Akbar",
     nim: "4342101006",
     instagram: "https://instagram.com/evand_a1",
     foto: stevan
   },
   {
-    nama: "Angelica Sun",
+    name: "Angelica Sun",
     nim: "4342101018",
     instagram: "https://instagram.com/anngelicaaa._",
     foto: angel
   },
   {
-    nama: "Atina Zahara",
+    name: "Atina Zahara",
     nim: "4342101005",
     instagram: "https://instagram.com/atina.zhr",
     foto: atina
@@ -40,8 +40,8 @@ const member_suki = [
 ];
 
 const pak_mr_manpro = {
-  nama: "Gilang Bagus Ramadhan, A.Md.Kom.",
-  title: "Dosen dan Laboran Jurusan Teknik Informatika",
+  name: "Gilang Bagus Ramadhan, A.Md.Kom.",
+  title: "lecturer dan Laboran department Teknik Informatika",
   foto: pak_gilang
 };
 
@@ -295,10 +295,10 @@ function MemberCard({ member }) {
     >
       <div className="ti-avatar">
         <div className="ti-avatar-inner">
-          <img src={member.foto} alt={member.nama} />
+          <img src={member.foto} alt={member.name} />
         </div>
       </div>
-      <div className="ti-card-name">{member.nama}</div>
+      <div className="ti-card-name">{member.name}</div>
       <div className="ti-nim">{member.nim}</div>
       <div className="ti-ig">Lihat Instagram ↗</div>
     </div>
@@ -310,11 +310,11 @@ function ManproCard({ pak_mr_manpro }) {
     <div className="ti-supervisor">
       <div className="ti-sup-avatar">
         <div className="ti-sup-avatar-inner">
-          <img src={pak_mr_manpro.foto} alt={pak_mr_manpro.nama} />
+          <img src={pak_mr_manpro.foto} alt={pak_mr_manpro.name} />
         </div>
       </div>
       <div style={{ fontSize: "18.5px", fontWeight: 700, marginBottom: "10px" }}>
-        {pak_mr_manpro.nama}
+        {pak_mr_manpro.name}
       </div>
       <div style={{ 
         fontSize: "14.5px", 

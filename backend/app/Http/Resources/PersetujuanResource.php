@@ -17,7 +17,7 @@ class PersetujuanResource extends JsonResource
         return [
             'id_peminjaman' => $this->id_peminjaman,
             'status_persetujuan' => $this->status_persetujuan,
-            'penyetuju' => $this->user?->nama ?? null,
+            'penyetuju' => $this->user?->name ?? null,
             'role_penyetuju' => $this->user?->role ?? null,
         ];
     }

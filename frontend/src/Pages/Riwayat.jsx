@@ -51,7 +51,7 @@ const ModalBatal = ({ item, onClose, onConfirm, loading }) => {
             {[
               { icon: "ph:calendar-blank", text: new Date(item.hari_tanggal).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
               { icon: "ph:clock",          text: `${item.jam_mulai?.slice(0,5)} s/d ${item.jam_selesai?.slice(0,5)}` },
-              { icon: "ph:note-pencil",    text: item.nama_kegiatan },
+              { icon: "ph:note-pencil",    text: item.name_kegiatan },
             ].map(({ icon, text }) => (
               <div key={icon} className="flex items-start gap-2 mb-1.5">
                 <Icon icon={icon} width={12} className="text-gray-400 flex-shrink-0 mt-0.5" />
@@ -125,7 +125,7 @@ const Riwayat = () => {
       const matchStatus = !statusFilter || d.status_persetujuan === statusFilter;
       const searchTerm = search.toLowerCase();
       const matchSearch = !searchTerm
-        || (d.nama_kegiatan || "").toLowerCase().includes(searchTerm)
+        || (d.name_kegiatan || "").toLowerCase().includes(searchTerm)
         || (d.ruangan || "").toLowerCase().includes(searchTerm)
         || (d.alat || "").toLowerCase().includes(searchTerm);
       return matchType && matchStatus && matchSearch;
@@ -260,7 +260,7 @@ const Riwayat = () => {
 {item.ruangan || item.alat || (item.id_ruangan ? "Ruangan #" + item.id_ruangan : item.id_alat ? "Alat #" + item.id_alat : "-")}
                       </p>
                       <p className="text-[11px] text-[#C92B58] opacity-60 mt-0.5 font-medium">
-                        {item.nama_kegiatan}
+                        {item.name_kegiatan}
                       </p>
                     </div>
                     <Badge status={item.status_persetujuan} />

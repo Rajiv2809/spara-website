@@ -5,39 +5,39 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Mahasiswa extends Model
+class mahasiswa extends Model
 {
     protected $table = 'mahasiswas';
 
-    protected $primaryKey = 'nomor_induk';
+    protected $primaryKey = 'id_number';
 
     public $incrementing = false;
 
     protected $keyType = 'int';
 
     protected $fillable = [
-        'nomor_induk',
+        'id_number',
         'kelas',
         'angkatan',
         'status',
-        'id_prodi'
+        'study_program_id'
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(
             User::class,
-            'nomor_induk',
-            'nomor_induk'
+            'id_number',
+            'id_number'
         );
     }
 
-    public function programStudi(): BelongsTo
+    public function StudyProgram(): BelongsTo
     {
         return $this->belongsTo(
-            ProgramStudi::class,
-            'id_prodi',
-            'id_prodi'
+            StudyProgram::class,
+            'study_program_id',
+            'study_program_id'
         );
     }
 }

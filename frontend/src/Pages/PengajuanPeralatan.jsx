@@ -13,7 +13,7 @@ const statusStyles = {
 };
 
 
-const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan }) => {
+const EquipmentCard = ({ name, deskripsi, status, onDetail, onAjukan }) => {
   const normalizedStatus = status?.toLowerCase();
   const s = statusStyles[normalizedStatus] || statusStyles.tersedia;
   const canApply = normalizedStatus === "tersedia";
@@ -37,7 +37,7 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan }) => {
       <div className="bg-[#3D0C1F] p-3 flex flex-col gap-2">
 
         <h3 className="text-white font-bold text-[12px] leading-tight line-clamp-2">
-          {nama}
+          {name}
         </h3>
 
         <div className="flex items-center gap-1 text-pink-200 text-[10px]">
@@ -85,17 +85,17 @@ const EquipmentCard = ({ nama, deskripsi, status, onDetail, onAjukan }) => {
    DATA
 ========================= */
 const initialEquipments = [
-  { id: 1, nama: "Kamera Luminux", kode: "KMR-001", deskripsi: "Kamera Lumix GH5 Lensa Kit dengan 1 baterai", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
-  { id: 2, nama: "Kamera Sony FX 3", kode: "KMR-002", deskripsi: "Kamera Sony FX 3, Body Only - Lensa Terpisah.", status: "tersedia", jenis: "FOTOGRAFI", stok: 1 },
-  { id: 3, nama: "GPS Handheld 73", kode: "GPS-001", deskripsi: "Alat Survey Terestris", status: "maintenance", jenis: "PROG PK", stok: 2 },
-  { id: 4, nama: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK", stok: 0 },
-  { id: 5, nama: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI", stok: 0 },
-  { id: 6, nama: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
-  { id: 7, nama: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK", stok: 2 },
-  { id: 8, nama: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK", stok: 2 },
-  { id: 9, nama: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK", stok: 0 },
-  { id: 10, nama: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK", stok: 4 },
-  { id: 11, nama: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM", stok: 1 },
+  { id: 1, name: "Kamera Luminux", kode: "KMR-001", deskripsi: "Kamera Lumix GH5 Lensa Kit dengan 1 baterai", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
+  { id: 2, name: "Kamera Sony FX 3", kode: "KMR-002", deskripsi: "Kamera Sony FX 3, Body Only - Lensa Terpisah.", status: "tersedia", jenis: "FOTOGRAFI", stok: 1 },
+  { id: 3, name: "GPS Handheld 73", kode: "GPS-001", deskripsi: "Alat Survey Terestris", status: "maintenance", jenis: "PROG PK", stok: 2 },
+  { id: 4, name: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK", stok: 0 },
+  { id: 5, name: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI", stok: 0 },
+  { id: 6, name: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
+  { id: 7, name: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK", stok: 2 },
+  { id: 8, name: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK", stok: 2 },
+  { id: 9, name: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK", stok: 0 },
+  { id: 10, name: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK", stok: 4 },
+  { id: 11, name: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM", stok: 1 },
 ];
 
 /* MAIN PAGE */
@@ -115,7 +115,7 @@ const PeminjamanPeralatan = () => {
 
   /* FILTER */
   const filtered = equipments.filter((item) => {
-    const matchSearch = item.nama.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = item.name.toLowerCase().includes(search.toLowerCase());
     const matchStatus =
       !filterStatus || item.status.toLowerCase() === filterStatus;
 
@@ -140,7 +140,7 @@ const PeminjamanPeralatan = () => {
         if (Array.isArray(data.data)) {
           const mapped = data.data.map((item) => ({
             id: item.id,
-            nama: item.nama_alat,
+            name: item.name_alat,
             kode: item.kode_alat,
             deskripsi: item.deskripsi_alat,
             status: item.status_alat,
@@ -178,7 +178,7 @@ const PeminjamanPeralatan = () => {
             <div className="bg-[#3D0C1F] p-4 flex justify-between">
               <div>
                 <h2 className="text-white font-bold text-[15px]">
-                  {selectedEquipment.nama}
+                  {selectedEquipment.name}
                 </h2>
                 <p className="text-[11px] text-pink-200">
                   Kode: {selectedEquipment.kode}

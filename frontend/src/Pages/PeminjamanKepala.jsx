@@ -185,7 +185,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
             .filter((r) => r.status_ruangan?.toLowerCase() === "tersedia")
             .map((r) => ({
               id: r.id_ruangan,
-              label: `${r.nama_ruangan} — ${r.nama_gedung} Lt.${r.nomor_lantai}`,
+              label: `${r.name_ruangan} — ${r.name_gedung} Lt.${r.nomor_lantai}`,
             }));
           setRuanganList(mapped);
         })
@@ -314,10 +314,10 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
               Kelola Peminjaman
             </h2>
             <p className="text-pink-200 text-[12px] mt-0.5 truncate max-w-[300px]">
-              {peminjaman.nama_peminjam} ·{" "}
+              {peminjaman.name_peminjam} ·{" "}
               {isRuangan
-                ? peminjaman.nama_ruangan
-                : peminjaman.nama_alat}
+                ? peminjaman.name_ruangan
+                : peminjaman.name_alat}
             </p>
           </div>
           <button
@@ -340,7 +340,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                 Kegiatan
               </span>
               <span className="text-[#2D0A18] font-semibold text-right max-w-[60%]">
-                {peminjaman.nama_kegiatan}
+                {peminjaman.name_kegiatan}
               </span>
             </div>
             <div className="flex justify-between items-center text-[12px]">
@@ -548,7 +548,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                       }}
                       className="w-full border border-pink-200 rounded-xl px-3 py-2 text-[13px] outline-none focus:border-[#C0254A] bg-white"
                     >
-                      <option value="">Tetap gunakan {peminjaman?.nama_ruangan ? peminjaman.nama_ruangan : "ruangan saat ini"}</option>
+                      <option value="">Tetap gunakan {peminjaman?.name_ruangan ? peminjaman.name_ruangan : "ruangan saat ini"}</option>
                       {ruanganList.map((r) => (
                         <option key={r.id} value={String(r.id)}>
                           {r.label}
@@ -738,8 +738,8 @@ const PeminjamanCard = ({ item, onAksi }) => {
           <div className="min-w-0">
             <p className="text-[13px] font-bold text-[#2D0A18] truncate">
               {isRuangan
-                ? item.nama_ruangan || "Ruangan"
-                : item.nama_alat || "Alat"}
+                ? item.name_ruangan || "Ruangan"
+                : item.name_alat || "Alat"}
             </p>
             <p className="text-[10px] text-gray-400">
               {isRuangan
@@ -757,19 +757,19 @@ const PeminjamanCard = ({ item, onAksi }) => {
           className="inline text-gray-300 mr-1"
           width={11}
         />
-        {item.nama_kegiatan}
+        {item.name_kegiatan}
       </p>
 
       <div className="flex items-center gap-2 bg-pink-50 rounded-xl px-3 py-2">
         <div className="w-7 h-7 bg-gradient-to-br from-[#C0254A] to-[#3D0C1F] rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
-          {(item.nama_peminjam || "?")[0].toUpperCase()}
+          {(item.name_peminjam || "?")[0].toUpperCase()}
         </div>
         <div className="min-w-0">
           <p className="text-[12px] font-semibold text-[#2D0A18] truncate">
-            {item.nama_peminjam || "—"}
+            {item.name_peminjam || "—"}
           </p>
           <p className="text-[10px] text-gray-400 truncate">
-            {item.unit_peminjam || item.nomor_induk_peminjam || "—"}
+            {item.unit_peminjam || item.id_number_peminjam || "—"}
           </p>
         </div>
       </div>
@@ -958,10 +958,10 @@ const MonitoringPeminjaman = () => {
       const keyword = search.toLowerCase();
       const matchSearch =
         !search ||
-        (item.nama_peminjam || "").toLowerCase().includes(keyword) ||
-        (item.nama_ruangan || "").toLowerCase().includes(keyword) ||
-        (item.nama_alat || "").toLowerCase().includes(keyword) ||
-        (item.nama_kegiatan || "").toLowerCase().includes(keyword) ||
+        (item.name_peminjam || "").toLowerCase().includes(keyword) ||
+        (item.name_ruangan || "").toLowerCase().includes(keyword) ||
+        (item.name_alat || "").toLowerCase().includes(keyword) ||
+        (item.name_kegiatan || "").toLowerCase().includes(keyword) ||
         (item.unit_peminjam || "").toLowerCase().includes(keyword);
 
       return matchTab && matchStatus && matchSearch;
@@ -1109,7 +1109,7 @@ const MonitoringPeminjaman = () => {
             <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <input
                 type="text"
-                placeholder="Cari nama peminjam, kegiatan, ruangan, atau alat..."
+                placeholder="Cari name peminjam, kegiatan, ruangan, atau alat..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="flex-1 outline-none text-[14px] text-gray-600 bg-transparent"

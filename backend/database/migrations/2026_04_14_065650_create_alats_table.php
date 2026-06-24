@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('alats', function (Blueprint $table) {
             $table->id('id_alat');
             $table->string('kode_alat')->unique();
-            $table->string('nama_alat');
+            $table->string('name_alat');
             $table->text('deskripsi_alat')->nullable();
             $table->enum('status_alat', ['tersedia', 'dipinjam', 'rusak', 'maintenance'])->default('tersedia');
 
-            $table->unsignedBigInteger('nomor_induk_pic')->nullable();
-            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('id_number_pic')->nullable();
+            $table->foreign('id_number_pic')->references('id_number')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }

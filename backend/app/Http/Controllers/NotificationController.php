@@ -9,7 +9,7 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = Notification::where('nomor_induk', auth('api')->user()->nomor_induk)
+        $notifications = Notification::where('id_number', auth('api')->user()->id_number)
             ->with('peminjaman')
             ->orderBy('created_at', 'desc')
             ->limit(20)
@@ -20,7 +20,7 @@ class NotificationController extends Controller
 
     public function unreadCount()
     {
-        $count = Notification::where('nomor_induk', auth('api')->user()->nomor_induk)
+        $count = Notification::where('id_number', auth('api')->user()->id_number)
             ->whereNull('read_at')
             ->count();
 
@@ -30,7 +30,7 @@ class NotificationController extends Controller
     public function markRead($id)
     {
         Notification::where('id', $id)
-            ->where('nomor_induk', auth('api')->user()->nomor_induk)
+            ->where('id_number', auth('api')->user()->id_number)
             ->update(['read_at' => now()]);
 
         return response()->json(['message' => 'Berhasil ditandai dibaca']);
@@ -38,7 +38,7 @@ class NotificationController extends Controller
 
     public function markAllRead()
     {
-        Notification::where('nomor_induk', auth('api')->user()->nomor_induk)
+        Notification::where('id_number', auth('api')->user()->id_number)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 

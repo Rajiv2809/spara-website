@@ -24,7 +24,7 @@ const Badge = ({ status }) => {
 const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
   if (!item) return null;
   const isAlat = item.id_alat !== null && item.id_ruangan === null;
-  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
 
   return (
     <div
@@ -62,7 +62,7 @@ const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
             <div className="flex items-center gap-2.5 mb-3">
               <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-green-600" />
-              <span className="text-sm font-bold text-green-900">{namaItem}</span>
+              <span className="text-sm font-bold text-green-900">{nameItem}</span>
               <span className="ml-auto text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
                 {isAlat ? "Peralatan" : "Ruangan"}
               </span>
@@ -71,7 +71,7 @@ const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
               { icon: "ph:user-circle-fill", text: `${item.peminjam} (${item.role_peminjam})` },
               { icon: "ph:calendar-blank",   text: new Date(item.hari_tanggal).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
               { icon: "ph:clock",            text: `${item.jam_mulai?.slice(0,5)} s/d ${item.jam_selesai?.slice(0,5)}` },
-              { icon: "ph:note-pencil",      text: item.nama_kegiatan },
+              { icon: "ph:note-pencil",      text: item.name_kegiatan },
             ].map(({ icon, text }) => (
               <div key={icon} className="flex items-start gap-2 mb-1.5">
                 <Icon icon={icon} width={12} className="text-green-500 opacity-70 flex-shrink-0 mt-0.5" />
@@ -110,7 +110,7 @@ const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
 const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
   if (!item) return null;
   const isAlat = item.id_alat !== null && item.id_ruangan === null;
-  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
 
   return (
     <div
@@ -148,7 +148,7 @@ const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
           <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
             <div className="flex items-center gap-2.5 mb-3">
               <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-red-600" />
-              <span className="text-sm font-bold text-red-900">{namaItem}</span>
+              <span className="text-sm font-bold text-red-900">{nameItem}</span>
               <span className="ml-auto text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 rounded-full">
                 {isAlat ? "Peralatan" : "Ruangan"}
               </span>
@@ -157,7 +157,7 @@ const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
               { icon: "ph:user-circle-fill", text: `${item.peminjam} (${item.role_peminjam})` },
               { icon: "ph:calendar-blank",   text: new Date(item.hari_tanggal).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) },
               { icon: "ph:clock",            text: `${item.jam_mulai?.slice(0,5)} s/d ${item.jam_selesai?.slice(0,5)}` },
-              { icon: "ph:note-pencil",      text: item.nama_kegiatan },
+              { icon: "ph:note-pencil",      text: item.name_kegiatan },
             ].map(({ icon, text }) => (
               <div key={icon} className="flex items-start gap-2 mb-1.5">
                 <Icon icon={icon} width={12} className="text-red-400 opacity-70 flex-shrink-0 mt-0.5" />
@@ -196,7 +196,7 @@ const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
 const ModalDetail = ({ item, onClose }) => {
   if (!item) return null;
   const isAlat = item.id_alat !== null && item.id_ruangan === null;
-  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
   const kodeItem = isAlat ? item.kode_alat : item.kode_ruangan;
   const tipeItem = isAlat ? "Peralatan" : "Ruangan";
 
@@ -221,7 +221,7 @@ const ModalDetail = ({ item, onClose }) => {
               <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={28} color="white" />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-white leading-tight m-0">{namaItem}</h2>
+              <h2 className="text-lg font-extrabold text-white leading-tight m-0">{nameItem}</h2>
               <p className="text-xs text-white/75 mt-1 font-medium">{kodeItem} &middot; {tipeItem}</p>
             </div>
           </div>
@@ -248,7 +248,7 @@ const ModalDetail = ({ item, onClose }) => {
               Informasi Peminjam
             </p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
-              <span className="text-gray-400">Nama</span>
+              <span className="text-gray-400">name</span>
               <span className="text-gray-700 font-medium">{item.peminjam || "-"}</span>
               <span className="text-gray-400">Role</span>
               <span className="text-gray-700 font-medium">{item.role_peminjam || "-"}</span>
@@ -268,8 +268,8 @@ const ModalDetail = ({ item, onClose }) => {
               Detail Peminjaman
             </p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
-              <span className="text-gray-400">Nama Kegiatan</span>
-              <span className="text-gray-700 font-medium">{item.nama_kegiatan || "-"}</span>
+              <span className="text-gray-400">name Kegiatan</span>
+              <span className="text-gray-700 font-medium">{item.name_kegiatan || "-"}</span>
               <span className="text-gray-400">Jenis Kegiatan</span>
               <span className="text-gray-700 font-medium">{item.jenis_kegiatan || "-"}</span>
               <span className="text-gray-400">Tanggal</span>
@@ -304,7 +304,7 @@ const ModalDetail = ({ item, onClose }) => {
 // ─── LOAN CARD ───────────────────────────────────────────────────────────────
 const LoanCard = ({ item, onApprove, onReject, onDetail }) => {
   const isAlat = item.id_alat !== null && item.id_ruangan === null;
-  const namaItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.nama_ruangan ?? item.id_ruangan);
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
   const kodeItem = isAlat ? item.kode_alat : item.kode_ruangan;
   const tipeItem = isAlat ? "Peralatan" : "Ruangan";
 
@@ -325,7 +325,7 @@ const LoanCard = ({ item, onApprove, onReject, onDetail }) => {
           <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={20} color="#C92B58" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-bold text-[#481020] leading-tight m-0">{namaItem}</p>
+          <p className="text-[13px] font-bold text-[#481020] leading-tight m-0">{nameItem}</p>
           <p className="text-[11px] text-[#C92B58] opacity-60 mt-0.5 font-medium">{kodeItem} • {tipeItem}</p>
         </div>
         <Badge status={item.status_persetujuan} />
@@ -360,7 +360,7 @@ const LoanCard = ({ item, onApprove, onReject, onDetail }) => {
           { icon: "ph:calendar-blank", label: "Hari/Tanggal", value: formatTanggal(item.hari_tanggal) },
           { icon: "ph:clock",          label: "Waktu",        value: `${formatJam(item.jam_mulai)} s/d ${formatJam(item.jam_selesai)}` },
           { icon: "ph:tag",            label: "Jenis",        value: item.jenis_kegiatan },
-          { icon: "ph:note-pencil",    label: "Kegiatan",     value: item.nama_kegiatan?.length > 80 ? item.nama_kegiatan.slice(0, 80) + "…" : item.nama_kegiatan },
+          { icon: "ph:note-pencil",    label: "Kegiatan",     value: item.name_kegiatan?.length > 80 ? item.name_kegiatan.slice(0, 80) + "…" : item.name_kegiatan },
         ].map(({ icon, label, value }) => (
           <div key={label} className="flex gap-2 items-start mb-1.5">
             <Icon icon={icon} width={13} color="#C92B58" className="opacity-70 flex-shrink-0 mt-0.5" />
@@ -505,7 +505,7 @@ const PersetujuanPeminjaman = () => {
       const matchType   = filterType === "ruangan" ? isRuangan : !isRuangan;
       const matchStatus = !statusFilter || d.status_persetujuan === statusFilter.toLowerCase();
       const matchSearch = !search
-        || (d.nama_ruangan ?? d.kode_alat ?? "").toLowerCase().includes(search.toLowerCase())
+        || (d.name_ruangan ?? d.kode_alat ?? "").toLowerCase().includes(search.toLowerCase())
         || (d.peminjam ?? "").toLowerCase().includes(search.toLowerCase());
       return matchType && matchStatus && matchSearch;
     });
@@ -650,7 +650,7 @@ const PersetujuanPeminjaman = () => {
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="telusuri peralatan atau nama peminjam..."
+              placeholder="telusuri peralatan atau name peminjam..."
               className="flex-1 min-w-[180px] px-5 py-2 border-2 border-[#701A32] rounded-full text-[13px] text-gray-500 bg-white outline-none"
             />
           </div>

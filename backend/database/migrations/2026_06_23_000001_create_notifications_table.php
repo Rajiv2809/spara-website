@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('nomor_induk');
+            $table->unsignedBigInteger('id_number');
             $table->string('type'); // 'disetujui', 'ditolak', 'dibatalkan', 'menunggu'
             $table->string('judul');
             $table->text('pesan');
@@ -18,9 +18,9 @@ return new class extends Migration
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
 
-            $table->foreign('nomor_induk')->references('nomor_induk')->on('users')->onDelete('cascade');
+            $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
             $table->foreign('peminjaman_id')->references('id_peminjaman')->on('peminjaman')->onDelete('cascade');
-            $table->index('nomor_induk');
+            $table->index('id_number');
         });
     }
 

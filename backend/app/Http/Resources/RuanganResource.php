@@ -12,7 +12,7 @@ class RuanganResource extends JsonResource
         return [
             'id'                => $this->id_ruangan,
             'kode_ruangan'      => $this->kode_ruangan,
-            'nama_ruangan'      => $this->nama_ruangan,
+            'name_ruangan'      => $this->name_ruangan,
             'kapasitas'         => $this->kapasitas,
             'fasilitas'         => $this->fasilitas,
             'deskripsi_ruangan' => $this->deskripsi_ruangan,
@@ -22,11 +22,11 @@ class RuanganResource extends JsonResource
                 : null,
             'nomor_lantai'      => $this->nomor_lantai,
             'id_gedung'         => $this->id_gedung,
-            'nama_gedung'       => $this->gedung?->nama_gedung ?? '-',
+            'name_gedung'       => $this->gedung?->name_gedung ?? '-',
 
-            'pic'               => $this->pic?->user?->nama ?? '-',
+            'pic'               => $this->pic?->user?->name ?? '-',
 
-            'nomor_induk_pic'   => $this->nomor_induk_pic,
+            'id_number_pic'   => $this->id_number_pic,
         ];
     }
 }

@@ -9,7 +9,7 @@ class Persetujuan extends Model
       protected $table   = 'persetujuans';
     protected $fillable = [
         'id_peminjaman',
-        'nomor_induk_penyetuju',
+        'id_number_penyetuju',
         'status_persetujuan',
     ];
 
@@ -19,7 +19,7 @@ class Persetujuan extends Model
     }
     public function user()
     {
-        return $this->belongsTo(User::class, 'nomor_induk_penyetuju', 'nomor_induk');
+        return $this->belongsTo(User::class, 'id_number_penyetuju', 'id_number');
     }
     public function peminjaman()
     {

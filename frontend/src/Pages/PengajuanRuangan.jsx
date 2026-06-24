@@ -134,7 +134,7 @@ const ModalDetail = ({ ruangan, onClose, onAjukan }) => {
       <div className="bg-white rounded-2xl overflow-hidden w-[400px] max-w-[100vw] shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="bg-[#3D0C1F] p-4 flex items-start justify-between">
           <div>
-            <h2 className="text-white font-bold text-[18px] leading-snug max-w-[270px]">{ruangan.nama}</h2>
+            <h2 className="text-white font-bold text-[18px] leading-snug max-w-[270px]">{ruangan.name}</h2>
             <p className="text-pink-300 text-[15px] mt-0.5">Kode: {ruangan.kode}</p>
           </div>
           <button onClick={onClose} className="text-white bg-white/20 rounded-full w-7 h-7 flex items-center justify-center text-lg leading-none hover:bg-white/30 transition">
@@ -200,7 +200,7 @@ const ModalDetail = ({ ruangan, onClose, onAjukan }) => {
 };
 
 const GedungCard = ({ ruangan, onDetail, onAjukan }) => {
-  const { nama, gedung, lantai, status } = ruangan;
+  const { name, gedung, lantai, status } = ruangan;
   const canApply = status === "TERSEDIA";
 
   const statusStyles = {
@@ -222,7 +222,7 @@ const GedungCard = ({ ruangan, onDetail, onAjukan }) => {
       </div>
 
       <div className="bg-[#3D0C1F] p-3 flex-1 flex flex-col gap-2">
-        <h3 className="text-white font-bold text-[12px] leading-tight line-clamp-2">{nama}</h3>
+        <h3 className="text-white font-bold text-[12px] leading-tight line-clamp-2">{name}</h3>
 
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1 text-pink-200 text-[10px]">
@@ -284,15 +284,15 @@ const PeminjamanRuangan = () => {
           id         : r.id,
           id_ruangan : r.id,
           kode       : r.kode_ruangan,
-          nama       : r.nama_ruangan,
-          gedung     : r.nama_gedung,
+          name       : r.name_ruangan,
+          gedung     : r.name_gedung,
           lantai     : `Lantai ${r.nomor_lantai}`,
           kapasitas  : r.kapasitas,
           fasilitas  : r.fasilitas.split(', '),
           deskripsi  : r.deskripsi_ruangan,
           status     : r.status_ruangan.toUpperCase().replace('_', ' '),
           path_foto  : r.path_foto,
-          nama_pic   : r.nomor_induk_pic,
+          name_pic   : r.id_number_pic,
         }));
         
         
@@ -344,7 +344,7 @@ const PeminjamanRuangan = () => {
 
   const filtered = useMemo(() => {
     return ruanganData.filter((r) => {
-      const matchSearch    = r.nama.toLowerCase().includes(search.toLowerCase());
+      const matchSearch    = r.name.toLowerCase().includes(search.toLowerCase());
       const matchGedung    = !filterGedung || r.gedung === filterGedung;
       const matchLantai    = !filterLantai || r.lantai === filterLantai;
       const matchKapasitas = filterKapasitas === null || filterKapasitas === undefined || r.kapasitas >= filterKapasitas;
@@ -402,7 +402,7 @@ const PeminjamanRuangan = () => {
             <div className="flex-1 flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <input
                 type="text"
-                placeholder="Telusuri nama ruangan..."
+                placeholder="Telusuri name ruangan..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="flex-1 outline-none text-[14px] text-gray-600 bg-transparent"

@@ -234,7 +234,7 @@ export default function KalenderPeminjaman() {
                         <div className="mt-3 flex flex-col gap-1 text-[11px] text-gray-600">
                           {dayEvents.slice(0, 2).map((item) => (
                             <div key={item.id_peminjaman} className="rounded-2xl bg-slate-50 px-2 py-1">
-                              <span className="font-medium">{item.nama_kegiatan}</span>
+                              <span className="font-medium">{item.name_kegiatan}</span>
                               <div className="mt-0.5 flex items-center gap-1">
                                 <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-slate-100">
                                   {item.jenis === 'ruangan' ? 'Ruangan' : 'Alat'}
@@ -291,8 +291,8 @@ export default function KalenderPeminjaman() {
                     <div key={item.id_peminjaman} className="rounded-3xl border border-gray-200 bg-[#FEF5EE] p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm font-semibold text-gray-900">{item.nama_kegiatan}</p>
-                          <p className="text-xs text-gray-500 mt-1">{item.nama_peminjam} · {item.jenis === 'ruangan' ? item.nama_ruangan : item.nama_alat}</p>
+                          <p className="text-sm font-semibold text-gray-900">{item.name_kegiatan}</p>
+                          <p className="text-xs text-gray-500 mt-1">{item.name_peminjam} · {item.jenis === 'ruangan' ? item.name_ruangan : item.name_alat}</p>
                         </div>
                         <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusColors[item.status_persetujuan] ?? 'bg-gray-100 text-gray-700'}`}>
                           {item.status_persetujuan}

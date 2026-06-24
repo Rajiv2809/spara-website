@@ -11,7 +11,7 @@ class Peminjaman extends Model
     protected $primaryKey = 'id_peminjaman';
 
     protected $fillable = [
-        'nama_kegiatan',
+        'name_kegiatan',
         'jenis_kegiatan',
         'hari_tanggal',
         'jam_mulai',
@@ -37,7 +37,7 @@ class Peminjaman extends Model
 
     public function peminjam(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_peminjam', 'nomor_induk');
+        return $this->belongsTo(User::class, 'id_peminjam', 'id_number');
     }
 
     public function alat(): BelongsTo

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_ruangan');
             $table->string('kode_ruangan')->unique();
 
-            $table->string('nama_ruangan');
+            $table->string('name_ruangan');
             $table->integer('kapasitas')->nullable();
             $table->text('fasilitas')->nullable();
             $table->text('deskripsi_ruangan')->nullable();
@@ -26,8 +26,8 @@ return new class extends Migration
             $table->foreign('id_gedung'
             )->references('id_gedung')->on('gedungs')->onDelete('cascade');
 
-            $table->unsignedBigInteger('nomor_induk_pic');
-            $table->foreign('nomor_induk_pic')->references('nomor_induk')->on('users');
+            $table->unsignedBigInteger('id_number_pic');
+            $table->foreign('id_number_pic')->references('id_number')->on('users');
 
             $table->unsignedBigInteger('nomor_lantai');
             $table->foreign('nomor_lantai')->references('nomor_lantai')->on('lantai')->onDelete('cascade');

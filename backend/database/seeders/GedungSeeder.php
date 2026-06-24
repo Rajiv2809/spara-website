@@ -10,9 +10,9 @@ class GedungSeeder extends Seeder
     public function run(): void
     {
         DB::table('gedungs')->insert([
-            ['id_gedung' => 1, 'nama_gedung' => 'Gedung A', 'created_at' => now(), 'updated_at' => now()],
-            ['id_gedung' => 2, 'nama_gedung' => 'Gedung B', 'created_at' => now(), 'updated_at' => now()],
-            ['id_gedung' => 3, 'nama_gedung' => 'Gedung C', 'created_at' => now(), 'updated_at' => now()],
+            ['id_gedung' => 1, 'name_gedung' => 'Gedung A', 'created_at' => now(), 'updated_at' => now()],
+            ['id_gedung' => 2, 'name_gedung' => 'Gedung B', 'created_at' => now(), 'updated_at' => now()],
+            ['id_gedung' => 3, 'name_gedung' => 'Gedung C', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

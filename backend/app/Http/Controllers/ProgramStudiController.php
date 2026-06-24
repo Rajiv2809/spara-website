@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProgramStudi;
+use App\Models\StudyProgram;
 use Illuminate\Http\Request;
 
-class ProgramStudiController extends Controller
+class StudyProgramController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class ProgramStudiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProgramStudi $programStudi)
+    public function show(StudyProgram $StudyProgram)
     {
         //
     }
@@ -42,7 +42,7 @@ class ProgramStudiController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ProgramStudi $programStudi)
+    public function edit(StudyProgram $StudyProgram)
     {
         //
     }
@@ -50,7 +50,7 @@ class ProgramStudiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ProgramStudi $programStudi)
+    public function update(Request $request, StudyProgram $StudyProgram)
     {
         //
     }
@@ -58,7 +58,7 @@ class ProgramStudiController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProgramStudi $programStudi)
+    public function destroy(StudyProgram $StudyProgram)
     {
         //
     }

@@ -15,22 +15,22 @@ export default function Register() {
   const [step, setStep] = useState(1);
 
   const [nomorInduk, setNomorInduk] = useState("");
-  const [nama, setNama] = useState("");
+  const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [telepon, setTelepon] = useState("");
-  const [jurusan, setJurusan] = useState("");
-  const [prodi, setProdi] = useState("");
+  const [department, setdepartment] = useState("");
+  const [study_program, setstudy_program] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const jurusanProdi = {
+  const departmentstudy_program = {
     "Teknik Informatika": [
-      { id: 101, nama: "S1 Teknik Informatika" },
-      { id: 102, nama: "D3 Teknik Informatika" },
-      { id: 201, nama: "S1 Sistem Informasi" },
+      { id: 101, name: "S1 Teknik Informatika" },
+      { id: 102, name: "D3 Teknik Informatika" },
+      { id: 201, name: "S1 Sistem Informasi" },
     ],
 
-    "Teknik Elektro": [{ id: 301, nama: "S1 Teknik Elektro" }],
+    "Teknik Elektro": [{ id: 301, name: "S1 Teknik Elektro" }],
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function Register() {
     if (step === 1) {
       const missing = [];
       if (!nomorInduk) missing.push("NIM");
-      if (!nama) missing.push("Nama Lengkap");
+      if (!name) missing.push("name Lengkap");
 
       if (missing.length > 0) {
         // Menggabungkan pesan jika ada lebih dari 1 data yang kosong
@@ -53,8 +53,8 @@ export default function Register() {
       const missing = [];
       if (!email) missing.push("Email");
       if (!telepon) missing.push("No Telepon");
-      if (!jurusan) missing.push("Jurusan");
-      if (!prodi) missing.push("Program Studi");
+      if (!department) missing.push("department");
+      if (!study_program) missing.push("Program Studi");
 
       if (missing.length > 0) {
         const message =
@@ -72,11 +72,11 @@ export default function Register() {
 
     axiosClient
       .post("/register", {
-        nomor_induk: nomorInduk,
-        nama,
+        id_number: nomorInduk,
+        name,
         email,
-        no_telepon: telepon,
-        id_prodi: prodi,
+        phone_number: telepon,
+        study_program_id: study_program,
         password,
         password_confirmation: confirmPassword,
       })
@@ -162,9 +162,9 @@ export default function Register() {
                 />
                 <input
                   type="text"
-                  placeholder="Nama Lengkap"
-                  value={nama}
-                  onChange={(e) => setNama(e.target.value)}
+                  placeholder="name Lengkap"
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
                   disabled={isLoading}
                   className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
                 />
@@ -218,17 +218,17 @@ export default function Register() {
                   className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
                 />
                 <select
-                  value={jurusan}
+                  value={department}
                   onChange={(e) => {
-                    setJurusan(e.target.value);
-                    setProdi("");
+                    setdepartment(e.target.value);
+                    setstudy_program("");
                   }}
                   disabled={isLoading}
                   className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
                 >
-                  <option value="">Pilih Jurusan</option>
+                  <option value="">Pilih department</option>
 
-                  {Object.keys(jurusanProdi).map((item) => (
+                  {Object.keys(departmentstudy_program).map((item) => (
                     <option key={item} value={item}>
                       {item}
                     </option>
@@ -236,23 +236,23 @@ export default function Register() {
                 </select>
               </div>
 
-              {jurusan && (
+              {department && (
                 <div className="w-full relative">
                   <Icon
                     icon="mdi:school"
                     className="absolute top-1/2 -translate-y-1/2 text-[#862440] text-[24px]"
                   />
                   <select
-                    value={prodi}
-                    onChange={(e) => setProdi(e.target.value)}
+                    value={study_program}
+                    onChange={(e) => setstudy_program(e.target.value)}
                     disabled={isLoading}
                     className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none bg-transparent disabled:opacity-50"
                   >
                     <option value="">Pilih Program Studi</option>
 
-                    {jurusanProdi[jurusan]?.map((item) => (
+                    {departmentstudy_program[department]?.map((item) => (
                       <option key={item.id} value={item.id}>
-                        {item.nama}
+                        {item.name}
                       </option>
                     ))}
                   </select>

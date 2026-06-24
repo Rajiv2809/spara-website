@@ -10,7 +10,7 @@ class PicSeeder extends Seeder
     public function run(): void
     {
         DB::table('pics')->insert([
-            ['nomor_induk' => 20230001, 'created_at' => now(), 'updated_at' => now()],
+            ['id_number' => 20230001, 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

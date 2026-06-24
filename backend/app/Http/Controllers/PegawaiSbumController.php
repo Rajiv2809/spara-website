@@ -26,26 +26,26 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nomor_induk' => 'required|integer|unique:users,nomor_induk',
-            'nama'        => 'required|string|max:100',
+            'id_number' => 'required|integer|unique:users,id_number',
+            'name'        => 'required|string|max:100',
             'email'       => 'required|email|max:100|unique:users,email',
-            'no_telepon'  => 'required|string|max:15',
+            'phone_number'  => 'required|string|max:15',
             'password'    => 'required|min:8|confirmed',
-            'fotoprofil'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_picture'  => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $fotoPath = null;
-        if ($request->hasFile('fotoprofil')) {
-            $fotoPath = $request->file('fotoprofil')->store('fotoprofil', 'public');
+        if ($request->hasFile('profile_picture')) {
+            $fotoPath = $request->file('profile_picture')->store('profile_picture', 'public');
         }
 
         $admin = User::create([
-            'nomor_induk' => $validated['nomor_induk'],
-            'nama'        => $validated['nama'],
+            'id_number' => $validated['id_number'],
+            'name'        => $validated['name'],
             'email'       => $validated['email'],
-            'no_telepon'  => $validated['no_telepon'],
+            'phone_number'  => $validated['phone_number'],
             'password'    => Hash::make($validated['password']),
-            'fotoprofil'  => $fotoPath,
+            'profile_picture'  => $fotoPath,
             'role'        => 'admin',
         ]);
 
@@ -71,29 +71,29 @@ class AdminController extends Controller
         abort_if($admin->role !== 'admin', 404, 'Admin tidak ditemukan.');
 
         $validated = $request->validate([
-            'nama'       => 'required|string|max:100',
-            'email'      => ['required', 'email', 'max:100', Rule::unique('users')->ignore($admin->nomor_induk, 'nomor_induk')],
-            'no_telepon' => 'required|string|max:15',
+            'name'       => 'required|string|max:100',
+            'email'      => ['required', 'email', 'max:100', Rule::unique('users')->ignore($admin->id_number, 'id_number')],
+            'phone_number' => 'required|string|max:15',
             'password'   => 'nullable|min:8|confirmed',
-            'fotoprofil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $data = [
-            'nama'       => $validated['nama'],
+            'name'       => $validated['name'],
             'email'      => $validated['email'],
-            'no_telepon' => $validated['no_telepon'],
+            'phone_number' => $validated['phone_number'],
         ];
 
         if (!empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
         }
 
-        if ($request->hasFile('fotoprofil')) {
+        if ($request->hasFile('profile_picture')) {
             // Hapus foto lama jika ada
-            if ($admin->fotoprofil) {
-                Storage::disk('public')->delete($admin->fotoprofil);
+            if ($admin->profile_picture) {
+                Storage::disk('public')->delete($admin->profile_picture);
             }
-            $data['fotoprofil'] = $request->file('fotoprofil')->store('fotoprofil', 'public');
+            $data['profile_picture'] = $request->file('profile_picture')->store('profile_picture', 'public');
         }
 
         $admin->update($data);
@@ -109,8 +109,8 @@ class AdminController extends Controller
     {
         abort_if($admin->role !== 'admin', 404, 'Admin tidak ditemukan.');
 
-        if ($admin->fotoprofil) {
-            Storage::disk('public')->delete($admin->fotoprofil);
+        if ($admin->profile_picture) {
+            Storage::disk('public')->delete($admin->profile_picture);
         }
 
         $admin->delete();

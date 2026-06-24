@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mahasiswas', function (Blueprint $table) {
-            $table->unsignedBigInteger('nomor_induk')->primary();
-            $table->foreign('nomor_induk')->references('nomor_induk')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('id_number')->primary();
+            $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
             $table->string('kelas')->nullable();
             $table->string('angkatan')->nullable();
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-            $table->unsignedBigInteger('id_prodi')->nullable();
-            $table->foreign('id_prodi')->references('id_prodi')->on('program_studis')->onDelete('set null');
+            $table->unsignedBigInteger('study_program_id')->nullable();
+            $table->foreign('study_program_id')->references('study_program_id')->on('study_programs')->onDelete('set null');
             $table->timestamps();
         });
     }

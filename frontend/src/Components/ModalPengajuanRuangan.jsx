@@ -81,7 +81,7 @@ const SearchableSelect = ({ label, name, value, onChange, required }) => {
   useEffect(() => {
     setFiltered(
       options.filter((o) =>
-        o.nama.toLowerCase().includes(query.toLowerCase())
+        o.name.toLowerCase().includes(query.toLowerCase())
       )
     );
   }, [query, options]);
@@ -97,10 +97,10 @@ const SearchableSelect = ({ label, name, value, onChange, required }) => {
   }, []);
 
   const handleSelect = (item) => {
-    setSelectedLabel(item.nama);
+    setSelectedLabel(item.name);
     setQuery("");
     setOpen(false);
-    onChange({ target: { name, value: item.nomor_induk } });
+    onChange({ target: { name, value: item.id_number } });
   };
 
   const handleInputChange = (e) => {
@@ -175,17 +175,17 @@ const SearchableSelect = ({ label, name, value, onChange, required }) => {
             ) : (
               filtered.map((item) => (
                 <button
-                  key={item.nomor_induk}
+                  key={item.id_number}
                   type="button"
                   onClick={() => handleSelect(item)}
                   className={`w-full text-left px-4 py-2.5 text-sm flex justify-between items-center hover:bg-pink-50 transition-colors ${
-                    value === item.nomor_induk
+                    value === item.id_number
                       ? "bg-pink-50 text-[#A3264C] font-medium"
                       : "text-gray-700"
                   }`}
                 >
-                  <span>{item.nama}</span>
-                  <span className="text-xs text-gray-400 font-mono">{item.nomor_induk}</span>
+                  <span>{item.name}</span>
+                  <span className="text-xs text-gray-400 font-mono">{item.id_number}</span>
                 </button>
               ))
             )}
@@ -219,13 +219,13 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   const isToday = tanggalCek === minDate;
 
   const [form, setForm] = useState({
-    nama_kegiatan: "",
+    name_kegiatan: "",
     jenis_kegiatan: "",
     hari_tanggal: "",
     jam_mulai: "",
     jam_selesai: "",
     id_ruangan: "",
-    nomor_induk_penanggungjawab: "",
+    id_number_penanggungjawab: "",
     keterangan: "",
   });
 
@@ -275,9 +275,9 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
 
   const handleSubmit = () => {
     if (
-      !form.nama_kegiatan ||
+      !form.name_kegiatan ||
       !form.jenis_kegiatan ||
-      !form.nomor_induk_penanggungjawab ||
+      !form.id_number_penanggungjawab ||
       !form.hari_tanggal ||
       !form.jam_mulai ||
       !form.jam_selesai
@@ -287,13 +287,13 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     }
 
     const payload = {
-      nama_kegiatan: form.nama_kegiatan,
+      name_kegiatan: form.name_kegiatan,
       jenis_kegiatan: form.jenis_kegiatan,
       hari_tanggal: form.hari_tanggal,
       jam_mulai: form.jam_mulai.slice(0, 5),
       jam_selesai: form.jam_selesai.slice(0, 5),
       id_ruangan: form.id_ruangan,
-      nomor_induk_penanggungjawab: form.nomor_induk_penanggungjawab,
+      id_number_penanggungjawab: form.id_number_penanggungjawab,
       keterangan: form.keterangan || null,
     };
 
@@ -389,7 +389,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                   Jadwal Pemakaian Ruangan
                 </h3>
                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-5">
-                  <p className="font-semibold text-[#A3264C] text-lg">{ruangan?.nama}</p>
+                  <p className="font-semibold text-[#A3264C] text-lg">{ruangan?.name}</p>
                   <p className="text-sm text-gray-500 mt-1 mb-4">
                     Pilih tanggal untuk mengecek ketersediaan ruangan
                   </p>
@@ -453,7 +453,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                                 : "Jam belum ditentukan"}
                             </span>
                             <div className="text-right">
-                              <p className="text-sm text-gray-700">{item.nama_kegiatan}</p>
+                              <p className="text-sm text-gray-700">{item.name_kegiatan}</p>
                               <span
                                 className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                                   item.jenis_kegiatan === "akademik"
@@ -495,7 +495,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                       <span>{form.jam_mulai.slice(0, 5)} - {form.jam_selesai.slice(0, 5)}</span>
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-[#A3264C] mt-2">{ruangan?.nama}</p>
+                  <p className="text-sm font-medium text-[#A3264C] mt-2">{ruangan?.name}</p>
                 </div>
 
                 <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Detail Pengajuan</h3>
@@ -510,9 +510,9 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     options={["akademik", "non-akademik"]}
                   />
                   <Input
-                    label="Nama Kegiatan"
-                    name="nama_kegiatan"
-                    value={form.nama_kegiatan}
+                    label="name Kegiatan"
+                    name="name_kegiatan"
+                    value={form.name_kegiatan}
                     onChange={handleChange}
                     required
                   />
@@ -521,8 +521,8 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                 <div className="mt-4">
                   <SearchableSelect
                     label="Penanggung Jawab"
-                    name="nomor_induk_penanggungjawab"
-                    value={form.nomor_induk_penanggungjawab}
+                    name="id_number_penanggungjawab"
+                    value={form.id_number_penanggungjawab}
                     onChange={handleChange}
                     required
                   />
@@ -676,9 +676,9 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
               Apakah Anda yakin ingin mengirim pengajuan ini?
             </p>
             <div className="mt-4 bg-gray-50 rounded-xl p-4 text-left space-y-2 text-sm text-gray-600">
-              <p><span className="font-medium">Ruangan:</span> {ruangan?.nama}</p>
+              <p><span className="font-medium">Ruangan:</span> {ruangan?.name}</p>
               <p><span className="font-medium">ID Ruangan:</span> {form.id_ruangan}</p>
-              <p><span className="font-medium">Kegiatan:</span> {form.nama_kegiatan}</p>
+              <p><span className="font-medium">Kegiatan:</span> {form.name_kegiatan}</p>
               <p><span className="font-medium">Jenis:</span> {form.jenis_kegiatan}</p>
               <p><span className="font-medium">Tanggal:</span> {form.hari_tanggal}</p>
               <p><span className="font-medium">Jam:</span> {form.jam_mulai.slice(0, 5)} - {form.jam_selesai.slice(0, 5)}</p>

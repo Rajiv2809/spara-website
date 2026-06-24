@@ -129,10 +129,10 @@ const ModalProfile = ({ onClose }) => {
         {/* Informasi Utama */}
         <div className="text-center w-full px-2 mb-6">
           <h2 className="text-lg font-bold text-gray-800 truncate">
-            {currentUser.nama || "Nama Pengguna"}
+            {currentUser.name || "name Pengguna"}
           </h2>
           <p className="text-xs text-gray-400 font-mono mt-0.5 tracking-wider">
-            {currentUser.nomor_induk || "-"}
+            {currentUser.id_number || "-"}
           </p>
         </div>
 
@@ -173,25 +173,30 @@ const ModalProfile = ({ onClose }) => {
               </span>
             </div>
           </div>
-        </div>
-        {selectedFile && (
-          <div className="w-full flex gap-2 mb-4">
-            <button
-              onClick={handleUpload}
-              disabled={isUploading}
-              className="flex-1 bg-[#862440] text-white py-2 rounded-xl hover:opacity-90"
-            >
-              {isUploading ? "Mengunggah..." : "Simpan Foto"}
-            </button>
 
-            <button
-              onClick={handleCancelSelection}
-              className="flex-1 border border-gray-300 py-2 rounded-xl"
-            >
-              Batal
-            </button>
-          </div>
-        )}
+          {/* Baris Kondisional 3: Program Studi ( jika Mahasiswa) */}
+          {role === "mahasiswa" && currentUser.prodi && (
+            <div className="flex items-center gap-3 text-gray-700">
+              <Icon icon="academicons:education" width="20" className="text-[#862440] shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Program Studi</span>
+                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.prodi}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Baris Kondisional 4: Jurusan */}
+          {currentUser.jurusan && (
+            <div className="flex items-center gap-3 text-gray-700">
+              <Icon icon="teal:building-columns" width="20" className="text-[#862440] shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Jurusan</span>
+                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.jurusan}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Tombol Aksi di bagian bawah */}
         <button
           onClick={onClose}

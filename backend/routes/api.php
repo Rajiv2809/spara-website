@@ -59,10 +59,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
     Route::get('/get-admin', [AdminController::class, 'getAdmin']);
-    Route::get('/admin/{nomor_induk}', [AdminController::class, 'show']);
+    Route::get('/admin/{id_number}', [AdminController::class, 'show']);
     Route::post('/admin', [AdminController::class, 'store']);
-    Route::put('/admin/{nomor_induk}', [AdminController::class, 'update']);
-    Route::delete('/admin/{nomor_induk}', [AdminController::class, 'destroy']);
+    Route::put('/admin/{id_number}', [AdminController::class, 'update']);
+    Route::delete('/admin/{id_number}', [AdminController::class, 'destroy']);
 
     Route::prefix('kepala')->group(function () {
         Route::get('/monitoring-peminjaman', [KepalaController::class, 'getMonitoringPeminjaman']);

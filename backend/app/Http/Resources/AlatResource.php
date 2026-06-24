@@ -12,11 +12,11 @@ class AlatResource extends JsonResource
         return [
             'id'          => $this->id_alat,
             'kode_alat'   => $this->kode_alat,
-            'nama_alat'   => $this->nama_alat,
+            'name_alat'   => $this->name_alat,
             'deskripsi_alat' => $this->deskripsi_alat,
             'status_alat' => $this->status_alat,
-            'pic'         => $this->penanggungJawab?->nama ?? '-',
-            'nomor_induk_pic' => $this->nomor_induk_pic,
+            'pic'         => $this->penanggungJawab?->name ?? '-',
+            'id_number_pic' => $this->id_number_pic,
             'path_foto'      => $this->path_foto
             ? asset('storage/' . $this->path_foto)
             : null,

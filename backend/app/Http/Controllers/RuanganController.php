@@ -34,13 +34,13 @@ class RuanganController extends Controller
 
     public function getGedung()
     {
-        $gedung = Gedungs::all(['id_gedung', 'nama_gedung']);
+        $gedung = Gedungs::all(['id_gedung', 'name_gedung']);
         return response()->json(['data' => $gedung]);
     }
 
     public function getLantai()
     {
-        $lantai = Lantai::all(['nomor_lantai', 'nama_lantai'])
+        $lantai = Lantai::all(['nomor_lantai', 'name_lantai'])
             ->sortBy('nomor_lantai')
             ->values();
         return response()->json(['data' => $lantai]);
@@ -50,14 +50,14 @@ class RuanganController extends Controller
     {
         $validated = $request->validate([
             'kode_ruangan'      => 'required|unique:ruangans,kode_ruangan',
-            'nama_ruangan'      => 'required|string|max:255',
+            'name_ruangan'      => 'required|string|max:255',
             'kapasitas'         => 'required|integer|min:1',
             'fasilitas'         => 'required|string',
             'deskripsi_ruangan' => 'nullable|string',
             'status_ruangan'    => 'required|in:tersedia,maintenance,tidak_tersedia',
             'nomor_lantai'      => 'required|exists:lantai,nomor_lantai',
             'id_gedung'         => 'required|exists:gedungs,id_gedung',
-            'nomor_induk_pic'   => 'required|exists:users,nomor_induk',
+            'id_number_pic'   => 'required|exists:users,id_number',
             'foto'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -82,14 +82,14 @@ class RuanganController extends Controller
 
         $validated = $request->validate([
             'kode_ruangan'      => 'required|unique:ruangans,kode_ruangan,' . $id . ',id_ruangan',
-            'nama_ruangan'      => 'required|string|max:255',
+            'name_ruangan'      => 'required|string|max:255',
             'kapasitas'         => 'required|integer|min:1',
             'fasilitas'         => 'required|string',
             'deskripsi_ruangan' => 'nullable|string',
             'status_ruangan'    => 'required|in:tersedia,maintenance,tidak_tersedia',
             'nomor_lantai'      => 'required|exists:lantai,nomor_lantai',
             'id_gedung'         => 'required|exists:gedungs,id_gedung',
-            'nomor_induk_pic'   => 'required|exists:users,nomor_induk',
+            'id_number_pic'   => 'required|exists:users,id_number',
             'foto'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 

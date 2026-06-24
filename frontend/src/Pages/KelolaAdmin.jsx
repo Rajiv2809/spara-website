@@ -13,7 +13,7 @@ const initialAdmin = [];
 ========================= */
 const ModalAdmin = ({ onClose, onSave, editData }) => {
   const [form, setForm] = useState({
-    nama: "",
+    name: "",
     nomorInduk: "",
     email: "",
     telepon: "",
@@ -24,7 +24,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     if (editData) {
       setForm({
-        nama: editData.nama || "",
+        name: editData.name || "",
         nomorInduk: editData.nomorInduk || "",
         email: editData.email || "",
         telepon: editData.telepon || "",
@@ -33,7 +33,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
       });
     } else {
       setForm({
-        nama: "",
+        name: "",
         nomorInduk: "",
         email: "",
         telepon: "",
@@ -50,7 +50,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
 
   const handleSubmit = () => {
     if (
-      !form.nama.trim() ||
+      !form.name.trim() ||
       !form.nomorInduk.trim() ||
       !form.email.trim() ||
       !form.telepon.trim() ||
@@ -76,14 +76,14 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
         <div className="p-5 space-y-4 text-black">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Nama Admin <span className="text-red-500">*</span>
+              name Admin <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              name="nama"
-              value={form.nama}
+              name="name"
+              value={form.name}
               onChange={handleChange}
-              placeholder="Masukkan nama admin"
+              placeholder="Masukkan name admin"
               className="border border-gray-300 p-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#862440]"
               required
             />
@@ -210,9 +210,9 @@ const KelolaAdmin = () => {
 
   const normalizeAdmin = (admin) => ({
     ...admin,
-    id: admin.nomor_induk?.toString() || admin.id?.toString() || Date.now().toString(),
-    nomorInduk: admin.nomor_induk?.toString() || admin.nomorInduk?.toString(),
-    telepon: admin.no_telepon || admin.telepon,
+    id: admin.id_number?.toString() || admin.id?.toString() || Date.now().toString(),
+    nomorInduk: admin.id_number?.toString() || admin.nomorInduk?.toString(),
+    telepon: admin.phone_number || admin.telepon,
     status: admin.status || "aktif",
   });
 
@@ -239,9 +239,9 @@ const KelolaAdmin = () => {
     if (editData) {
       try {
         const payload = {
-          nama: data.nama,
+          name: data.name,
           email: data.email,
-          no_telepon: data.telepon,
+          phone_number: data.telepon,
         };
 
         await axiosClient.put(`/admin/${editData.nomorInduk}`, payload);
@@ -260,10 +260,10 @@ const KelolaAdmin = () => {
     } else {
       try {
         const payload = {
-          nomor_induk: data.nomorInduk,
-          nama: data.nama,
+          id_number: data.nomorInduk,
+          name: data.name,
           email: data.email,
-          no_telepon: data.telepon,
+          phone_number: data.telepon,
           password: data.password,
         };
 
@@ -384,7 +384,7 @@ const KelolaAdmin = () => {
 
             {/* HEADER TABLE */}
             <div className="grid grid-cols-6 text-gray-500 text-sm font-semibold border-b pb-3">
-              <span>Nama</span>
+              <span>name</span>
               <span>Nomor Induk</span>
               <span>Email</span>
               <span>Telepon</span>
@@ -401,7 +401,7 @@ const KelolaAdmin = () => {
                   className="grid grid-cols-6 items-center py-4 border-b last:border-none"
                 >
                   <span className="font-semibold text-[#C0254A]">
-                    {admin.nama}
+                    {admin.name}
                   </span>
 
                   <span>{admin.nomorInduk}</span>
