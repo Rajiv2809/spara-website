@@ -14,12 +14,12 @@ return new class extends Migration
             $table->string('type'); // 'disetujui', 'ditolak', 'dibatalkan', 'menunggu'
             $table->string('judul');
             $table->text('pesan');
-            $table->unsignedBigInteger('loan_id')->nullable();
+            $table->unsignedBigInteger('peminjaman_id')->nullable();
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
 
             $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
-            $table->foreign('loan_id')->references('loan_id')->on('loan')->onDelete('cascade');
+            $table->foreign('peminjaman_id')->references('id_peminjaman')->on('peminjaman')->onDelete('cascade');
             $table->index('id_number');
         });
     }

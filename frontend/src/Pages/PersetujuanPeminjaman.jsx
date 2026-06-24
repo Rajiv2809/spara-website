@@ -23,8 +23,8 @@ const Badge = ({ status }) => {
 // ─── MODAL SETUJUI ────────────────────────────────────────────────────────────
 const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
   if (!item) return null;
-  const istool = item.tool_id !== null && item.room_id === null;
-  const nameItem = istool ? (item.tool_code ?? item.tool_id) : (item.room_name ?? item.room_id);
+  const isAlat = item.id_alat !== null && item.id_ruangan === null;
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
 
   return (
     <div
@@ -57,14 +57,14 @@ const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
         {/* Body */}
         <div className="px-7 pt-6 pb-2">
           <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-            Apakah Anda yakin ingin <strong className="text-green-600">menyetujui</strong> loan berikut?
+            Apakah Anda yakin ingin <strong className="text-green-600">menyetujui</strong> peminjaman berikut?
           </p>
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4">
             <div className="flex items-center gap-2.5 mb-3">
-              <Icon icon={istool ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-green-600" />
+              <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-green-600" />
               <span className="text-sm font-bold text-green-900">{nameItem}</span>
               <span className="ml-auto text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
-                {istool ? "Pertoolan" : "room"}
+                {isAlat ? "Peralatan" : "Ruangan"}
               </span>
             </div>
             {[
@@ -109,8 +109,8 @@ const ModalSetujui = ({ item, onClose, onConfirm, loading }) => {
 // ─── MODAL TOLAK ──────────────────────────────────────────────────────────────
 const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
   if (!item) return null;
-  const istool = item.tool_id !== null && item.room_id === null;
-  const nameItem = istool ? (item.tool_code ?? item.tool_id) : (item.room_name ?? item.room_id);
+  const isAlat = item.id_alat !== null && item.id_ruangan === null;
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
 
   return (
     <div
@@ -143,14 +143,14 @@ const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
         {/* Body */}
         <div className="px-7 pt-6 pb-2">
           <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-            Anda akan <strong className="text-red-600">menolak</strong> loan berikut:
+            Anda akan <strong className="text-red-600">menolak</strong> peminjaman berikut:
           </p>
           <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
             <div className="flex items-center gap-2.5 mb-3">
-              <Icon icon={istool ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-red-600" />
+              <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-red-600" />
               <span className="text-sm font-bold text-red-900">{nameItem}</span>
               <span className="ml-auto text-[10px] font-bold bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 rounded-full">
-                {istool ? "Pertoolan" : "room"}
+                {isAlat ? "Peralatan" : "Ruangan"}
               </span>
             </div>
             {[
@@ -195,10 +195,10 @@ const ModalTolak = ({ item, onClose, onConfirm, loading }) => {
 // ─── MODAL DETAIL ─────────────────────────────────────────────────────────────
 const ModalDetail = ({ item, onClose }) => {
   if (!item) return null;
-  const istool = item.tool_id !== null && item.room_id === null;
-  const nameItem = istool ? (item.tool_code ?? item.tool_id) : (item.room_name ?? item.room_id);
-  const kodeItem = istool ? item.tool_code : item.room_code;
-  const tipeItem = istool ? "Pertoolan" : "room";
+  const isAlat = item.id_alat !== null && item.id_ruangan === null;
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
+  const kodeItem = isAlat ? item.kode_alat : item.kode_ruangan;
+  const tipeItem = isAlat ? "Peralatan" : "Ruangan";
 
   const formatTanggal = (iso) => {
     if (!iso) return "-";
@@ -218,7 +218,7 @@ const ModalDetail = ({ item, onClose }) => {
           </button>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
-              <Icon icon={istool ? "ph:wrench-bold" : "ph:door-open-bold"} width={28} color="white" />
+              <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={28} color="white" />
             </div>
             <div>
               <h2 className="text-lg font-extrabold text-white leading-tight m-0">{nameItem}</h2>
@@ -261,11 +261,11 @@ const ModalDetail = ({ item, onClose }) => {
             </div>
           </div>
 
-          {/* Detail loan */}
+          {/* Detail Peminjaman */}
           <div className="bg-[#FFF5F7] rounded-2xl p-4">
             <p className="text-xs font-bold text-[#481020] mb-2 flex items-center gap-1.5">
               <Icon icon="ph:clipboard-text" width={14} color="#C92B58" />
-              Detail loan
+              Detail Peminjaman
             </p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[12px]">
               <span className="text-gray-400">name Kegiatan</span>
@@ -303,10 +303,10 @@ const ModalDetail = ({ item, onClose }) => {
 
 // ─── LOAN CARD ───────────────────────────────────────────────────────────────
 const LoanCard = ({ item, onApprove, onReject, onDetail }) => {
-  const istool = item.tool_id !== null && item.room_id === null;
-  const nameItem = istool ? (item.tool_code ?? item.tool_id) : (item.room_name ?? item.room_id);
-  const kodeItem = istool ? item.tool_code : item.room_code;
-  const tipeItem = istool ? "Pertoolan" : "room";
+  const isAlat = item.id_alat !== null && item.id_ruangan === null;
+  const nameItem = isAlat ? (item.kode_alat ?? item.id_alat) : (item.name_ruangan ?? item.id_ruangan);
+  const kodeItem = isAlat ? item.kode_alat : item.kode_ruangan;
+  const tipeItem = isAlat ? "Peralatan" : "Ruangan";
 
   const formatTanggal = (iso) => {
     if (!iso) return "-";
@@ -322,7 +322,7 @@ const LoanCard = ({ item, onApprove, onReject, onDetail }) => {
       {/* Header */}
       <div className="flex items-start gap-3 px-4 pt-4 pb-2.5">
         <div className="w-10 h-10 rounded-xl flex-shrink-0 bg-[#FDEAF0] border border-[#F5C6D8] flex items-center justify-center">
-          <Icon icon={istool ? "ph:wrench-bold" : "ph:door-open-bold"} width={20} color="#C92B58" />
+          <Icon icon={isAlat ? "ph:wrench-bold" : "ph:door-open-bold"} width={20} color="#C92B58" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[13px] font-bold text-[#481020] leading-tight m-0">{nameItem}</p>
@@ -458,10 +458,10 @@ const Pagination = ({ current, total, onChange }) => {
 };
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-const Persetujuanloan = () => {
+const PersetujuanPeminjaman = () => {
   const [data, setData]                   = useState([]);
   const [loading, setLoading]             = useState(true);
-  const [filterType, setFilterType]       = useState("tool");
+  const [filterType, setFilterType]       = useState("alat");
   const [statusFilter, setStatusFilter]   = useState("");
   const [statusOpen, setStatusOpen]       = useState(false);
   const [search, setSearch]               = useState("");
@@ -489,9 +489,9 @@ const Persetujuanloan = () => {
   }, []);
 
   const stats = useMemo(() => {
-    const scope = filterType === "room"
-      ? data.filter((d) => d.room_id !== null)
-      : data.filter((d) => d.tool_id !== null);
+    const scope = filterType === "ruangan"
+      ? data.filter((d) => d.id_ruangan !== null)
+      : data.filter((d) => d.id_alat !== null);
     return {
       approved: scope.filter((d) => d.status_persetujuan === "disetujui").length,
       waiting:  scope.filter((d) => d.status_persetujuan === "menunggu").length,
@@ -501,11 +501,11 @@ const Persetujuanloan = () => {
 
   const filtered = useMemo(() => {
     return data.filter((d) => {
-      const isroom   = d.room_id !== null;
-      const matchType   = filterType === "room" ? isroom : !isroom;
+      const isRuangan   = d.id_ruangan !== null;
+      const matchType   = filterType === "ruangan" ? isRuangan : !isRuangan;
       const matchStatus = !statusFilter || d.status_persetujuan === statusFilter.toLowerCase();
       const matchSearch = !search
-        || (d.room_name ?? d.tool_code ?? "").toLowerCase().includes(search.toLowerCase())
+        || (d.name_ruangan ?? d.kode_alat ?? "").toLowerCase().includes(search.toLowerCase())
         || (d.peminjam ?? "").toLowerCase().includes(search.toLowerCase());
       return matchType && matchStatus && matchSearch;
     });
@@ -567,8 +567,8 @@ const Persetujuanloan = () => {
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-extrabold text-[#481020] m-0">Halaman loan</h1>
-            <p className="text-lg text-gray-400 mt-1">Pantau dan setujui seluruh loan tool atau room</p>
+            <h1 className="text-4xl font-extrabold text-[#481020] m-0">Halaman Peminjaman</h1>
+            <p className="text-lg text-gray-400 mt-1">Pantau dan setujui seluruh peminjaman alat atau ruangan</p>
           </div>
 
           {/* Stat Card */}
@@ -576,7 +576,7 @@ const Persetujuanloan = () => {
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-sm font-bold text-[#C92B58] m-0 tracking-wide">DATA PERSETUJUAN TERKINI</h3>
               <div className="flex border-2 border-[#C92B58] rounded-full overflow-hidden">
-                {["tool", "room"].map((t) => (
+                {["alat", "ruangan"].map((t) => (
                   <button
                     key={t}
                     onClick={() => handleFilterType(t)}
@@ -608,7 +608,7 @@ const Persetujuanloan = () => {
           {/* Filter Bar */}
           <div className="flex items-center gap-2.5 flex-wrap mb-5">
             <div className="flex bg-[#6B1028] rounded-full p-[3px]">
-              {["tool", "room"].map((t) => (
+              {["alat", "ruangan"].map((t) => (
                 <button
                   key={t}
                   onClick={() => handleFilterType(t)}
@@ -650,7 +650,7 @@ const Persetujuanloan = () => {
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="telusuri pertoolan atau name peminjam..."
+              placeholder="telusuri peralatan atau name peminjam..."
               className="flex-1 min-w-[180px] px-5 py-2 border-2 border-[#701A32] rounded-full text-[13px] text-gray-500 bg-white outline-none"
             />
           </div>
@@ -702,4 +702,4 @@ const Persetujuanloan = () => {
   );
 };
 
-export default Persetujuanloan;
+export default PersetujuanPeminjaman;

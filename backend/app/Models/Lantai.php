@@ -5,23 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
-class floor extends Model
+class Lantai extends Model
 {
-     protected $table = 'floor';
-    protected $primaryKey = 'floor_number';
+     protected $table = 'lantai';
+    protected $primaryKey = 'nomor_lantai';
 
     protected $fillable = [
-        'floor_number',
-        'building_id',
+        'nomor_lantai',
+        'id_gedung',
     ];
 
-    public function building(): BelongsTo
+    public function gedung(): BelongsTo
     {
-        return $this->belongsTo(buildings::class, 'building_id', 'building_id');
+        return $this->belongsTo(Gedungs::class, 'id_gedung', 'id_gedung');
     }
 
-    public function room(): HasMany
+    public function ruangan(): HasMany
     {
-        return $this->hasMany(room::class, 'floor_number', 'floor_number');
+        return $this->hasMany(Ruangan::class, 'nomor_lantai', 'nomor_lantai');
     }
 }

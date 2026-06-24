@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loan', function (Blueprint $table) {
-            $table->id('loan_id');
+        Schema::create('peminjaman', function (Blueprint $table) {
+            $table->id('id_peminjaman');
             $table->string('name_kegiatan');
             $table->enum('jenis_kegiatan', ['akademik', 'non-akademik']);
             $table->date('hari_tanggal');
@@ -22,12 +22,12 @@ return new class extends Migration
             $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
 
             $table->unsignedBigInteger('id_peminjam');
-            $table->unsignedBigInteger('tool_id')->nullable();
-            $table->unsignedBigInteger('room_id')->nullable();
+            $table->unsignedBigInteger('id_alat')->nullable();
+            $table->unsignedBigInteger('id_ruangan')->nullable();
 
             $table->foreign('id_peminjam')->references('id_number')->on('users')->onDelete('cascade');
-            $table->foreign('tool_id')->references('tool_id')->on('tools')->onDelete('set null');
-            $table->foreign('room_id')->references('room_id')->on('rooms')->onDelete('set null');
+            $table->foreign('id_alat')->references('id_alat')->on('alats')->onDelete('set null');
+            $table->foreign('id_ruangan')->references('id_ruangan')->on('ruangans')->onDelete('set null');
             
             $table->timestamp('dibuat_pada')->nullable();
             $table->timestamp('diubah_pada')->nullable();
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loan');
+        Schema::dropIfExists('peminjaman');
     }
 };

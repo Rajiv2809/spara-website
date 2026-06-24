@@ -8,21 +8,21 @@ class Persetujuan extends Model
 {
       protected $table   = 'persetujuans';
     protected $fillable = [
-        'loan_id',
+        'id_peminjaman',
         'id_number_penyetuju',
         'status_persetujuan',
     ];
 
     public function peminjam()
     {
-        return $this->belongsTo(loan::class, 'loan_id');
+        return $this->belongsTo(Peminjaman::class, 'id_peminjaman');
     }
     public function user()
     {
         return $this->belongsTo(User::class, 'id_number_penyetuju', 'id_number');
     }
-    public function loan()
+    public function peminjaman()
     {
-        return $this->belongsTo(loan::class, 'loan_id');
+        return $this->belongsTo(Peminjaman::class, 'id_peminjaman');
     }
 }

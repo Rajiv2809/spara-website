@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tools', function (Blueprint $table) {
-            $table->id('tool_id');
-            $table->string('tool_code')->unique();
-            $table->string('tool_name');
-            $table->text('tool_description')->nullable();
-            $table->enum('tool_status', ['tersedia', 'dipinjam', 'rusak', 'maintenance'])->default('tersedia');
+        Schema::create('alats', function (Blueprint $table) {
+            $table->id('id_alat');
+            $table->string('kode_alat')->unique();
+            $table->string('name_alat');
+            $table->text('deskripsi_alat')->nullable();
+            $table->enum('status_alat', ['tersedia', 'dipinjam', 'rusak', 'maintenance'])->default('tersedia');
 
             $table->unsignedBigInteger('id_number_pic')->nullable();
             $table->foreign('id_number_pic')->references('id_number')->on('users')->onDelete('set null');
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tools');
+        Schema::dropIfExists('alats');
     }
 };

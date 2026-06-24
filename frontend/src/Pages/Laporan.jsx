@@ -53,14 +53,14 @@ export default function Laporan() {
 
         if (status) payload.status = status;
 
-        axiosClient.post('/loan-rekapitulasi', payload)
+        axiosClient.post('/peminjaman-rekapitulasi', payload)
             .then((res) => {
                 setData(res.data.data.data);
                 setMeta(res.data.meta);
                 setPagination(res.data.data);
             })
             .catch((err) => {
-                console.error('Gagal mengambil data loan:', err);
+                console.error('Gagal mengambil data peminjaman:', err);
                 setError(err.response?.data?.message ?? 'Gagal memuat data.');
             })
             .finally(() => {
@@ -88,7 +88,7 @@ export default function Laporan() {
             .filter((item) => item.value > 0)
     ), [data]);
 
-    // ── Data untuk bar chart: jumlah loan per tanggal ─────────────
+    // ── Data untuk bar chart: jumlah peminjaman per tanggal ─────────────
     const dailyChartData = useMemo(() => {
         const grouped = {};
 
@@ -114,9 +114,9 @@ export default function Laporan() {
             
                 {/* ── Header ─────────────────────────────────────────── */}
                 <div className="mb-6">
-                    <h1 className="text-xl font-semibold text-gray-800">Laporan loan</h1>
+                    <h1 className="text-xl font-semibold text-gray-800">Laporan Peminjaman</h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Rekapitulasi data loan room &amp; tool
+                        Rekapitulasi data peminjaman ruangan &amp; alat
                     </p>
                 </div>
 
@@ -219,9 +219,9 @@ export default function Laporan() {
                             </ResponsiveContainer>
                         </div>
 
-                        {/* Bar: jumlah loan per tanggal */}
+                        {/* Bar: jumlah peminjaman per tanggal */}
                         <div className="lg:col-span-3 bg-white/70 rounded-xl p-4 shadow-sm">
-                            <p className="text-sm font-medium text-gray-700 mb-2">loan per Tanggal</p>
+                            <p className="text-sm font-medium text-gray-700 mb-2">Peminjaman per Tanggal</p>
                             <ResponsiveContainer width="100%" height={220}>
                                 <BarChart data={dailyChartData}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -249,7 +249,7 @@ export default function Laporan() {
 
                 {!loading && !error && data.length === 0 && (
                     <div className="text-center py-12 text-gray-400 text-sm">
-                        Tidak ada data loan pada periode ini.
+                        Tidak ada data peminjaman pada periode ini.
                     </div>
                 )}
 
@@ -258,15 +258,15 @@ export default function Laporan() {
                     <div className="flex flex-col gap-3">
                         {data.map((p) => {
                             const st   = STATUS_CONFIG[p.status_persetujuan];
-                            const aset = p.tool
-                                ? { icon: '🖥', label: p.tool.tool_name }
-                                : p.room
-                                ? { icon: '🚪', label: `${p.room.room_name} (${p.room.room_code})` }
+                            const aset = p.alat
+                                ? { icon: '🖥', label: p.alat.name_alat }
+                                : p.ruangan
+                                ? { icon: '🚪', label: `${p.ruangan.name_ruangan} (${p.ruangan.kode_ruangan})` }
                                 : null;
 
                             return (
                                 <div
-                                    key={p.loan_id}
+                                    key={p.id_peminjaman}
                                     className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-sm border border-white/60"
                                 >
                                     <div className="flex items-start justify-between gap-3 mb-2">

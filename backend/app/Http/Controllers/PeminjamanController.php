@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Validator};
 use Carbon\Carbon;
-use App\Models\{loan, Persetujuan, Notification};
-use App\Http\Resources\loanResource;
+use App\Models\{Peminjaman, Persetujuan, Notification};
+use App\Http\Resources\PeminjamanResource;
 use App\Http\Resources\PersetujuanResource;
 use App\Http\Resources\ListPersetujuanResource;
-use App\Models\room;
-use App\Models\tool;
+use App\Models\Ruangan;
+use App\Models\Alat;
 
-class loanController extends Controller
+class PeminjamanController extends Controller
 {
     public function create(Request $request)
     {
@@ -23,8 +23,8 @@ class loanController extends Controller
             'jam_mulai'      => 'required|date_format:H:i',
             'jam_selesai'    => 'required|date_format:H:i|after:jam_mulai',
             'keterangan'     => 'nullable|string',
-            'tool_id'        => 'nullable|exists:tools,tool_id',
-            'room_id'     =>     'nullable|exists:rooms,room_id',
+            'id_alat'        => 'nullable|exists:alats,id_alat',
+            'id_ruangan'     =>     'nullable|exists:ruangans,id_ruangan',
             'id_number_penanggungjawab' => 'required|exists:users,id_number',
         ]);
 
@@ -35,9 +35,9 @@ class loanController extends Controller
             ], 422);
         }
 
-        // Cek konflik jadwal room — hanya blokir jika sudah disetujui 3 tahap
-        if ($request->room_id && $request->jam_mulai && $request->jam_selesai) {
-            $konflik = loan::where('room_id', $request->room_id)
+        // Cek konflik jadwal ruangan — hanya blokir jika sudah disetujui 3 tahap
+        if ($request->id_ruangan && $request->jam_mulai && $request->jam_selesai) {
+            $konflik = Peminjaman::where('id_ruangan', $request->id_ruangan)
                 ->where('hari_tanggal', $request->hari_tanggal)
                 ->where('status_persetujuan', '!=', 'ditolak')
                 ->where(function ($query) use ($request) {
@@ -56,14 +56,14 @@ class loanController extends Controller
 
             if ($konflik) {
                 return response()->json([
-                    'message' => 'room sudah dibooking pada jam tersebut.',
+                    'message' => 'Ruangan sudah dibooking pada jam tersebut.',
                 ], 409);
             }
         }
 
-        // Cek konflik jadwal tool
-        if ($request->tool_id && $request->jam_mulai && $request->jam_selesai) {
-            $konfliktool = loan::where('tool_id', $request->tool_id)
+        // Cek konflik jadwal alat
+        if ($request->id_alat && $request->jam_mulai && $request->jam_selesai) {
+            $konflikAlat = Peminjaman::where('id_alat', $request->id_alat)
                 ->where('hari_tanggal', $request->hari_tanggal)
                 ->where('status_persetujuan', '!=', 'ditolak')
                 ->where(function ($query) use ($request) {
@@ -75,15 +75,15 @@ class loanController extends Controller
                         });
                 })->exists();
 
-            if ($konfliktool) {
+            if ($konflikAlat) {
                 return response()->json([
-                    'message' => 'tool sudah dipinjam pada jam tersebut.',
+                    'message' => 'Alat sudah dipinjam pada jam tersebut.',
                 ], 409);
             }
         }
 
-        // Buat loan
-        $loan = loan::create([
+        // Buat peminjaman
+        $peminjaman = Peminjaman::create([
             'name_kegiatan'      => $request->name_kegiatan,
             'jenis_kegiatan'     => $request->jenis_kegiatan,
             'hari_tanggal'       => $request->hari_tanggal,
@@ -92,45 +92,45 @@ class loanController extends Controller
             'keterangan'         => $request->keterangan,
             'status_persetujuan' => 'menunggu',
             'id_peminjam'        => $request->user()->id_number,
-            'tool_id'            => $request->tool_id,
-            'room_id'         => $request->room_id,
+            'id_alat'            => $request->id_alat,
+            'id_ruangan'         => $request->id_ruangan,
             'dibuat_pada'        => Carbon::now(),
             'diubah_pada'        => null,
         ]);
 
-        // ── Ambil id_number PIC dari room / tool ────────────────────────
+        // ── Ambil id_number PIC dari ruangan / alat ────────────────────────
         $nomorIndukPic = null;
-        if ($request->room_id) {
-            $room = DB::table('rooms')
-                ->where('room_id', $request->room_id)
+        if ($request->id_ruangan) {
+            $ruangan = DB::table('ruangans')
+                ->where('id_ruangan', $request->id_ruangan)
                 ->first();
 
-            if ($room && $room->id_number_pic) {
-                $nomorIndukPic = $room->id_number_pic;
+            if ($ruangan && $ruangan->id_number_pic) {
+                $nomorIndukPic = $ruangan->id_number_pic;
             }
-        } elseif ($request->tool_id) {
-            $tool = DB::table('tools')
-                ->where('tool_id', $request->tool_id)
+        } elseif ($request->id_alat) {
+            $alat = DB::table('alats')
+                ->where('id_alat', $request->id_alat)
                 ->first();
 
-            if ($tool && $tool->id_number_pic) {
-                $nomorIndukPic = $tool->id_number_pic;
+            if ($alat && $alat->id_number_pic) {
+                $nomorIndukPic = $alat->id_number_pic;
             }
         }
 
         // ── Buat 3 row persetujuan ───────────────────────────────────────────
         $persetujuans = [
-            // Row 1 — Penanggung jawab (user yang membuat loan)
+            // Row 1 — Penanggung jawab (user yang membuat peminjaman)
             [
-                'loan_id'         => $loan->loan_id,
+                'id_peminjaman'         => $peminjaman->id_peminjaman,
                 'id_number_penyetuju' => $request->id_number_penanggungjawab,
                 'status_persetujuan'    => 'menunggu',
                 'created_at'            => Carbon::now(),
                 'updated_at'            => Carbon::now(),
             ],
-            // Row 2 — PIC room
+            // Row 2 — PIC ruangan
             [
-                'loan_id'         => $loan->loan_id,
+                'id_peminjaman'         => $peminjaman->id_peminjaman,
                 'id_number_penyetuju' => $nomorIndukPic,
                 'status_persetujuan'    => 'menunggu',
                 'created_at'            => Carbon::now(),
@@ -138,7 +138,7 @@ class loanController extends Controller
             ],
             // Row 3 — Admin (null)
             [
-                'loan_id'         => $loan->loan_id,
+                'id_peminjaman'         => $peminjaman->id_peminjaman,
                 'id_number_penyetuju' => null,
                 'status_persetujuan'    => 'menunggu',
                 'created_at'            => Carbon::now(),
@@ -149,21 +149,21 @@ class loanController extends Controller
         Persetujuan::insert($persetujuans);
 
         // ── Notifikasi ke penanggung jawab ──────────────────────────────────
-        $itemName = $loan->room?->room_name
-            ?? $loan->tool?->tool_name
+        $itemName = $peminjaman->ruangan?->name_ruangan
+            ?? $peminjaman->alat?->name_alat
             ?? 'Item';
         Notification::create([
             'id_number'   => $request->id_number_penanggungjawab,
             'type'          => 'menunggu',
-            'judul'         => 'loan Baru',
+            'judul'         => 'Peminjaman Baru',
             'pesan'         => "{$itemName} diajukan oleh {$request->user()->name}, perlu persetujuan Anda.",
-            'loan_id' => $loan->loan_id,
+            'peminjaman_id' => $peminjaman->id_peminjaman,
         ]);
 
         return response()->json([
-            'message'      => 'loan berhasil diajukan.',
-            'loan'   => $loan,
-            'persetujuans' => Persetujuan::where('loan_id', $loan->loan_id)->get(),
+            'message'      => 'Peminjaman berhasil diajukan.',
+            'peminjaman'   => $peminjaman,
+            'persetujuans' => Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)->get(),
         ], 201);
     }
 
@@ -178,29 +178,29 @@ class loanController extends Controller
             'penanggung_jawab' => $penanggungJawab,
         ]);
     }
-    public function getloan()
+    public function getPeminjaman()
     {
-        $loan = loan::where('id_peminjam', request()->user()->id_number)
+        $peminjaman = Peminjaman::where('id_peminjam', request()->user()->id_number)
             ->latest()
             ->take(5)
             ->get();
 
         return response()->json([
-            'loan' => loanResource::collection($loan),
+            'peminjaman' => PeminjamanResource::collection($peminjaman),
         ]);
     }
     public function dashboard()
     {
-        $totaltool = tool::count();
-        $totalroom = room::count();
-        $toolDipinjam = loan::whereNotNull('tool_id')
+        $totalAlat = Alat::count();
+        $totalRuangan = Ruangan::count();
+        $alatDipinjam = Peminjaman::whereNotNull('id_alat')
             ->whereIn('status_persetujuan', ['menunggu', 'disetujui'])
-            ->distinct('tool_id')
-            ->count('tool_id');
-        $roomDipinjam = loan::whereNotNull('room_id')
+            ->distinct('id_alat')
+            ->count('id_alat');
+        $ruanganDipinjam = Peminjaman::whereNotNull('id_ruangan')
             ->whereIn('status_persetujuan', ['menunggu', 'disetujui'])
-            ->distinct('room_id')
-            ->count('room_id');
+            ->distinct('id_ruangan')
+            ->count('id_ruangan');
 
         $user = request()->user();
         if (in_array($user->role, ['lecturer', 'pic'])) {
@@ -212,22 +212,22 @@ class loanController extends Controller
                 ->where('status_persetujuan', 'menunggu')
                 ->whereRaw('NOT EXISTS (
                     SELECT 1 FROM persetujuans AS earlier
-                    WHERE earlier.loan_id = persetujuans.loan_id
+                    WHERE earlier.id_peminjaman = persetujuans.id_peminjaman
                       AND earlier.id < persetujuans.id
                       AND earlier.status_persetujuan != "disetujui"
                 )')
                 ->count();
         } else {
-            $perluDisetujui = loan::where('id_peminjam', $user->id_number)
+            $perluDisetujui = Peminjaman::where('id_peminjam', $user->id_number)
                 ->where('status_persetujuan', 'menunggu')
                 ->count();
         }
 
         return response()->json([
-            'total_tool'       => $totaltool,
-            'total_room'    => $totalroom,
-            'tool_dipinjam'    => $toolDipinjam,
-            'room_dipinjam' => $roomDipinjam,
+            'total_alat'       => $totalAlat,
+            'total_ruangan'    => $totalRuangan,
+            'alat_dipinjam'    => $alatDipinjam,
+            'ruangan_dipinjam' => $ruanganDipinjam,
             'perlu_disetujui'  => $perluDisetujui,
         ]);
     }
@@ -242,7 +242,7 @@ class loanController extends Controller
         })
             ->whereRaw('NOT EXISTS (
                 SELECT 1 FROM persetujuans AS earlier
-                WHERE earlier.loan_id = persetujuans.loan_id
+                WHERE earlier.id_peminjaman = persetujuans.id_peminjaman
                   AND earlier.id < persetujuans.id
                   AND earlier.status_persetujuan != "disetujui"
             )')
@@ -265,7 +265,7 @@ class loanController extends Controller
         })
             ->whereRaw('NOT EXISTS (
                 SELECT 1 FROM persetujuans AS earlier
-                WHERE earlier.loan_id = persetujuans.loan_id
+                WHERE earlier.id_peminjaman = persetujuans.id_peminjaman
                   AND earlier.id < persetujuans.id
                   AND earlier.status_persetujuan != "disetujui"
             )')
@@ -277,7 +277,7 @@ class loanController extends Controller
         ]);
     }
 
-    public function setujuloan($id)
+    public function setujuPeminjaman($id)
     {
         $persetujuan = Persetujuan::find($id);
 
@@ -285,21 +285,21 @@ class loanController extends Controller
             return response()->json(['message' => 'Persetujuan tidak ditemukan.'], 404);
         }
 
-        $loan = loan::with('persetujuans')->find($persetujuan->loan_id);
-        if (!$loan) {
-            return response()->json(['message' => 'loan tidak ditemukan.'], 404);
+        $peminjaman = Peminjaman::with('persetujuans')->find($persetujuan->id_peminjaman);
+        if (!$peminjaman) {
+            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
         }
 
-        if ($loan->status_persetujuan === 'ditolak') {
-            return response()->json(['message' => 'loan sudah ditolak.'], 422);
+        if ($peminjaman->status_persetujuan === 'ditolak') {
+            return response()->json(['message' => 'Peminjaman sudah ditolak.'], 422);
         }
 
-        if ($loan->status_persetujuan === 'disetujui') {
-            return response()->json(['message' => 'loan sudah disetujui sebelumnya.'], 422);
+        if ($peminjaman->status_persetujuan === 'disetujui') {
+            return response()->json(['message' => 'Peminjaman sudah disetujui sebelumnya.'], 422);
         }
 
         // Cek urutan persetujuan (berdasarkan id)
-        $allPersetujuan = $loan->persetujuans->sortBy('id');
+        $allPersetujuan = $peminjaman->persetujuans->sortBy('id');
         $currentIndex = $allPersetujuan->search(fn($item) => (int) $item->id === (int) $id);
 
         if ($currentIndex === false) {
@@ -320,31 +320,31 @@ class loanController extends Controller
         $persetujuan->save();
 
         // ── Notifikasi ─────────────────────────────────────────────────────
-        $itemName = $loan->room?->room_name
-            ?? $loan->tool?->tool_name
+        $itemName = $peminjaman->ruangan?->name_ruangan
+            ?? $peminjaman->alat?->name_alat
             ?? 'Item';
         $approverName = $persetujuan->user?->name ?? auth()->user()->name;
 
         // Cek apakah semua tahap sudah disetujui
-        $semuaDisetujui = Persetujuan::where('loan_id', $loan->loan_id)
+        $semuaDisetujui = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
             ->where('status_persetujuan', '!=', 'disetujui')
             ->doesntExist();
 
         if ($semuaDisetujui) {
-            $loan->status_persetujuan = 'disetujui';
-            $loan->save();
+            $peminjaman->status_persetujuan = 'disetujui';
+            $peminjaman->save();
 
             // Notif ke peminjam
             Notification::create([
-                'id_number'   => $loan->id_peminjam,
+                'id_number'   => $peminjaman->id_peminjam,
                 'type'          => 'disetujui',
-                'judul'         => 'loan Disetujui',
-                'pesan'         => "loan {$itemName} telah disetujui oleh semua pihak.",
-                'loan_id' => $loan->loan_id,
+                'judul'         => 'Peminjaman Disetujui',
+                'pesan'         => "Peminjaman {$itemName} telah disetujui oleh semua pihak.",
+                'peminjaman_id' => $peminjaman->id_peminjaman,
             ]);
         } else {
             // Notif ke penyetuju selanjutnya
-            $next = Persetujuan::where('loan_id', $loan->loan_id)
+            $next = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
                 ->where('id', '>', $persetujuan->id)
                 ->orderBy('id')
                 ->first();
@@ -356,7 +356,7 @@ class loanController extends Controller
                         'type'          => 'menunggu',
                         'judul'         => 'Perlu Persetujuan',
                         'pesan'         => "{$itemName} telah disetujui oleh {$approverName}, menunggu persetujuan Anda.",
-                        'loan_id' => $loan->loan_id,
+                        'peminjaman_id' => $peminjaman->id_peminjaman,
                     ]);
                 } else {
                     // Admin — notif semua admin
@@ -367,7 +367,7 @@ class loanController extends Controller
                             'type'          => 'menunggu',
                             'judul'         => 'Perlu Persetujuan Admin',
                             'pesan'         => "{$itemName} telah disetujui oleh {$approverName}, menunggu persetujuan Admin.",
-                            'loan_id' => $loan->loan_id,
+                            'peminjaman_id' => $peminjaman->id_peminjaman,
                         ]);
                     }
                 }
@@ -375,12 +375,12 @@ class loanController extends Controller
         }
 
         return response()->json([
-            'message' => 'loan disetujui.',
+            'message' => 'Peminjaman disetujui.',
             'persetujuan' => new PersetujuanResource($persetujuan),
         ]);
     }
 
-    public function tolakloan($id)
+    public function tolakPeminjaman($id)
     {
         $persetujuan = Persetujuan::find($id);
 
@@ -388,75 +388,75 @@ class loanController extends Controller
             return response()->json(['message' => 'Persetujuan tidak ditemukan.'], 404);
         }
 
-        $loan = loan::find($persetujuan->loan_id);
+        $peminjaman = Peminjaman::find($persetujuan->id_peminjaman);
 
         $persetujuan->status_persetujuan = 'ditolak';
         $persetujuan->updated_at = Carbon::now();
         $persetujuan->save();
 
-        // Kalau ada yang tolak, loan langsung ditolak
-        if ($loan && $loan->status_persetujuan !== 'ditolak') {
-            $loan->status_persetujuan = 'ditolak';
-            $loan->save();
+        // Kalau ada yang tolak, peminjaman langsung ditolak
+        if ($peminjaman && $peminjaman->status_persetujuan !== 'ditolak') {
+            $peminjaman->status_persetujuan = 'ditolak';
+            $peminjaman->save();
         }
 
         // ── Notifikasi ke peminjam ──────────────────────────────────────────
-        $itemName = $loan?->room?->room_name
-            ?? $loan?->tool?->tool_name
+        $itemName = $peminjaman?->ruangan?->name_ruangan
+            ?? $peminjaman?->alat?->name_alat
             ?? 'Item';
         $penolak = auth()->user()->name;
         Notification::create([
-            'id_number'   => $loan->id_peminjam,
+            'id_number'   => $peminjaman->id_peminjam,
             'type'          => 'ditolak',
-            'judul'         => 'loan Ditolak',
-            'pesan'         => "loan {$itemName} ditolak oleh {$penolak}.",
-            'loan_id' => $loan->loan_id,
+            'judul'         => 'Peminjaman Ditolak',
+            'pesan'         => "Peminjaman {$itemName} ditolak oleh {$penolak}.",
+            'peminjaman_id' => $peminjaman->id_peminjaman,
         ]);
 
         return response()->json([
-            'message' => 'loan ditolak.',
+            'message' => 'Peminjaman ditolak.',
             'persetujuan' => new PersetujuanResource($persetujuan),
         ]);
     }
-    public function getAllloan()
+    public function getAllPeminjaman()
     {
-        $riwayat = loan::with(['persetujuans', 'room', 'tool', 'peminjam'])
+        $riwayat = Peminjaman::with(['persetujuans', 'ruangan', 'alat', 'peminjam'])
             ->where('id_peminjam', request()->user()->id_number)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
 
         return response()->json([
-            'message' => 'Riwayat loan berhasil diambil.',
-            'data' => loanResource::collection($riwayat),
+            'message' => 'Riwayat peminjaman berhasil diambil.',
+            'data' => PeminjamanResource::collection($riwayat),
         ]);
     }
 
-    public function cancelloan($id)
+    public function cancelPeminjaman($id)
     {
-        $loan = loan::where('loan_id', $id)
+        $peminjaman = Peminjaman::where('id_peminjaman', $id)
             ->where('id_peminjam', request()->user()->id_number)
             ->first();
 
-        if (!$loan) {
-            return response()->json(['message' => 'loan tidak ditemukan.'], 404);
+        if (!$peminjaman) {
+            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
         }
 
-        if ($loan->status_persetujuan !== 'menunggu') {
-            return response()->json(['message' => 'Hanya loan dengan status menunggu yang dapat dibatalkan.'], 422);
+        if ($peminjaman->status_persetujuan !== 'menunggu') {
+            return response()->json(['message' => 'Hanya peminjaman dengan status menunggu yang dapat dibatalkan.'], 422);
         }
 
-        $loan->status_persetujuan = 'dibatalkan';
-        $loan->save();
+        $peminjaman->status_persetujuan = 'dibatalkan';
+        $peminjaman->save();
 
-        Persetujuan::where('loan_id', $id)
+        Persetujuan::where('id_peminjaman', $id)
             ->where('status_persetujuan', 'menunggu')
             ->update(['status_persetujuan' => 'ditolak']);
 
         // ── Notifikasi ke PJ, PIC, Admin ────────────────────────────────────
-        $itemName = $loan->room?->room_name
-            ?? $loan->tool?->tool_name
+        $itemName = $peminjaman->ruangan?->name_ruangan
+            ?? $peminjaman->alat?->name_alat
             ?? 'Item';
-        $persetujuans = Persetujuan::where('loan_id', $id)->get();
+        $persetujuans = Persetujuan::where('id_peminjaman', $id)->get();
 
         foreach ($persetujuans as $ps) {
             $notifTargets = [];
@@ -469,33 +469,33 @@ class loanController extends Controller
 
             foreach (array_unique($notifTargets) as $ni) {
                 // Jangan notif ke peminjam sendiri
-                if ((string) $ni === (string) $loan->id_peminjam) continue;
+                if ((string) $ni === (string) $peminjaman->id_peminjam) continue;
 
                 Notification::create([
                     'id_number'   => $ni,
                     'type'          => 'dibatalkan',
-                    'judul'         => 'loan Dibatalkan',
-                    'pesan'         => "loan {$itemName} dibatalkan oleh peminjam.",
-                    'loan_id' => $loan->loan_id,
+                    'judul'         => 'Peminjaman Dibatalkan',
+                    'pesan'         => "Peminjaman {$itemName} dibatalkan oleh peminjam.",
+                    'peminjaman_id' => $peminjaman->id_peminjaman,
                 ]);
             }
         }
 
-        return response()->json(['message' => 'loan berhasil dibatalkan.']);
+        return response()->json(['message' => 'Peminjaman berhasil dibatalkan.']);
     }
 
     public function riwayat()
     {
         $user = request()->user();
 
-        $riwayat = loan::with(['persetujuans', 'room', 'tool', 'peminjam'])
+        $riwayat = Peminjaman::with(['persetujuans', 'ruangan', 'alat', 'peminjam'])
             ->where('id_peminjam', $user->id_number)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
 
         return response()->json([
-            'message' => 'Riwayat loan berhasil diambil.',
-            'data' => loanResource::collection($riwayat),
+            'message' => 'Riwayat peminjaman berhasil diambil.',
+            'data' => PeminjamanResource::collection($riwayat),
         ]);
     }
 
@@ -514,18 +514,18 @@ class loanController extends Controller
             ], 400);
         }
 
-        $riwayat = loan::with(['persetujuans', 'room', 'tool', 'peminjam'])
+        $riwayat = Peminjaman::with(['persetujuans', 'ruangan', 'alat', 'peminjam'])
             ->where('id_peminjam', $nomor)
             ->orderBy('dibuat_pada', 'desc')
             ->get();
 
         return response()->json([
             'message' => 'Riwayat debug berhasil diambil.',
-            'data' => loanResource::collection($riwayat),
+            'data' => PeminjamanResource::collection($riwayat),
         ]);
     }
     /**
-     * GET /api/loan-rekapitulasi
+     * GET /api/peminjaman-rekapitulasi
      *
      * Query params:
      *  - filter    : 'seminggu' | 'sebulan' | (opsional, default tampil semua)
@@ -536,7 +536,7 @@ class loanController extends Controller
      *  - status    : 'menunggu' | 'disetujui' | 'ditolak' (opsional)
      *  - per_page  : integer (default 15, max 100)
      */
-    public function getloanRekapitulasi(Request $request)
+    public function getPeminjamanRekapitulasi(Request $request)
     {
         $request->validate([
             'filter'   => 'nullable|in:seminggu,sebulan',
@@ -547,7 +547,7 @@ class loanController extends Controller
             'per_page' => 'nullable|integer|min:1|max:100',
         ]);
 
-        $query = loan::with(['peminjam', 'tool', 'room'])
+        $query = Peminjaman::with(['peminjam', 'alat', 'ruangan'])
             ->orderBy('hari_tanggal', 'desc')
             ->orderBy('jam_mulai', 'asc');
 

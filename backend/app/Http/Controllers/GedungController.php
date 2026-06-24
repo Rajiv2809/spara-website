@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\building;
+use App\Models\Gedung;
 use Illuminate\Http\Request;
 
-class buildingController extends Controller
+class GedungController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class buildingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(building $building)
+    public function show(Gedung $gedung)
     {
         //
     }
@@ -42,7 +42,7 @@ class buildingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(building $building)
+    public function edit(Gedung $gedung)
     {
         //
     }
@@ -50,7 +50,7 @@ class buildingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, building $building)
+    public function update(Request $request, Gedung $gedung)
     {
         //
     }
@@ -58,7 +58,7 @@ class buildingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(building $building)
+    public function destroy(Gedung $gedung)
     {
         //
     }

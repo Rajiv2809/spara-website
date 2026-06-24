@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
-import ModalPengajuan from "../Components/ModalPengajuanroom";
-import building_utama from '../assets/gu601.jpeg';
+import ModalPengajuan from "../Components/ModalPengajuanRuangan";
+import gedung_utama from '../assets/gu601.jpeg';
 import axiosClient from "../axios";
 
 const ITEMS_PER_PAGE = 10;
@@ -54,7 +54,7 @@ const Dropdown = ({ label, icon, options, value, onChange, disabled }) => {
   );
 };
 
-const Filtercapacity = ({ value, onChange }) => {
+const FilterKapasitas = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState(value ?? "");
 
@@ -83,14 +83,14 @@ const Filtercapacity = ({ value, onChange }) => {
         }`}
       >
         <Icon icon="mdi:account-group" width={14} />
-        {value !== null && value !== undefined ? `≥ ${value} orang` : "capacity"}
+        {value !== null && value !== undefined ? `≥ ${value} orang` : "Kapasitas"}
         <Icon icon={open ? "mdi:chevron-up" : "mdi:chevron-down"} width={14} />
       </button>
 
       {open && (
         <div className="absolute top-full mt-1 left-0 z-30 bg-white border border-pink-100 rounded-2xl shadow-xl p-4 min-w-[220px]">
           <p className="text-[11px] text-gray-400 mb-2">
-            Tampilkan room dengan capacity minimal:
+            Tampilkan ruangan dengan kapasitas minimal:
           </p>
           <div className="flex items-center gap-2 mb-1">
             <input
@@ -119,23 +119,23 @@ const Filtercapacity = ({ value, onChange }) => {
   );
 };
 
-const ModalDetail = ({ room, onClose, onAjukan }) => {
-  if (!room) return null;
-  const canApply = room.status === "TERSEDIA";
+const ModalDetail = ({ ruangan, onClose, onAjukan }) => {
+  if (!ruangan) return null;
+  const canApply = ruangan.status === "TERSEDIA";
   const statusStyles = {
     TERSEDIA: { bg: "bg-green-500", text: "TERSEDIA" },
     MAINTENANCE: { bg: "bg-yellow-500", text: "MAINTENANCE" },
     "TIDAK TERSEDIA": { bg: "bg-red-500", text: "TIDAK TERSEDIA" },
   };
-  const s = statusStyles[room.status] || statusStyles["TERSEDIA"];
+  const s = statusStyles[ruangan.status] || statusStyles["TERSEDIA"];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
       <div className="bg-white rounded-2xl overflow-hidden w-[400px] max-w-[100vw] shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="bg-[#3D0C1F] p-4 flex items-start justify-between">
           <div>
-            <h2 className="text-white font-bold text-[18px] leading-snug max-w-[270px]">{room.name}</h2>
-            <p className="text-pink-300 text-[15px] mt-0.5">Kode: {room.kode}</p>
+            <h2 className="text-white font-bold text-[18px] leading-snug max-w-[270px]">{ruangan.name}</h2>
+            <p className="text-pink-300 text-[15px] mt-0.5">Kode: {ruangan.kode}</p>
           </div>
           <button onClick={onClose} className="text-white bg-white/20 rounded-full w-7 h-7 flex items-center justify-center text-lg leading-none hover:bg-white/30 transition">
             ×
@@ -143,7 +143,7 @@ const ModalDetail = ({ room, onClose, onAjukan }) => {
         </div>
 
         <div className="relative h-[240px] bg-gradient-to-br from-sky-300 to-blue-500 flex items-end justify-center pb-2 overflow-hidden">
-          <img src={building_utama} className="absolute inset-0 w-full h-full object-cover" />
+          <img src={gedung_utama} className="absolute inset-0 w-full h-full object-cover" />
         </div>
 
         <div className="p-4 flex flex-col gap-2.5">
@@ -152,9 +152,9 @@ const ModalDetail = ({ room, onClose, onAjukan }) => {
           </div>
 
           {[
-            { icon: "mdi:stairs", label: "floor", value: room.floor },
-            { icon: "mdi:office-building", label: "building", value: room.building },
-            { icon: "mdi:account-group", label: "capacity", value: `${room.capacity} orang` },
+            { icon: "mdi:stairs", label: "Lantai", value: ruangan.lantai },
+            { icon: "mdi:office-building", label: "Gedung", value: ruangan.gedung },
+            { icon: "mdi:account-group", label: "Kapasitas", value: `${ruangan.kapasitas} orang` },
           ].map(({ icon, label, value }) => (
             <div key={label} className="flex justify-between items-center border-b border-pink-100 pb-2">
               <span className="flex items-center gap-1.5 text-gray-400 text-[11px]">
@@ -168,16 +168,16 @@ const ModalDetail = ({ room, onClose, onAjukan }) => {
           <div className="flex justify-between items-start border-b border-pink-100 pb-2">
             <span className="flex items-center gap-1.5 text-gray-400 text-[11px]">
               <Icon icon="mdi:star-check" className="text-[#C0254A]" />
-              facility
+              Fasilitas
             </span>
             <div className="flex flex-wrap gap-1 justify-end max-w-[65%]">
-              {room.facility.map((f) => (
+              {ruangan.fasilitas.map((f) => (
                 <span key={f} className="bg-pink-100 text-[#C0254A] text-[10px] px-2 py-0.5 rounded-full font-semibold">{f}</span>
               ))}
             </div>
           </div>
 
-          <p className="text-[11px] text-gray-500 leading-relaxed bg-pink-50 rounded-lg p-2.5">{room.deskripsi}</p>
+          <p className="text-[11px] text-gray-500 leading-relaxed bg-pink-50 rounded-lg p-2.5">{ruangan.deskripsi}</p>
         </div>
 
         <div className="px-4 pb-4 flex gap-2">
@@ -186,12 +186,12 @@ const ModalDetail = ({ room, onClose, onAjukan }) => {
           </button>
           <button
             disabled={!canApply}
-            onClick={() => onAjukan(room)}
+            onClick={() => onAjukan(ruangan)}
             className={`flex-1 rounded-full py-2 text-[12px] font-bold transition ${
               canApply ? "bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white hover:opacity-90" : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
           >
-            Ajukan loan
+            Ajukan Peminjaman
           </button>
         </div>
       </div>
@@ -199,8 +199,8 @@ const ModalDetail = ({ room, onClose, onAjukan }) => {
   );
 };
 
-const buildingCard = ({ room, onDetail, onAjukan }) => {
-  const { name, building, floor, status } = room;
+const GedungCard = ({ ruangan, onDetail, onAjukan }) => {
+  const { name, gedung, lantai, status } = ruangan;
   const canApply = status === "TERSEDIA";
 
   const statusStyles = {
@@ -214,7 +214,7 @@ const buildingCard = ({ room, onDetail, onAjukan }) => {
     <div className="bg-white rounded-2xl overflow-hidden border border-pink-100 shadow-[0_6px_20px_rgba(0,0,0,0.07)] flex flex-col hover:scale-[1.02] hover:shadow-xl transition duration-300">
       <div className="relative h-[155px] bg-gradient-to-br from-sky-300 to-blue-500 overflow-hidden">
         <div className="absolute inset-0 flex items-end justify-center pb-3">
-          <img src={building_utama} className="absolute inset-0 w-full h-full object-cover" />
+          <img src={gedung_utama} className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 ${s.bg} text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap`}>
           {s.text}
@@ -227,17 +227,17 @@ const buildingCard = ({ room, onDetail, onAjukan }) => {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1 text-pink-200 text-[10px]">
             <Icon icon="mdi:office-building" width={11} />
-            <span className="truncate">{building}</span>
+            <span className="truncate">{gedung}</span>
           </div>
           <div className="flex items-center gap-1 text-pink-200 text-[10px]">
             <Icon icon="mdi:stairs" width={11} />
-            <span>{floor}</span>
+            <span>{lantai}</span>
           </div>
         </div>
 
         <div className="flex gap-1.5 mt-1">
           <button
-            onClick={() => onDetail(room)}
+            onClick={() => onDetail(ruangan)}
             className="flex items-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2.5 py-1 rounded-full hover:bg-pink-800/30 transition"
           >
             <Icon icon="mdi:information-outline" width={11} />
@@ -246,7 +246,7 @@ const buildingCard = ({ room, onDetail, onAjukan }) => {
 
           {canApply ? (
             <button
-              onClick={() => onAjukan(room)}
+              onClick={() => onAjukan(ruangan)}
               className="flex items-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2.5 py-1 rounded-full hover:bg-pink-800/30 transition">
               <Icon icon="mdi:plus" width={11} />
               Ajukan
@@ -263,55 +263,55 @@ const buildingCard = ({ room, onDetail, onAjukan }) => {
   );
 };
 
-const loanroom = () => {
+const PeminjamanRuangan = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [showModalPengajuan, setShowModalPengajuan] = useState(false);
   const [selectedPengajuanRoom, setSelectedPengajuanRoom] = useState(null);
-  const [filterbuilding, setFilterbuilding] = useState(null);
-  const [filterfloor, setFilterfloor] = useState(null);
-  const [filtercapacity, setFiltercapacity] = useState(null);
-  const [roomData, setroomData] = useState([]);
-  const [buildingList, setbuildingList] = useState([]);
-  const [floorPerbuilding, setfloorPerbuilding] = useState({});
+  const [filterGedung, setFilterGedung] = useState(null);
+  const [filterLantai, setFilterLantai] = useState(null);
+  const [filterKapasitas, setFilterKapasitas] = useState(null);
+  const [ruanganData, setRuanganData] = useState([]);
+  const [gedungList, setGedungList] = useState([]);
+  const [lantaiPerGedung, setLantaiPerGedung] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axiosClient.get('/get-room')
+    axiosClient.get('/get-ruangan')
       .then(({ data }) => {
         const mapped = data.data.map((r) => ({
           id         : r.id,
-          room_id : r.id,
-          kode       : r.room_code,
-          name       : r.room_name,
-          building     : r.building_name,
-          floor     : `floor ${r.floor_number}`,
-          capacity  : r.capacity,
-          facility  : r.facility.split(', '),
-          deskripsi  : r.room_description,
-          status     : r.room_status.toUpperCase().replace('_', ' '),
+          id_ruangan : r.id,
+          kode       : r.kode_ruangan,
+          name       : r.name_ruangan,
+          gedung     : r.name_gedung,
+          lantai     : `Lantai ${r.nomor_lantai}`,
+          kapasitas  : r.kapasitas,
+          fasilitas  : r.fasilitas.split(', '),
+          deskripsi  : r.deskripsi_ruangan,
+          status     : r.status_ruangan.toUpperCase().replace('_', ' '),
           path_foto  : r.path_foto,
           name_pic   : r.id_number_pic,
         }));
         
         
-        const buildingSet = [...new Set(mapped.map((r) => r.building))];
+        const gedungSet = [...new Set(mapped.map((r) => r.gedung))];
 
-        const floorMap = {};
-        buildingSet.forEach((building) => {
-          floorMap[building] = [
+        const lantaiMap = {};
+        gedungSet.forEach((gedung) => {
+          lantaiMap[gedung] = [
             ...new Set(
               mapped
-                .filter((r) => r.building === building)
-                .map((r) => r.floor)
+                .filter((r) => r.gedung === gedung)
+                .map((r) => r.lantai)
             ),
-          ].sort((a, b) => parseInt(a.replace('floor ', '')) - parseInt(b.replace('floor ', '')));
+          ].sort((a, b) => parseInt(a.replace('Lantai ', '')) - parseInt(b.replace('Lantai ', '')));
         });
 
-        setroomData(mapped);
-        setbuildingList(buildingSet);
-        setfloorPerbuilding(floorMap);
+        setRuanganData(mapped);
+        setGedungList(gedungSet);
+        setLantaiPerGedung(lantaiMap);
       })
       .catch(({ res }) => {
         console.log(res);
@@ -321,19 +321,19 @@ const loanroom = () => {
       });
   }, []);
 
-  const handleFilterbuilding = (val) => {
-    setFilterbuilding(val);
-    setFilterfloor(null);
+  const handleFilterGedung = (val) => {
+    setFilterGedung(val);
+    setFilterLantai(null);
     setCurrentPage(1);
   };
 
-  const handleFilterfloor = (val) => {
-    setFilterfloor(val);
+  const handleFilterLantai = (val) => {
+    setFilterLantai(val);
     setCurrentPage(1);
   };
 
-  const handleFiltercapacity = (val) => {
-    setFiltercapacity(val);
+  const handleFilterKapasitas = (val) => {
+    setFilterKapasitas(val);
     setCurrentPage(1);
   };
 
@@ -343,18 +343,18 @@ const loanroom = () => {
   };
 
   const filtered = useMemo(() => {
-    return roomData.filter((r) => {
+    return ruanganData.filter((r) => {
       const matchSearch    = r.name.toLowerCase().includes(search.toLowerCase());
-      const matchbuilding    = !filterbuilding || r.building === filterbuilding;
-      const matchfloor    = !filterfloor || r.floor === filterfloor;
-      const matchcapacity = filtercapacity === null || filtercapacity === undefined || r.capacity >= filtercapacity;
-      return matchSearch && matchbuilding && matchfloor && matchcapacity;
+      const matchGedung    = !filterGedung || r.gedung === filterGedung;
+      const matchLantai    = !filterLantai || r.lantai === filterLantai;
+      const matchKapasitas = filterKapasitas === null || filterKapasitas === undefined || r.kapasitas >= filterKapasitas;
+      return matchSearch && matchGedung && matchLantai && matchKapasitas;
     });
-  }, [roomData, search, filterbuilding, filterfloor, filtercapacity]);
+  }, [ruanganData, search, filterGedung, filterLantai, filterKapasitas]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-  const floorOptions = filterbuilding ? floorPerbuilding[filterbuilding] ?? [] : [];
+  const lantaiOptions = filterGedung ? lantaiPerGedung[filterGedung] ?? [] : [];
 
   const pageRange = useMemo(() => {
     const delta = 2;
@@ -371,7 +371,7 @@ const loanroom = () => {
 
       {selectedRoom && (
         <ModalDetail
-          room={selectedRoom}
+          ruangan={selectedRoom}
           onClose={() => setSelectedRoom(null)}
           onAjukan={(room) => {
             setSelectedRoom(null);
@@ -383,16 +383,16 @@ const loanroom = () => {
 
       {showModalPengajuan && (
         <ModalPengajuan
-          room={selectedPengajuanRoom}
+          ruangan={selectedPengajuanRoom}
           onClose={() => setShowModalPengajuan(false)}
         />
       )}
 
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4 overflow-y-auto">
         <div className="mb-8">
-          <h1 className="text-[#2D0A18] text-[32px] lg:mt-2 mt-12 font-extrabold">Daftar room</h1>
+          <h1 className="text-[#2D0A18] text-[32px] lg:mt-2 mt-12 font-extrabold">Daftar Ruangan</h1>
           <p className="text-gray-500 text-[14px] mt-1">
-            Memilih room yang tersedia berdasarkan jadwal dan capacity
+            Memilih ruangan yang tersedia berdasarkan jadwal dan kapasitas
           </p>
         </div>
 
@@ -402,7 +402,7 @@ const loanroom = () => {
             <div className="flex-1 flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <input
                 type="text"
-                placeholder="Telusuri name room..."
+                placeholder="Telusuri name ruangan..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="flex-1 outline-none text-[14px] text-gray-600 bg-transparent"
@@ -420,24 +420,24 @@ const loanroom = () => {
 
           <div className="flex gap-2 mb-5 flex-wrap items-center">
             <Dropdown
-              label="building"
+              label="Gedung"
               icon="mdi:office-building"
-              options={buildingList}
-              value={filterbuilding}
-              onChange={handleFilterbuilding}
+              options={gedungList}
+              value={filterGedung}
+              onChange={handleFilterGedung}
             />
             <Dropdown
-              label="floor"
+              label="Lantai"
               icon="mdi:stairs"
-              options={floorOptions}
-              value={filterfloor}
-              onChange={handleFilterfloor}
-              disabled={!filterbuilding}
+              options={lantaiOptions}
+              value={filterLantai}
+              onChange={handleFilterLantai}
+              disabled={!filterGedung}
             />
-            <Filtercapacity value={filtercapacity} onChange={handleFiltercapacity} />
+            <FilterKapasitas value={filterKapasitas} onChange={handleFilterKapasitas} />
 
             <span className="ml-auto text-[12px] text-gray-400">
-              {filtered.length} room ditemukan
+              {filtered.length} ruangan ditemukan
             </span>
           </div>
 
@@ -445,14 +445,14 @@ const loanroom = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Icon icon="mdi:loading" width={48} className="mb-3 opacity-50 animate-spin" />
-              <p className="text-[14px] font-semibold">Memuat data room...</p>
+              <p className="text-[14px] font-semibold">Memuat data ruangan...</p>
             </div>
           ) : paginated.length > 0 ? (
             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6">
               {paginated.map((r, i) => (
-                <buildingCard
+                <GedungCard
                   key={i}
-                  room={r}
+                  ruangan={r}
                   onDetail={setSelectedRoom}
                   onAjukan={(room) => {
                     setSelectedPengajuanRoom(room);
@@ -464,7 +464,7 @@ const loanroom = () => {
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <Icon icon="mdi:magnify-close" width={48} className="mb-3 opacity-30" />
-              <p className="text-[14px] font-semibold">Tidak ada room yang cocok</p>
+              <p className="text-[14px] font-semibold">Tidak ada ruangan yang cocok</p>
               <p className="text-[12px] mt-1">Coba ubah kata kunci atau filter</p>
             </div>
           )}
@@ -539,4 +539,4 @@ const loanroom = () => {
   );
 };
 
-export default loanroom;
+export default PeminjamanRuangan;

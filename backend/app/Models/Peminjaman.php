@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany, HasOne};
 
-class loan extends Model
+class Peminjaman extends Model
 {
-   protected $table = 'loan';
-    protected $primaryKey = 'loan_id';
+   protected $table = 'peminjaman';
+    protected $primaryKey = 'id_peminjaman';
 
     protected $fillable = [
         'name_kegiatan',
@@ -19,8 +19,8 @@ class loan extends Model
         'keterangan',
         'status_persetujuan',
         'id_peminjam',
-        'tool_id',
-        'room_id',
+        'id_alat',
+        'id_ruangan',
         'dibuat_pada',
         'diubah_pada',
         'alasan_kepala',
@@ -40,24 +40,24 @@ class loan extends Model
         return $this->belongsTo(User::class, 'id_peminjam', 'id_number');
     }
 
-    public function tool(): BelongsTo
+    public function alat(): BelongsTo
     {
-        return $this->belongsTo(tool::class, 'tool_id', 'tool_id');
+        return $this->belongsTo(Alat::class, 'id_alat', 'id_alat');
     }
 
-    public function room(): BelongsTo
+    public function ruangan(): BelongsTo
     {
-        return $this->belongsTo(room::class, 'room_id', 'room_id');
+        return $this->belongsTo(Ruangan::class, 'id_ruangan', 'id_ruangan');
     }
 
     public function persetujuans(): HasMany
     {
-        return $this->hasMany(Persetujuan::class, 'loan_id', 'loan_id');
+        return $this->hasMany(Persetujuan::class, 'id_peminjaman', 'id_peminjaman');
     }
 
     // public function persetujuan(): BelongsTo
     // {
-    //     return $this->belongsTo(Persetujuan::class, 'loan_id', 'loan_id');
+    //     return $this->belongsTo(Persetujuan::class, 'id_peminjaman', 'id_peminjaman');
     // }
 
     

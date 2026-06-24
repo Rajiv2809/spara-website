@@ -144,15 +144,15 @@ const Dropdown = ({ label, icon, options, value, onChange }) => {
 // ==========================================
 // ModalAksi — dengan cek ketersediaan real-time
 // ==========================================
-const ModalAksi = ({ loan, onClose, onSubmit }) => {
+const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
   const [mode, setMode] = useState(null);
   const [alasan, setAlasan] = useState("");
   const [newTanggal, setNewTanggal] = useState("");
   const [newJamMulai, setNewJamMulai] = useState("");
   const [newJamSelesai, setNewJamSelesai] = useState("");
-  const [idroomBaru, setIdroomBaru] = useState("");
-  const [roomList, setroomList] = useState([]);
-  const [loadingroom, setLoadingroom] = useState(false);
+  const [idRuanganBaru, setIdRuanganBaru] = useState("");
+  const [ruanganList, setRuanganList] = useState([]);
+  const [loadingRuangan, setLoadingRuangan] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -163,36 +163,36 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
     pesan: "",
   });
 
-  const isroom = loan?.jenis === "room";
-  const isMenunggu = loan?.status_persetujuan === "menunggu";
+  const isRuangan = peminjaman?.jenis === "ruangan";
+  const isMenunggu = peminjaman?.status_persetujuan === "menunggu";
 
   useEffect(() => {
-    if (loan) {
-      setNewTanggal(loan.hari_tanggal || "");
-      setNewJamMulai(formatJam(loan.jam_mulai) || "");
-      setNewJamSelesai(formatJam(loan.jam_selesai) || "");
-      setIdroomBaru("");
+    if (peminjaman) {
+      setNewTanggal(peminjaman.hari_tanggal || "");
+      setNewJamMulai(formatJam(peminjaman.jam_mulai) || "");
+      setNewJamSelesai(formatJam(peminjaman.jam_selesai) || "");
+      setIdRuanganBaru("");
     }
-  }, [loan]);
+  }, [peminjaman]);
 
   useEffect(() => {
-    if (mode === "jadwalkan_ulang" && isroom && roomList.length === 0) {
-      setLoadingroom(true);
+    if (mode === "jadwalkan_ulang" && isRuangan && ruanganList.length === 0) {
+      setLoadingRuangan(true);
       axiosClient
-        .get("/get-room")
+        .get("/get-ruangan")
         .then(({ data }) => {
           const mapped = (data.data || [])
-            .filter((r) => r.room_status?.toLowerCase() === "tersedia")
+            .filter((r) => r.status_ruangan?.toLowerCase() === "tersedia")
             .map((r) => ({
-              id: r.room_id,
-              label: `${r.room_name} — ${r.building_name} Lt.${r.floor_number}`,
+              id: r.id_ruangan,
+              label: `${r.name_ruangan} — ${r.name_gedung} Lt.${r.nomor_lantai}`,
             }));
-          setroomList(mapped);
+          setRuanganList(mapped);
         })
         .catch(() => {})
-        .finally(() => setLoadingroom(false));
+        .finally(() => setLoadingRuangan(false));
     }
-  }, [mode, isroom, roomList.length]);
+  }, [mode, isRuangan, ruanganList.length]);
 
   useEffect(() => {
     if (mode !== "jadwalkan_ulang") return;
@@ -212,19 +212,19 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
 
       try {
         const payload = {
-          jenis: loan.jenis,
+          jenis: peminjaman.jenis,
           hari_tanggal: newTanggal,
           jam_mulai: newJamMulai,
           jam_selesai: newJamSelesai,
-          exclude_id: loan.loan_id,
+          exclude_id: peminjaman.id_peminjaman,
         };
 
-        if (isroom) {
-          payload.room_id = idroomBaru
-            ? Number(idroomBaru)
-            : loan.room_id;
+        if (isRuangan) {
+          payload.id_ruangan = idRuanganBaru
+            ? Number(idRuanganBaru)
+            : peminjaman.id_ruangan;
         } else {
-          payload.tool_id = loan.tool_id;
+          payload.id_alat = peminjaman.id_alat;
         }
 
         const { data } = await axiosClient.post("/kepala/cek-ketersediaan", payload);
@@ -247,13 +247,13 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
     newTanggal,
     newJamMulai,
     newJamSelesai,
-    idroomBaru,
+    idRuanganBaru,
     mode,
-    loan,
-    isroom,
+    peminjaman,
+    isRuangan,
   ]);
 
-  if (!loan) return null;
+  if (!peminjaman) return null;
 
   const validate = () => {
     const e = {};
@@ -278,15 +278,15 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
     setLoading(true);
     try {
       await onSubmit({
-        id: loan.loan_id,
+        id: peminjaman.id_peminjaman,
         mode,
         alasan_kepala: alasan,
         ...(mode === "jadwalkan_ulang" && {
           hari_tanggal_baru: newTanggal,
           jam_mulai_baru: newJamMulai,
           jam_selesai_baru: newJamSelesai,
-          ...(isroom && idroomBaru && !isNaN(Number(idroomBaru))
-            ? { room_id_baru: Number(idroomBaru) }
+          ...(isRuangan && idRuanganBaru && !isNaN(Number(idRuanganBaru))
+            ? { id_ruangan_baru: Number(idRuanganBaru) }
             : {}),
         }),
       });
@@ -311,13 +311,13 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
         <div className="bg-gradient-to-r from-[#3D0C1F] to-[#C0254A] p-5 flex items-start justify-between sticky top-0 z-10">
           <div>
             <h2 className="text-white font-bold text-[17px]">
-              Kelola loan
+              Kelola Peminjaman
             </h2>
             <p className="text-pink-200 text-[12px] mt-0.5 truncate max-w-[300px]">
-              {loan.name_peminjam} ·{" "}
-              {isroom
-                ? loan.room_name
-                : loan.tool_name}
+              {peminjaman.name_peminjam} ·{" "}
+              {isRuangan
+                ? peminjaman.name_ruangan
+                : peminjaman.name_alat}
             </p>
           </div>
           <button
@@ -329,7 +329,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
         </div>
 
         <div className="p-5">
-          {/* Info ringkas loan */}
+          {/* Info ringkas peminjaman */}
           <div className="bg-pink-50 border border-pink-100 rounded-2xl p-4 mb-5 flex flex-col gap-2">
             <div className="flex justify-between items-center text-[12px]">
               <span className="text-gray-400 flex items-center gap-1.5">
@@ -340,7 +340,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                 Kegiatan
               </span>
               <span className="text-[#2D0A18] font-semibold text-right max-w-[60%]">
-                {loan.name_kegiatan}
+                {peminjaman.name_kegiatan}
               </span>
             </div>
             <div className="flex justify-between items-center text-[12px]">
@@ -352,7 +352,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                 Tanggal
               </span>
               <span className="text-[#2D0A18] font-semibold">
-                {formatTanggal(loan.hari_tanggal)}
+                {formatTanggal(peminjaman.hari_tanggal)}
               </span>
             </div>
             <div className="flex justify-between items-center text-[12px]">
@@ -361,8 +361,8 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                 Waktu
               </span>
               <span className="text-[#2D0A18] font-semibold">
-                {formatJam(loan.jam_mulai)} –{" "}
-                {formatJam(loan.jam_selesai)}
+                {formatJam(peminjaman.jam_mulai)} –{" "}
+                {formatJam(peminjaman.jam_selesai)}
               </span>
             </div>
             <div className="flex justify-between items-center text-[12px]">
@@ -370,7 +370,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                 <Icon icon="mdi:tag-outline" className="text-[#C0254A]" />
                 Status
               </span>
-              <StatusBadge status={loan.status_persetujuan} />
+              <StatusBadge status={peminjaman.status_persetujuan} />
             </div>
           </div>
 
@@ -398,7 +398,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                     </p>
                     <p className="text-[11px] text-blue-400">
                       Ubah tanggal, waktu
-                      {isroom ? ", atau room" : ""} loan
+                      {isRuangan ? ", atau ruangan" : ""} peminjaman
                     </p>
                   </div>
                   <Icon
@@ -421,12 +421,12 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                   </div>
                   <div>
                     <p className="text-[13px] font-bold text-red-600">
-                      Batalkan loan
+                      Batalkan Peminjaman
                     </p>
                     <p className="text-[11px] text-red-400">
                       {isMenunggu
                         ? "Tolak pengajuan yang belum diproses"
-                        : "Batalkan loan yang sudah disetujui"}
+                        : "Batalkan peminjaman yang sudah disetujui"}
                     </p>
                   </div>
                   <Icon
@@ -455,7 +455,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
 
               <p className="text-[13px] font-bold text-blue-700 flex items-center gap-2">
                 <Icon icon="mdi:calendar-refresh" width={16} />
-                Jadwalkan Ulang loan
+                Jadwalkan Ulang Peminjaman
               </p>
 
               {/* Tanggal Baru */}
@@ -523,42 +523,42 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                 </div>
               </div>
 
-              {/* room Pengganti */}
-              {isroom && (
+              {/* Ruangan Pengganti */}
+              {isRuangan && (
                 <div>
                   <label className="text-[11px] text-gray-500 font-semibold mb-1 block">
-                    room Pengganti{" "}
+                    Ruangan Pengganti{" "}
                     <span className="text-gray-300 font-normal">(opsional)</span>
                   </label>
-                  {loadingroom ? (
+                  {loadingRuangan ? (
                     <div className="flex items-center gap-2 text-[12px] text-gray-400 py-2">
                       <Icon
                         icon="mdi:loading"
                         className="animate-spin"
                         width={14}
                       />
-                      Memuat daftar room...
+                      Memuat daftar ruangan...
                     </div>
                   ) : (
                     <select
-                      value={idroomBaru}
+                      value={idRuanganBaru}
                       onChange={(e) => {
                         const val = e.target.value;
-                        setIdroomBaru(val && !isNaN(Number(val)) ? val : "");
+                        setIdRuanganBaru(val && !isNaN(Number(val)) ? val : "");
                       }}
                       className="w-full border border-pink-200 rounded-xl px-3 py-2 text-[13px] outline-none focus:border-[#C0254A] bg-white"
                     >
-                      <option value="">Tetap gunakan {loan?.room_name ? loan.room_name : "room saat ini"}</option>
-                      {roomList.map((r) => (
+                      <option value="">Tetap gunakan {peminjaman?.name_ruangan ? peminjaman.name_ruangan : "ruangan saat ini"}</option>
+                      {ruanganList.map((r) => (
                         <option key={r.id} value={String(r.id)}>
                           {r.label}
                         </option>
                       ))}
                     </select>
                   )}
-                  {idroomBaru && (
+                  {idRuanganBaru && (
                     <p className="text-[10px] text-gray-400 mt-1">
-                      ID terpilih: {idroomBaru}
+                      ID terpilih: {idRuanganBaru}
                     </p>
                   )}
                 </div>
@@ -618,7 +618,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                   width={15}
                 />
                 <p className="text-[11px] text-blue-600 leading-relaxed">
-                  Jadwal loan akan diperbarui dan persetujuan akan direset ke tahap awal (Penanggungjawab → PIC → Admin SBUM).
+                  Jadwal peminjaman akan diperbarui dan persetujuan akan direset ke tahap awal (Penanggungjawab → PIC → Admin SBUM).
                 </p>
               </div>
             </div>
@@ -639,7 +639,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
 
               <p className="text-[13px] font-bold text-red-600 flex items-center gap-2">
                 <Icon icon="mdi:cancel" width={16} />
-                Batalkan loan
+                Batalkan Peminjaman
               </p>
 
               <div>
@@ -671,7 +671,7 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
                 <p className="text-[11px] text-amber-700 leading-relaxed">
                   {isMenunggu
                     ? "Pengajuan akan ditolak dan peminjam akan diberi tahu melalui sistem."
-                    : "Tindakan ini membatalkan loan yang sudah disetujui. Peminjam akan menerima notifikasi beserta alasan pembatalan."}
+                    : "Tindakan ini membatalkan peminjaman yang sudah disetujui. Peminjam akan menerima notifikasi beserta alasan pembatalan."}
                 </p>
               </div>
             </div>
@@ -714,8 +714,8 @@ const ModalAksi = ({ loan, onClose, onSubmit }) => {
   );
 };
 
-const loanCard = ({ item, onAksi }) => {
-  const isroom = item.jenis === "room";
+const PeminjamanCard = ({ item, onAksi }) => {
+  const isRuangan = item.jenis === "ruangan";
   const canAksi =
     item.status_persetujuan === "menunggu" ||
     item.status_persetujuan === "disetujui";
@@ -726,25 +726,25 @@ const loanCard = ({ item, onAksi }) => {
         <div className="flex items-center gap-2.5 min-w-0">
           <div
             className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-              isroom ? "bg-purple-100" : "bg-orange-100"
+              isRuangan ? "bg-purple-100" : "bg-orange-100"
             }`}
           >
             <Icon
-              icon={isroom ? "mdi:door-sliding" : "mdi:tools"}
-              className={isroom ? "text-purple-600" : "text-orange-500"}
+              icon={isRuangan ? "mdi:door-sliding" : "mdi:tools"}
+              className={isRuangan ? "text-purple-600" : "text-orange-500"}
               width={18}
             />
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-bold text-[#2D0A18] truncate">
-              {isroom
-                ? item.room_name || "room"
-                : item.tool_name || "tool"}
+              {isRuangan
+                ? item.name_ruangan || "Ruangan"
+                : item.name_alat || "Alat"}
             </p>
             <p className="text-[10px] text-gray-400">
-              {isroom
-                ? item.room_code || "room"
-                : item.tool_code || "tool"}
+              {isRuangan
+                ? item.kode_ruangan || "Ruangan"
+                : item.kode_alat || "Alat"}
             </p>
           </div>
         </div>
@@ -791,7 +791,7 @@ const loanCard = ({ item, onAksi }) => {
           className="mt-0.5 w-full flex items-center justify-center gap-2 border-2 border-[#C0254A]/20 hover:border-[#C0254A] text-[#C0254A] rounded-xl py-2 text-[12px] font-bold hover:bg-pink-50 transition"
         >
           <Icon icon="mdi:cog-outline" width={14} />
-          Kelola loan
+          Kelola Peminjaman
         </button>
       )}
 
@@ -806,7 +806,7 @@ const loanCard = ({ item, onAksi }) => {
   );
 };
 
-const Monitoringloan = () => {
+const MonitoringPeminjaman = () => {
   const [activeTab, setActiveTab] = useState("semua");
   const [filterStatus, setFilterStatus] = useState(null);
   const [search, setSearch] = useState("");
@@ -820,7 +820,7 @@ const Monitoringloan = () => {
   const fetchData = useCallback(() => {
     setLoading(true);
     axiosClient
-      .get("/kepala/monitoring-loan")
+      .get("/kepala/monitoring-peminjaman")
       .then(({ data: res }) => {
         setData(res.data || []);
         setStats(res.stats || null);
@@ -848,23 +848,23 @@ const Monitoringloan = () => {
     hari_tanggal_baru,
     jam_mulai_baru,
     jam_selesai_baru,
-    room_id_baru,
+    id_ruangan_baru,
   }) => {
     try {
       if (mode === "batalkan") {
-        await axiosClient.post(`/kepala/batalkan-loan/${id}`, {
+        await axiosClient.post(`/kepala/batalkan-peminjaman/${id}`, {
           alasan_kepala,
         });
 
         setData((prev) =>
           prev.map((item) =>
-            item.loan_id === id
+            item.id_peminjaman === id
               ? { ...item, status_persetujuan: "dibatalkan", alasan_kepala }
               : item
           )
         );
 
-        const target = data.find((d) => d.loan_id === id);
+        const target = data.find((d) => d.id_peminjaman === id);
         setStats((prev) =>
           prev
             ? {
@@ -882,7 +882,7 @@ const Monitoringloan = () => {
             : prev
         );
 
-        showToast("loan berhasil dibatalkan.");
+        showToast("Peminjaman berhasil dibatalkan.");
       } else {
         const payload = {
           hari_tanggal_baru,
@@ -891,18 +891,18 @@ const Monitoringloan = () => {
           alasan_kepala,
         };
 
-        if (room_id_baru && !isNaN(Number(room_id_baru))) {
-          payload.room_id_baru = Number(room_id_baru);
+        if (id_ruangan_baru && !isNaN(Number(id_ruangan_baru))) {
+          payload.id_ruangan_baru = Number(id_ruangan_baru);
         }
 
         await axiosClient.post(`/kepala/jadwalkan-ulang/${id}`, payload);
 
-        const target = data.find((d) => d.loan_id === id);
+        const target = data.find((d) => d.id_peminjaman === id);
         const wasDisetujui = target?.status_persetujuan === "disetujui";
 
         setData((prev) =>
           prev.map((item) =>
-            item.loan_id === id
+            item.id_peminjaman === id
               ? {
                   ...item,
                   hari_tanggal: hari_tanggal_baru,
@@ -910,8 +910,8 @@ const Monitoringloan = () => {
                   jam_selesai: jam_selesai_baru,
                   alasan_kepala,
                   status_persetujuan: "menunggu",
-                  ...(room_id_baru
-                    ? { room_id: Number(room_id_baru) }
+                  ...(id_ruangan_baru
+                    ? { id_ruangan: Number(id_ruangan_baru) }
                     : {}),
                 }
               : item
@@ -949,8 +949,8 @@ const Monitoringloan = () => {
     return data.filter((item) => {
       const matchTab =
         activeTab === "semua" ||
-        (activeTab === "room" && item.jenis === "room") ||
-        (activeTab === "tool" && item.jenis === "tool");
+        (activeTab === "ruangan" && item.jenis === "ruangan") ||
+        (activeTab === "alat" && item.jenis === "alat");
 
       const matchStatus =
         !filterStatus || item.status_persetujuan === filterStatus;
@@ -959,8 +959,8 @@ const Monitoringloan = () => {
       const matchSearch =
         !search ||
         (item.name_peminjam || "").toLowerCase().includes(keyword) ||
-        (item.room_name || "").toLowerCase().includes(keyword) ||
-        (item.tool_name || "").toLowerCase().includes(keyword) ||
+        (item.name_ruangan || "").toLowerCase().includes(keyword) ||
+        (item.name_alat || "").toLowerCase().includes(keyword) ||
         (item.name_kegiatan || "").toLowerCase().includes(keyword) ||
         (item.unit_peminjam || "").toLowerCase().includes(keyword);
 
@@ -1024,7 +1024,7 @@ const Monitoringloan = () => {
 
       {selectedItem && (
         <ModalAksi
-          loan={selectedItem}
+          peminjaman={selectedItem}
           onClose={() => setSelectedItem(null)}
           onSubmit={handleSubmitAksi}
         />
@@ -1042,10 +1042,10 @@ const Monitoringloan = () => {
             </div>
             <div>
               <h1 className="text-[#2D0A18] text-[28px] lg:mt-0 mt-10 font-extrabold leading-tight">
-                Monitoring loan
+                Monitoring Peminjaman
               </h1>
               <p className="text-gray-500 text-[13px]">
-                Pantau dan kelola seluruh loan tool &amp; room yang
+                Pantau dan kelola seluruh peminjaman alat &amp; ruangan yang
                 sedang aktif
               </p>
             </div>
@@ -1076,8 +1076,8 @@ const Monitoringloan = () => {
           />
           <StatCard
             icon="mdi:door-sliding"
-            label="loan room"
-            value={loading ? "..." : stats?.room ?? 0}
+            label="Peminjaman Ruangan"
+            value={loading ? "..." : stats?.ruangan ?? 0}
             color="bg-gradient-to-br from-purple-400 to-purple-600"
             bgColor="bg-purple-50"
           />
@@ -1087,8 +1087,8 @@ const Monitoringloan = () => {
           <div className="flex gap-2 mb-5 flex-wrap">
             {[
               { key: "semua", label: "Semua", icon: "mdi:view-grid-outline" },
-              { key: "room", label: "room", icon: "mdi:door-sliding" },
-              { key: "tool", label: "tool", icon: "mdi:tools" },
+              { key: "ruangan", label: "Ruangan", icon: "mdi:door-sliding" },
+              { key: "alat", label: "Alat", icon: "mdi:tools" },
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -1109,7 +1109,7 @@ const Monitoringloan = () => {
             <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <input
                 type="text"
-                placeholder="Cari name peminjam, kegiatan, room, atau tool..."
+                placeholder="Cari name peminjam, kegiatan, ruangan, atau alat..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="flex-1 outline-none text-[14px] text-gray-600 bg-transparent"
@@ -1148,7 +1148,7 @@ const Monitoringloan = () => {
                 Refresh
               </button>
               <span className="ml-auto text-[12px] text-gray-400">
-                {filtered.length} loan ditemukan
+                {filtered.length} peminjaman ditemukan
               </span>
             </div>
           </div>
@@ -1161,14 +1161,14 @@ const Monitoringloan = () => {
                 className="mb-3 opacity-50 animate-spin"
               />
               <p className="text-[14px] font-semibold">
-                Memuat data loan...
+                Memuat data peminjaman...
               </p>
             </div>
           ) : paginated.length > 0 ? (
             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 mb-6">
               {paginated.map((item, i) => (
-                <loanCard
-                  key={`${item.jenis}-${item.loan_id}-${i}`}
+                <PeminjamanCard
+                  key={`${item.jenis}-${item.id_peminjaman}-${i}`}
                   item={item}
                   onAksi={setSelectedItem}
                 />
@@ -1182,7 +1182,7 @@ const Monitoringloan = () => {
                 className="mb-3 opacity-30"
               />
               <p className="text-[14px] font-semibold">
-                Tidak ada data loan
+                Tidak ada data peminjaman
               </p>
               <p className="text-[12px] mt-1 text-center">
                 Coba ubah filter atau kata kunci pencarian
@@ -1272,4 +1272,4 @@ const Monitoringloan = () => {
   );
 };
 
-export default Monitoringloan;
+export default MonitoringPeminjaman;

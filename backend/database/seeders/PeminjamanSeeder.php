@@ -6,12 +6,12 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class loanSeeder extends Seeder
+class PeminjamanSeeder extends Seeder
 {
     public function run(): void
     {
         $users = DB::table('users')->pluck('id_number')->toArray();
-        $tools = DB::table('tools')->pluck('tool_id')->toArray();
+        $alats = DB::table('alats')->pluck('id_alat')->toArray();
 
         $jenisKegiatan = [
             'akademik',
@@ -19,8 +19,8 @@ class loanSeeder extends Seeder
         ];
 
         $keteranganList = [
-            'Kebutuhan room untuk kegiatan akademik',
-            'loan tool untuk keperluan praktikum',
+            'Kebutuhan ruangan untuk kegiatan akademik',
+            'Peminjaman alat untuk keperluan praktikum',
             'Kegiatan organisasi mahasiswa',
             'Seminar nasional department',
             'Workshop pengembangan soft skill',
@@ -78,14 +78,14 @@ class loanSeeder extends Seeder
 
                 $status = $statusList[rand(0, 2)];
 
-                $pinjamroom = rand(0, 1) === 0;
+                $pinjamRuangan = rand(0, 1) === 0;
 
-                $idroom = $pinjamroom
+                $idRuangan = $pinjamRuangan
                     ? rand(1, 10)
                     : null;
 
-                $idtool = !$pinjamroom && !empty($tools)
-                    ? $tools[array_rand($tools)]
+                $idAlat = !$pinjamRuangan && !empty($alats)
+                    ? $alats[array_rand($alats)]
                     : null;
 
                 $now = Carbon::now();
@@ -101,8 +101,8 @@ class loanSeeder extends Seeder
                     'keterangan'         => $keteranganList[array_rand($keteranganList)],
                     'status_persetujuan' => $status,
                     'id_peminjam'        => $nomorInduk,
-                    'tool_id'            => $idtool,
-                    'room_id'         => $idroom,
+                    'id_alat'            => $idAlat,
+                    'id_ruangan'         => $idRuangan,
                     'dibuat_pada'        => $now,
                     'diubah_pada'        => $status !== 'menunggu'
                                             ? $now->copy()->addMinutes(rand(5, 120))
@@ -113,6 +113,6 @@ class loanSeeder extends Seeder
             }
         }
 
-        DB::table('loan')->insert($data);
+        DB::table('peminjaman')->insert($data);
     }
 }

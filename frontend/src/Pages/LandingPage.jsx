@@ -43,12 +43,12 @@ export default function Home() {
         <div className="relative z-10 flex items-center min-h-screen px-10">
           <div className="max-w-xl text-white">
             <h1 className="text-5xl font-extrabold leading-tight">
-              Pinjam <span className="text-pink-400">tool &</span><br />
-              <span className="text-pink-400">room</span> dengan<br />
+              Pinjam <span className="text-pink-400">Alat &</span><br />
+              <span className="text-pink-400">Ruangan</span> dengan<br />
               Mudah dan Cepat
             </h1>
             <p className="mt-4 text-gray-200 text-sm leading-relaxed">
-              SPARA Polibatam memberikan solusi loan tool dan room dalam kampus
+              SPARA Polibatam memberikan solusi peminjaman alat dan ruangan dalam kampus
               untuk mendukung kegiatan anda. Cepat, mudah, dan efisien!
             </p>
             <div className="mt-8 flex gap-4">
@@ -66,16 +66,16 @@ export default function Home() {
       </section>
 
       <section className="bg-gradient-to-b from-pink-800 to-pink-900 text-white py-16 text-center">
-        <h2 className="text-2xl font-bold">facility Kampus dalam Genggaman</h2>
+        <h2 className="text-2xl font-bold">Fasilitas Kampus dalam Genggaman</h2>
         <p className="text-sm opacity-70 mt-2">
           Beberapa data statistik terkait sarana, prasarana, dan pengguna aplikasi ini
         </p>
 
         <div className="grid grid-cols-3 gap-6 mt-10 max-w-3xl mx-auto">
           {[
-            { label: "Pertoolan Tersedia", desc: "Termasuk proyektor, kamera, dan lainnya" },
+            { label: "Peralatan Tersedia", desc: "Termasuk proyektor, kamera, dan lainnya" },
             { label: "Pengguna Terdaftar", desc: "Termasuk mahasiswa, pegawai, dan lainnya" },
-            { label: "room Tersedia",   desc: "Termasuk auditorium, kelas, dan lainnya" },
+            { label: "Ruangan Tersedia",   desc: "Termasuk auditorium, kelas, dan lainnya" },
           ].map((item, i) => (
             <div key={i} className="bg-white/10 border border-white/15 rounded-2xl py-7 px-4">
               <div className="text-5xl font-extrabold">67</div>
@@ -99,12 +99,12 @@ export default function Home() {
 
         <div className="grid grid-cols-3 gap-5 mt-12 max-w-5xl mx-auto px-6">
           {[
-            { title: "loan Terstruktur", desc: "Proses yang cepat dan terstruktur untuk meminjam tool atau room hingga tool atau room dapat digunakan." },
-            { title: "Pencarian CETAR",        desc: "Pencarian Cepat dan Pintar (CETAR) untuk memudahkan pengguna menemukan tool atau room yang ingin dipinjam." },
-            { title: "Akses Penuh 24 Jam",     desc: "loan dapat dilakukan dengan mudah dan penuh selama 24 jam." },
-            { title: "Riwayat dan Monitoring", desc: "Riwayat loan yang telah dilakukan dapat dengan mudah diakses dan di-monitoring." },
-            { title: "Rekomendasi Terbaik",    desc: "Memberikan rekomendasi tool atau room terbaik sesuai dengan kebutuhan pengguna." },
-            { title: "Persetujuan Resmi",      desc: "Setiap loan diverifikasi oleh penanggung jawab room dan sub bagian umum universitas." },
+            { title: "Peminjaman Terstruktur", desc: "Proses yang cepat dan terstruktur untuk meminjam alat atau ruangan hingga alat atau ruangan dapat digunakan." },
+            { title: "Pencarian CETAR",        desc: "Pencarian Cepat dan Pintar (CETAR) untuk memudahkan pengguna menemukan alat atau ruangan yang ingin dipinjam." },
+            { title: "Akses Penuh 24 Jam",     desc: "Peminjaman dapat dilakukan dengan mudah dan penuh selama 24 jam." },
+            { title: "Riwayat dan Monitoring", desc: "Riwayat peminjaman yang telah dilakukan dapat dengan mudah diakses dan di-monitoring." },
+            { title: "Rekomendasi Terbaik",    desc: "Memberikan rekomendasi alat atau ruangan terbaik sesuai dengan kebutuhan pengguna." },
+            { title: "Persetujuan Resmi",      desc: "Setiap peminjaman diverifikasi oleh penanggung jawab ruangan dan sub bagian umum universitas." },
           ].map((f, i) => (
             <div key={i} className="bg-white p-6 rounded-2xl shadow-sm text-left">
               <div className="w-9 h-9 bg-pink-100 rounded-xl mb-3 flex items-center justify-center">
@@ -118,16 +118,16 @@ export default function Home() {
       </section>
 
       <section className="bg-[#fce4ec] py-20 text-center">
-        <h2 className="text-3xl font-extrabold text-pink-900">4 Langkah loan</h2>
-        <p className="text-sm text-pink-700/60 mt-2">loan dengan 4 langkah mudah dan sederhana</p>
+        <h2 className="text-3xl font-extrabold text-pink-900">4 Langkah Peminjaman</h2>
+        <p className="text-sm text-pink-700/60 mt-2">Peminjaman dengan 4 langkah mudah dan sederhana</p>
 
         <div className="relative grid grid-cols-4 gap-6 mt-14 max-w-3xl mx-auto px-6">
           <div className="absolute top-7 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-pink-500 to-pink-800 z-0" />
           {[
-            { label: "Ajukan",    desc: "Isi data dan ajukan loan" },
+            { label: "Ajukan",    desc: "Isi data dan ajukan peminjaman" },
             { label: "Disetujui", desc: "Pengajuan diverifikasi petugas" },
             { label: "Terjadwal", desc: "Jadwal dikonfirmasi sesuai pengajuan" },
-            { label: "Gunakan",   desc: "tool atau room siap digunakan" },
+            { label: "Gunakan",   desc: "Alat atau ruangan siap digunakan" },
           ].map((s, i) => (
             <div key={i} className="relative z-10 flex flex-col items-center">
               <div className="w-14 h-14 bg-pink-600 text-white rounded-full flex items-center justify-center text-xl font-bold border-4 border-[#fce4ec]">
@@ -149,8 +149,8 @@ export default function Home() {
               <span className="font-bold">SPARA Polibatam</span>
             </div>
             <p className="text-xs opacity-55 leading-relaxed">
-              Sistem loan tool dan room (SPARA) Polibatam, platform loan
-              tool dan room Polibatam yang gratis, mudah, dan terorganisir.
+              Sistem Peminjaman Alat dan Ruangan (SPARA) Polibatam, platform peminjaman
+              alat dan ruangan Polibatam yang gratis, mudah, dan terorganisir.
             </p>
             <div className="flex gap-3 mt-4">
               {sosmetLink.map((item, i) => (
@@ -168,7 +168,7 @@ export default function Home() {
           <div>
             <h4 className="font-bold mb-4 text-sm">Tautan Cepat</h4>
             <ul className="space-y-2 text-xs opacity-55">
-              {["Beranda", "Tentang Kami", "Katalog Pertoolan", "Katalog room"].map((l) => (
+              {["Beranda", "Tentang Kami", "Katalog Peralatan", "Katalog Ruangan"].map((l) => (
                 <li key={l} className="hover:opacity-100 cursor-pointer transition-opacity">{l}</li>
               ))}
             </ul>

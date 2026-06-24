@@ -9,7 +9,7 @@ const ModalKonfirmasi = ({ onClose }) => {
         </h2>
 
         <p className="text-gray-500 mt-2 text-sm">
-          Pengajuan pertoolan berhasil dikirim dan sedang menunggu persetujuan.
+          Pengajuan peralatan berhasil dikirim dan sedang menunggu persetujuan.
         </p>
 
         <button

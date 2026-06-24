@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class tool extends Model
+class Alat extends Model
 {
-    protected $table = 'tools';
-    protected $primaryKey = 'tool_id';
+    protected $table = 'alats';
+    protected $primaryKey = 'id_alat';
 
     protected $fillable = [
-        'tool_code',
-        'tool_name',
-        'tool_description',
-        'tool_status',
+        'kode_alat',
+        'name_alat',
+        'deskripsi_alat',
+        'status_alat',
         'id_number_pic',
         'path_foto',
     ];
@@ -25,8 +25,8 @@ class tool extends Model
         return $this->belongsTo(Pic::class, 'id_number_pic', 'id_number');
     }
 
-    public function loan(): HasMany
+    public function peminjaman(): HasMany
     {
-        return $this->hasMany(loan::class, 'tool_id', 'tool_id');
+        return $this->hasMany(Peminjaman::class, 'id_alat', 'id_alat');
     }
 }

@@ -3,97 +3,97 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\tool;
-use App\Models\loan;
-use App\Http\Resources\toolResource;
-use App\Http\Resources\JadwaroomResource;
+use App\Models\Alat;
+use App\Models\Peminjaman;
+use App\Http\Resources\AlatResource;
+use App\Http\Resources\JadwaRuanganResource;
 
-class toolController extends Controller
+class AlatController extends Controller
 {
-    public function gettool()
+    public function getAlat()
     {
-        $tool = tool::all();
-        return toolResource::collection($tool);
+        $alat = Alat::all();
+        return AlatResource::collection($alat);
     }
 
     public function show($id)
     {
-        $tool = tool::findOrFail($id);
-        return new toolResource($tool);
+        $alat = Alat::findOrFail($id);
+        return new AlatResource($alat);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tool_code'        => 'required|unique:tools,tool_code',
-            'tool_name'        => 'required|string|max:255',
-            'tool_description'   => 'nullable|string',
-            'tool_status'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
+            'kode_alat'        => 'required|unique:alats,kode_alat',
+            'name_alat'        => 'required|string|max:255',
+            'deskripsi_alat'   => 'nullable|string',
+            'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
             'id_number_pic'  => 'nullable|exists:users,id_number',
             'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
             $validated['path_foto'] = $request->file('foto')
-                ->store('tool', 'public');
+                ->store('alat', 'public');
         }
         unset($validated['foto']);
 
-        $tool = tool::create($validated);
+        $alat = Alat::create($validated);
 
         return response()->json([
-            'message' => 'tool berhasil ditambahkan',
-            'data'    => $tool
+            'message' => 'Alat berhasil ditambahkan',
+            'data'    => $alat
         ], 201);
     }
 
     public function update(Request $request, $id)
     {
-        $tool = tool::findOrFail($id);
+        $alat = Alat::findOrFail($id);
 
         $validated = $request->validate([
-            'tool_code'        => 'required|unique:tools,tool_code,' . $id . ',tool_id',
-            'tool_name'        => 'required|string|max:255',
-            'tool_description'   => 'nullable|string',
-            'tool_status'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
+            'kode_alat'        => 'required|unique:alats,kode_alat,' . $id . ',id_alat',
+            'name_alat'        => 'required|string|max:255',
+            'deskripsi_alat'   => 'nullable|string',
+            'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
             'id_number_pic'  => 'nullable|exists:users,id_number',
             'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
-            if ($tool->path_foto) {
-                Storage::disk('public')->delete($tool->path_foto);
+            if ($alat->path_foto) {
+                Storage::disk('public')->delete($alat->path_foto);
             }
             $validated['path_foto'] = $request->file('foto')
-                ->store('tool', 'public');
+                ->store('alat', 'public');
         }
         unset($validated['foto']);
 
-        $tool->update($validated);
+        $alat->update($validated);
 
         return response()->json([
-            'message' => 'tool berhasil diperbarui',
-            'data'    => $tool
+            'message' => 'Alat berhasil diperbarui',
+            'data'    => $alat
         ]);
     }
 
-    public function jadwaltool(int $id, string $tanggal)
+    public function jadwalAlat(int $id, string $tanggal)
     {
-        $loan = loan::with('persetujuans')
-            ->where('tool_id', $id)
+        $peminjaman = Peminjaman::with('persetujuans')
+            ->where('id_alat', $id)
             ->whereDate('hari_tanggal', $tanggal)
             ->get();
 
-        return JadwaroomResource::collection($loan);
+        return JadwaRuanganResource::collection($peminjaman);
     }
 
     public function destroy($id)
     {
-        $tool = tool::findOrFail($id);
-        $tool->delete();
+        $alat = Alat::findOrFail($id);
+        $alat->delete();
 
         return response()->json([
-            'message' => 'tool berhasil dihapus'
+            'message' => 'Alat berhasil dihapus'
         ]);
     }
 }

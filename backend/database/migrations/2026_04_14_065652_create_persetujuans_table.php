@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('persetujuans', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('loan_id');
+            $table->unsignedBigInteger('id_peminjaman');
             $table->unsignedBigInteger('id_number_penyetuju')->nullable();
             $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
-            $table->foreign('loan_id')->references('loan_id')->on('loan')->onDelete('cascade');
+            $table->foreign('id_peminjaman')->references('id_peminjaman')->on('peminjaman')->onDelete('cascade');
             $table->foreign('id_number_penyetuju')->references('id_number')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

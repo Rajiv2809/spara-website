@@ -182,7 +182,7 @@ const SearchableSelect = ({ label, name, value, onChange, required }) => {
   );
 };
 
-const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
+const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -212,26 +212,26 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
     hari_tanggal: "",
     jam_mulai: "",
     jam_selesai: "",
-    tool_id: "",
+    id_alat: "",
     keterangan: "",
   });
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, tool_id: pertoolan?.id || "" }));
-  }, [pertoolan]);
+    setForm((prev) => ({ ...prev, id_alat: peralatan?.id || "" }));
+  }, [peralatan]);
 
   useEffect(() => {
-    if (!tanggalCek || !pertoolan?.id) return;
+    if (!tanggalCek || !peralatan?.id) return;
 
     setIsLoadingJadwal(true);
     axiosClient
-      .get(`/jadwal-tool/${pertoolan.id}/${tanggalCek}`)
+      .get(`/jadwal-alat/${peralatan.id}/${tanggalCek}`)
       .then(({ data }) => {
         setJadwalTerpakai(data.data ?? []);
       })
       .catch(() => setJadwalTerpakai([]))
       .finally(() => setIsLoadingJadwal(false));
-  }, [tanggalCek, pertoolan?.id]);
+  }, [tanggalCek, peralatan?.id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -274,7 +274,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
       hari_tanggal: form.hari_tanggal,
       jam_mulai: form.jam_mulai.slice(0, 5),
       jam_selesai: form.jam_selesai.slice(0, 5),
-      tool_id: form.tool_id,
+      id_alat: form.id_alat,
       id_number_penanggungjawab: form.id_number_penanggungjawab,
       keterangan: form.keterangan || null,
     };
@@ -284,7 +284,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
     setStep(3);
 
     axiosClient
-      .post("/loan", payload)
+      .post("/peminjaman", payload)
       .then(() => {
         setIsSuccess(true);
         setTimeout(() => {
@@ -337,7 +337,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
           <div className="bg-[#A3264C] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Icon icon="mdi:tools" />
-              Form Pengajuan loan Pertoolan
+              Form Pengajuan Peminjaman Peralatan
             </h2>
             <button
               onClick={onClose}
@@ -375,10 +375,10 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
             {/* STEP 1 - Cek Jadwal */}
             {step === 1 && (
               <>
-                <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Cek Jadwal Pertoolan</h3>
+                <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Cek Jadwal Peralatan</h3>
 
                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-5">
-                  <p className="font-semibold text-[#A3264C] text-lg">{pertoolan?.name}</p>
+                  <p className="font-semibold text-[#A3264C] text-lg">{peralatan?.name}</p>
                   <p className="text-sm text-gray-500 mt-1 mb-4">
                     Pilih tanggal dan jam untuk mengecek ketersediaan
                   </p>
@@ -410,11 +410,11 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
 
                   {isBentrokConfirmed ? (
                     <p className="text-red-600 text-sm mt-2 font-medium">
-                      Jadwal yang dipilih bertabrakan dengan loan lain yang sudah dikonfirmasi.
+                      Jadwal yang dipilih bertabrakan dengan peminjaman lain yang sudah dikonfirmasi.
                     </p>
                   ) : isBentrokPending ? (
                     <p className="text-amber-600 text-sm mt-2 font-medium">
-                      Ada loan yang diajukan di jam yang sama (belum disetujui). Anda tetap bisa melanjutkan.
+                      Ada peminjaman yang diajukan di jam yang sama (belum disetujui). Anda tetap bisa melanjutkan.
                     </p>
                   ) : (
                     jamMulaiCek &&
@@ -457,7 +457,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
                     ) : (
                       <p className="text-sm text-gray-400">
                         {tanggalCek
-                          ? "Belum ada loan pada tanggal ini"
+                          ? "Belum ada peminjaman pada tanggal ini"
                           : "Pilih tanggal untuk melihat jadwal"}
                       </p>
                     )}
@@ -481,7 +481,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
                       <span>{form.jam_mulai.slice(0, 5)} - {form.jam_selesai.slice(0, 5)}</span>
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-[#A3264C] mt-2">{pertoolan?.name}</p>
+                  <p className="text-sm font-medium text-[#A3264C] mt-2">{peralatan?.name}</p>
                 </div>
 
                 <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Detail Pengajuan</h3>
@@ -516,7 +516,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
 
                 <div className="mt-4">
                   <Input
-                    label="Tanggal loan"
+                    label="Tanggal Peminjaman"
                     name="hari_tanggal"
                     type="date"
                     value={form.hari_tanggal}
@@ -581,7 +581,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
                     }
 
                     if (isBentrokConfirmed) {
-                      alert("Jam yang dipilih sudah digunakan oleh loan yang sudah dikonfirmasi.");
+                      alert("Jam yang dipilih sudah digunakan oleh peminjaman yang sudah dikonfirmasi.");
                       return;
                     }
 
@@ -620,7 +620,7 @@ const ModalPengajuan = ({ pertoolan, onClose, onSuccess }) => {
             </div>
             <h2 className="text-xl font-bold text-[#3D0C1F] mt-4">Peringatan</h2>
             <p className="text-sm text-gray-500 mt-3">
-              Sudah ada loan yang diajukan pada jam tersebut. Apakah anda tetap ingin mengajukan?
+              Sudah ada peminjaman yang diajukan pada jam tersebut. Apakah anda tetap ingin mengajukan?
             </p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => setShowPendingWarning(false)} className="px-6 py-2 border rounded-lg text-sm">

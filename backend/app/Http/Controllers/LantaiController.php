@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\floor;
+use App\Models\Lantai;
 use Illuminate\Http\Request;
 
-class floorController extends Controller
+class LantaiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class floorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(floor $floor)
+    public function show(Lantai $lantai)
     {
         //
     }
@@ -42,7 +42,7 @@ class floorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(floor $floor)
+    public function edit(Lantai $lantai)
     {
         //
     }
@@ -50,7 +50,7 @@ class floorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, floor $floor)
+    public function update(Request $request, Lantai $lantai)
     {
         //
     }
@@ -58,7 +58,7 @@ class floorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(floor $floor)
+    public function destroy(Lantai $lantai)
     {
         //
     }

@@ -5,19 +5,19 @@ import Login from "./Pages/Login.jsx";
 import Home from "./Pages/Home.jsx";
 import Dashboard from "./Pages/Dashboard.jsx";
 import LandingPage from "./Pages/LandingPage.jsx";
-import Pengajuanroom from "./Pages/Pengajuanroom.jsx";
-import PengajuanPertoolan from "./Pages/PengajuanPertoolan.jsx";
+import PengajuanRuangan from "./Pages/PengajuanRuangan.jsx";
+import PengajuanPeralatan from "./Pages/PengajuanPeralatan.jsx";
 import TentangKami from "./Pages/TentangKami.jsx";
-import Kelolaroom from "./Pages/Kelolaroom.jsx";
-import Persetujuanloan from "./Pages/Persetujuanloan.jsx";
+import KelolaRuangan from "./Pages/KelolaRuangan.jsx";
+import PersetujuanPeminjaman from "./Pages/PersetujuanPeminjaman.jsx";
 import Riwayat from "./Pages/Riwayat.jsx";
-import KelolaPertoolan from "./Pages/KelolaPertoolan.jsx";
+import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
 import KelolaAdmin from "./Pages/KelolaAdmin";
-import AllListloan from "./Pages/AllLlistPeminjman.jsx";
+import AllListPeminjaman from "./Pages/AllLlistPeminjman.jsx";
 import Register from "./Pages/Register.jsx";
 import Laporan from "./Pages/Laporan.jsx";
-import loanKepala from "./Pages/loanKepala.jsx";
-import Kalenderloan from "./Pages/Kalenderloan.jsx";
+import PeminjamanKepala from "./Pages/PeminjamanKepala.jsx";
+import KalenderPeminjaman from "./Pages/KalenderPeminjaman.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -36,28 +36,28 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "/pengajuan-room",
-        element: <Pengajuanroom />,
+        path: "/pengajuan-ruangan",
+        element: <PengajuanRuangan />,
       },
       {
-        path: "/loan-pertoolan",
-        element: <PengajuanPertoolan />,
+        path: "/peminjaman-peralatan",
+        element: <PengajuanPeralatan />,
       },
       {
-        path: "/kelola-room",
-        element: <Kelolaroom />,
+        path: "/kelola-ruangan",
+        element: <KelolaRuangan />,
       },
       {
         path: "/riwayat",
         element: <Riwayat />,
       },
       {
-        path: "/persetujuan-loan",
-        element: <Persetujuanloan />,
+        path: "/persetujuan-peminjaman",
+        element: <PersetujuanPeminjaman />,
       },
       {
-        path: "/kelola-pertoolan",
-        element: <KelolaPertoolan />,
+        path: "/kelola-peralatan",
+        element: <KelolaPeralatan />,
       },
       {
         path: "/kelola-admin",
@@ -68,16 +68,16 @@ const router = createBrowserRouter([
         element: <Laporan/>
       },
       {
-        path:"/kalender-loan",
-        element: <Kalenderloan/>
+        path:"/kalender-peminjaman",
+        element: <KalenderPeminjaman/>
       },
       {
-        path:"/loan-kepala",
-        element: <loanKepala/>
+        path:"/peminjaman-kepala",
+        element: <PeminjamanKepala/>
       },
       // {
-      //     path: "/semua-loan",
-      //     element: <AllListloan />
+      //     path: "/semua-peminjaman",
+      //     element: <AllListPeminjaman />
       // }
     ],
   },

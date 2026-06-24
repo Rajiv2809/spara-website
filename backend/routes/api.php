@@ -2,14 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, AuthController, loanController, roomController, toolController, KepalaController, NotificationController};
+use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 //init untuk auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/riwayat-debug', [loanController::class, 'riwayatDebug']);
+Route::get('/riwayat-debug', [PeminjamanController::class, 'riwayatDebug']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/test', [AuthController::class, 'test']);
@@ -18,39 +18,39 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/update-profile-photo', [AuthController::class, 'updateProfilePhoto']);
 
-    Route::get('/get-room', [roomController::class, 'getroom']);
-    Route::get('/room/{id}', [roomController::class, 'show']);
-    Route::get('/jadwal-room/{id}/{tanggal}', [roomController::class, 'jadwalroom']);
+    Route::get('/get-ruangan', [RuanganController::class, 'getRuangan']);
+    Route::get('/ruangan/{id}', [RuanganController::class, 'show']);
+    Route::get('/jadwal-ruangan/{id}/{tanggal}', [RuanganController::class, 'jadwalRuangan']);
 
-    Route::post('/room', [roomController::class, 'store']);
-    Route::put('/room/{id}', [roomController::class, 'update']);
-    Route::delete('/room/{id}', [roomController::class, 'destroy']);
+    Route::post('/ruangan', [RuanganController::class, 'store']);
+    Route::put('/ruangan/{id}', [RuanganController::class, 'update']);
+    Route::delete('/ruangan/{id}', [RuanganController::class, 'destroy']);
 
-    Route::get('/get-building', [roomController::class, 'getbuilding']);
-    Route::get('/get-floor', [roomController::class, 'getfloor']);
+    Route::get('/get-gedung', [RuanganController::class, 'getGedung']);
+    Route::get('/get-lantai', [RuanganController::class, 'getLantai']);
 
-    Route::get('/get-tool', [toolController::class, 'gettool']);
-    Route::get('/tool/{id}', [toolController::class, 'show']);
-    Route::get('/jadwal-tool/{id}/{tanggal}', [toolController::class, 'jadwaltool']);
-    Route::post('/tool', [toolController::class, 'store']);
-    Route::put('/tool/{id}', [toolController::class, 'update']);
-    Route::delete('/tool/{id}', [toolController::class, 'destroy']);
+    Route::get('/get-alat', [AlatController::class, 'getAlat']);
+    Route::get('/alat/{id}', [AlatController::class, 'show']);
+    Route::get('/jadwal-alat/{id}/{tanggal}', [AlatController::class, 'jadwalAlat']);
+    Route::post('/alat', [AlatController::class, 'store']);
+    Route::put('/alat/{id}', [AlatController::class, 'update']);
+    Route::delete('/alat/{id}', [AlatController::class, 'destroy']);
 
-    Route::post('/loan', [loanController::class, 'create']);
-    Route::get('/loan', [loanController::class, 'getloan']);
-    Route::get('/loan-all', [loanController::class, 'getAllloan']);
-    Route::get('/riwayat', [loanController::class, 'riwayat']);
-    Route::post('/loan-rekapitulasi', [loanController::class, 'getloanRekapitulasi']);
+    Route::post('/peminjaman', [PeminjamanController::class, 'create']);
+    Route::get('/peminjaman', [PeminjamanController::class, 'getPeminjaman']);
+    Route::get('/peminjaman-all', [PeminjamanController::class, 'getAllPeminjaman']);
+    Route::get('/riwayat', [PeminjamanController::class, 'riwayat']);
+    Route::post('/peminjaman-rekapitulasi', [PeminjamanController::class, 'getPeminjamanRekapitulasi']);
 
-    Route::get('/penanggung-jawab', [loanController::class, 'getPenanggungJawab']);
-    Route::get('/dashboard-stats', [loanController::class, 'dashboard']);
+    Route::get('/penanggung-jawab', [PeminjamanController::class, 'getPenanggungJawab']);
+    Route::get('/dashboard-stats', [PeminjamanController::class, 'dashboard']);
 
-    Route::get('/persetujuan', [loanController::class, 'getPersetujuan']);
-    Route::get('/list-persetujuan', [loanController::class, 'getPersetujuanList']);
+    Route::get('/persetujuan', [PeminjamanController::class, 'getPersetujuan']);
+    Route::get('/list-persetujuan', [PeminjamanController::class, 'getPersetujuanList']);
 
-    Route::post('/persetujuan-setujui/{id}', [loanController::class, 'setujuloan']);
-    Route::post('/persetujuan-tolak/{id}', [loanController::class, 'tolakloan']);
-    Route::post('/loan-batal/{id}', [loanController::class, 'cancelloan']);
+    Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
+    Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);
+    Route::post('/peminjaman-batal/{id}', [PeminjamanController::class, 'cancelPeminjaman']);
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
@@ -65,8 +65,8 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/admin/{id_number}', [AdminController::class, 'destroy']);
 
     Route::prefix('kepala')->group(function () {
-        Route::get('/monitoring-loan', [KepalaController::class, 'getMonitoringloan']);
-        Route::post('/batalkan-loan/{id}', [KepalaController::class, 'batalkanloan']);
+        Route::get('/monitoring-peminjaman', [KepalaController::class, 'getMonitoringPeminjaman']);
+        Route::post('/batalkan-peminjaman/{id}', [KepalaController::class, 'batalkanPeminjaman']);
         Route::post('/jadwalkan-ulang/{id}', [KepalaController::class, 'jadwalkanUlang']);
         Route::post('/cek-ketersediaan', [KepalaController::class, 'cekKetersediaan']);
     });

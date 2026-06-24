@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
-import building_utama from "../assets/gu601.jpeg";
+import gedung_utama from "../assets/gu601.jpeg";
 import axiosClient from "../axios";
 
 // STATUS CONFIG
 const STATUS_STYLES = {
   tersedia:       { badge: "bg-emerald-500", label: "Tersedia" },
-  dipinjam:       { badge: "bg-orange-400",  label: "Dalam loan" },
+  dipinjam:       { badge: "bg-orange-400",  label: "Dalam Peminjaman" },
   maintenance:    { badge: "bg-red-500",     label: "Maintenance" },
   tidak_tersedia: { badge: "bg-red-500",     label: "Tidak Tersedia" },
 };
@@ -91,32 +91,32 @@ const DropdownField = ({ loading, error, onRetry, children }) => {
 
 // ROOM CARD
 const RoomCard = ({ room, onEdit, onDelete }) => {
-  const statusCfg = STATUS_STYLES[room.room_status] ?? STATUS_STYLES.tersedia;
+  const statusCfg = STATUS_STYLES[room.status_ruangan] ?? STATUS_STYLES.tersedia;
 
   return (
     <div className="bg-[#F5EDED] rounded-2xl shadow-md border border-pink-100 flex flex-col overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
       <div className="relative h-[180px] overflow-hidden">
         <img
-          src={room.path_foto || building_utama}
-          alt={room.room_name}
+          src={room.path_foto || gedung_utama}
+          alt={room.name_ruangan}
           className="w-full h-full object-cover"
-          onError={(e) => { e.target.src = building_utama; }}
+          onError={(e) => { e.target.src = gedung_utama; }}
         />
         <span className={`absolute top-3 right-3 ${statusCfg.badge} text-white text-[10px] px-3 py-1 rounded-full font-bold shadow`}>
           {statusCfg.label}
         </span>
         <div className="absolute bottom-0 left-0 right-0 px-3 py-3 bg-gradient-to-t from-black/70 to-transparent text-white">
-          <h2 className="font-bold text-[15px] leading-tight truncate">{room.room_name}</h2>
+          <h2 className="font-bold text-[15px] leading-tight truncate">{room.name_ruangan}</h2>
           <div className="flex items-center gap-1 text-[11px] opacity-90 mt-0.5">
             <Icon icon="mdi:map-marker" width={12} />
-            <span className="truncate">{room.building_name} - floor {room.floor_number}</span>
+            <span className="truncate">{room.name_gedung} - Lantai {room.nomor_lantai}</span>
           </div>
         </div>
       </div>
 
       <div className="p-3 flex flex-col flex-1 text-[12px] text-[#3D0C1F]">
         <span className="inline-block self-start border border-gray-400 rounded-full px-3 py-0.5 text-[10px] font-semibold mb-2 truncate max-w-full">
-          {room.room_code}
+          {room.kode_ruangan}
         </span>
 
         <div className="space-y-1.5 flex-1">
@@ -126,11 +126,11 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
           </div>
           <div className="flex gap-2 items-start">
             <Icon icon="mdi:account-group" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
-            <p className="leading-snug"><b>capacity</b>: {room.capacity} Orang</p>
+            <p className="leading-snug"><b>Kapasitas</b>: {room.kapasitas} Orang</p>
           </div>
           <div className="flex gap-2 items-start">
             <Icon icon="mdi:office-building" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
-            <p className="leading-snug line-clamp-2"><b>facility</b>: {room.facility || "-"}</p>
+            <p className="leading-snug line-clamp-2"><b>Fasilitas</b>: {room.fasilitas || "-"}</p>
           </div>
         </div>
 
@@ -145,7 +145,7 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
           <button
             onClick={() => onDelete(room)}
             className="bg-[#862440] text-white p-2 rounded-lg hover:bg-[#6e1d35] hover:scale-105 transition-all"
-            title="Hapus room"
+            title="Hapus ruangan"
           >
             <Icon icon="mdi:delete-outline" width={14} />
           </button>
@@ -157,28 +157,28 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
 
 // MODAL FORM
 const EMPTY_FORM = {
-  room_code:      "",
-  room_name:      "",
-  building_id:         "",
-  floor_number:      "",
-  capacity:         "",
-  facility:         "",
-  room_description: "",
-  room_status:    "tersedia",
+  kode_ruangan:      "",
+  name_ruangan:      "",
+  id_gedung:         "",
+  nomor_lantai:      "",
+  kapasitas:         "",
+  fasilitas:         "",
+  deskripsi_ruangan: "",
+  status_ruangan:    "tersedia",
   id_number_pic:   "",
 };
 
-const Modalroom = ({ onClose, onSave, editData, saving }) => {
+const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
   const [form, setForm] = useState(
     editData ? {
-      room_code:      editData.room_code      ?? "",
-      room_name:      editData.room_name      ?? "",
-      building_id:         String(editData.building_id  ?? ""),
-      floor_number:      String(editData.floor_number ?? ""),
-      capacity:         editData.capacity          ?? "",
-      facility:         editData.facility          ?? "",
-      room_description: editData.room_description ?? "",
-      room_status:    editData.room_status    ?? "tersedia",
+      kode_ruangan:      editData.kode_ruangan      ?? "",
+      name_ruangan:      editData.name_ruangan      ?? "",
+      id_gedung:         String(editData.id_gedung  ?? ""),
+      nomor_lantai:      String(editData.nomor_lantai ?? ""),
+      kapasitas:         editData.kapasitas          ?? "",
+      fasilitas:         editData.fasilitas          ?? "",
+      deskripsi_ruangan: editData.deskripsi_ruangan ?? "",
+      status_ruangan:    editData.status_ruangan    ?? "tersedia",
       id_number_pic:   editData.id_number_pic != null ? String(editData.id_number_pic) : "",
     } : { ...EMPTY_FORM }
   );
@@ -189,14 +189,14 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
 
   // Dropdown states
   const [picList,       setPicList]       = useState([]);
-  const [buildingList,    setbuildingList]    = useState([]);
-  const [floorList,    setfloorList]    = useState([]);
+  const [gedungList,    setGedungList]    = useState([]);
+  const [lantaiList,    setLantaiList]    = useState([]);
   const [picLoading,    setPicLoading]    = useState(true);
-  const [buildingLoading, setbuildingLoading] = useState(true);
-  const [floorLoading, setfloorLoading] = useState(true);
+  const [gedungLoading, setGedungLoading] = useState(true);
+  const [lantaiLoading, setLantaiLoading] = useState(true);
   const [picError,      setPicError]      = useState(false);
-  const [buildingError,   setbuildingError]   = useState(false);
-  const [floorError,   setfloorError]   = useState(false);
+  const [gedungError,   setGedungError]   = useState(false);
+  const [lantaiError,   setLantaiError]   = useState(false);
 
   const fetchPic = useCallback(() => {
     setPicLoading(true); setPicError(false);
@@ -206,27 +206,27 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
       .finally(() => setPicLoading(false));
   }, []);
 
-  const fetchbuilding = useCallback(() => {
-    setbuildingLoading(true); setbuildingError(false);
-    axiosClient.get("/get-building")
-      .then(({ data }) => setbuildingList(data.data ?? []))
-      .catch(() => setbuildingError(true))
-      .finally(() => setbuildingLoading(false));
+  const fetchGedung = useCallback(() => {
+    setGedungLoading(true); setGedungError(false);
+    axiosClient.get("/get-gedung")
+      .then(({ data }) => setGedungList(data.data ?? []))
+      .catch(() => setGedungError(true))
+      .finally(() => setGedungLoading(false));
   }, []);
 
-  const fetchfloor = useCallback(() => {
-    setfloorLoading(true); setfloorError(false);
-    axiosClient.get("/get-floor")
-      .then(({ data }) => setfloorList(data.data ?? []))
-      .catch(() => setfloorError(true))
-      .finally(() => setfloorLoading(false));
+  const fetchLantai = useCallback(() => {
+    setLantaiLoading(true); setLantaiError(false);
+    axiosClient.get("/get-lantai")
+      .then(({ data }) => setLantaiList(data.data ?? []))
+      .catch(() => setLantaiError(true))
+      .finally(() => setLantaiLoading(false));
   }, []);
 
   useEffect(() => {
     fetchPic();
-    fetchbuilding();
-    fetchfloor();
-  }, [fetchPic, fetchbuilding, fetchfloor]);
+    fetchGedung();
+    fetchLantai();
+  }, [fetchPic, fetchGedung, fetchLantai]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -250,14 +250,14 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
 
   const validate = () => {
     const e = {};
-    if (!form.room_code.trim())  e.room_code   = "Kode room wajib diisi.";
-    if (!form.room_name.trim())  e.room_name   = "name room wajib diisi.";
-    if (!form.building_id)            e.building_id      = "building wajib dipilih.";
-    if (!form.floor_number)         e.floor_number   = "floor wajib dipilih.";
-    if (!form.capacity)            e.capacity      = "capacity wajib diisi.";
-    if (!form.facility.trim())     e.facility      = "facility wajib diisi.";
+    if (!form.kode_ruangan.trim())  e.kode_ruangan   = "Kode ruangan wajib diisi.";
+    if (!form.name_ruangan.trim())  e.name_ruangan   = "name ruangan wajib diisi.";
+    if (!form.id_gedung)            e.id_gedung      = "Gedung wajib dipilih.";
+    if (!form.nomor_lantai)         e.nomor_lantai   = "Lantai wajib dipilih.";
+    if (!form.kapasitas)            e.kapasitas      = "Kapasitas wajib diisi.";
+    if (!form.fasilitas.trim())     e.fasilitas      = "Fasilitas wajib diisi.";
     if (!form.id_number_pic)      e.id_number_pic = "PIC wajib dipilih.";
-    if (!form.room_status)       e.room_status = "Status wajib dipilih.";
+    if (!form.status_ruangan)       e.status_ruangan = "Status wajib dipilih.";
     return e;
   };
 
@@ -281,7 +281,7 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
         <div className="bg-[#3D0C1F] px-5 py-4 text-white flex justify-between items-center shrink-0">
           <div className="flex items-center gap-2">
             <Icon icon={editData ? "mdi:pencil-circle-outline" : "mdi:plus-circle-outline"} width={20} />
-            <h2 className="font-bold text-[17px]">{editData ? "Edit room" : "Tambah room Baru"}</h2>
+            <h2 className="font-bold text-[17px]">{editData ? "Edit Ruangan" : "Tambah Ruangan Baru"}</h2>
           </div>
           <button onClick={onClose} disabled={saving} className="hover:bg-white/20 rounded-full p-1 transition disabled:opacity-50">
             <Icon icon="mdi:close" width={18} />
@@ -291,84 +291,84 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
         {/* Fields */}
         <div className="p-5 flex flex-col gap-4 overflow-y-auto">
 
-          {/* Kode room */}
+          {/* Kode Ruangan */}
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Kode room <span className="text-red-500">*</span>
+              Kode Ruangan <span className="text-red-500">*</span>
             </label>
             <input
-              name="room_code" value={form.room_code} onChange={handleChange}
+              name="kode_ruangan" value={form.kode_ruangan} onChange={handleChange}
               placeholder="Contoh: GU-601"
-              className={`${inputBase} ${errors.room_code ? "border-red-400" : ""}`}
+              className={`${inputBase} ${errors.kode_ruangan ? "border-red-400" : ""}`}
             />
-            {errors.room_code && <p className={errorText}>{errors.room_code}</p>}
+            {errors.kode_ruangan && <p className={errorText}>{errors.kode_ruangan}</p>}
           </div>
 
-          {/* name room */}
+          {/* name Ruangan */}
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              name room <span className="text-red-500">*</span>
+              name Ruangan <span className="text-red-500">*</span>
             </label>
             <input
-              name="room_name" value={form.room_name} onChange={handleChange}
+              name="name_ruangan" value={form.name_ruangan} onChange={handleChange}
               placeholder="Contoh: Ruang Rapat Utama"
-              className={`${inputBase} ${errors.room_name ? "border-red-400" : ""}`}
+              className={`${inputBase} ${errors.name_ruangan ? "border-red-400" : ""}`}
             />
-            {errors.room_name && <p className={errorText}>{errors.room_name}</p>}
+            {errors.name_ruangan && <p className={errorText}>{errors.name_ruangan}</p>}
           </div>
 
-          {/* building & floor — 2 kolom */}
+          {/* Gedung & Lantai — 2 kolom */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-                building <span className="text-red-500">*</span>
+                Gedung <span className="text-red-500">*</span>
               </label>
-              <DropdownField loading={buildingLoading} error={buildingError} onRetry={fetchbuilding}>
+              <DropdownField loading={gedungLoading} error={gedungError} onRetry={fetchGedung}>
                 <select
-                  name="building_id" value={form.building_id} onChange={handleChange}
-                  className={`${selectBase} ${errors.building_id ? "border-red-400" : ""}`}
+                  name="id_gedung" value={form.id_gedung} onChange={handleChange}
+                  className={`${selectBase} ${errors.id_gedung ? "border-red-400" : ""}`}
                 >
-                  <option value="">— Pilih building —</option>
-                  {buildingList.map((g) => (
-                    <option key={g.building_id} value={g.building_id}>{g.building_name}</option>
+                  <option value="">— Pilih Gedung —</option>
+                  {gedungList.map((g) => (
+                    <option key={g.id_gedung} value={g.id_gedung}>{g.name_gedung}</option>
                   ))}
                 </select>
               </DropdownField>
-              {errors.building_id && <p className={errorText}>{errors.building_id}</p>}
+              {errors.id_gedung && <p className={errorText}>{errors.id_gedung}</p>}
             </div>
 
             <div>
               <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-                floor <span className="text-red-500">*</span>
+                Lantai <span className="text-red-500">*</span>
               </label>
-              <DropdownField loading={floorLoading} error={floorError} onRetry={fetchfloor}>
+              <DropdownField loading={lantaiLoading} error={lantaiError} onRetry={fetchLantai}>
                 <select
-                  name="floor_number" value={form.floor_number} onChange={handleChange}
-                  className={`${selectBase} ${errors.floor_number ? "border-red-400" : ""}`}
+                  name="nomor_lantai" value={form.nomor_lantai} onChange={handleChange}
+                  className={`${selectBase} ${errors.nomor_lantai ? "border-red-400" : ""}`}
                 >
-                  <option value="">— Pilih floor —</option>
-                  {floorList.map((l) => (
-                    <option key={l.floor_number} value={l.floor_number}>
-                      {l.floor_name ? `${l.floor_name} (${l.floor_number})` : `floor ${l.floor_number}`}
+                  <option value="">— Pilih Lantai —</option>
+                  {lantaiList.map((l) => (
+                    <option key={l.nomor_lantai} value={l.nomor_lantai}>
+                      {l.name_lantai ? `${l.name_lantai} (${l.nomor_lantai})` : `Lantai ${l.nomor_lantai}`}
                     </option>
                   ))}
                 </select>
               </DropdownField>
-              {errors.floor_number && <p className={errorText}>{errors.floor_number}</p>}
+              {errors.nomor_lantai && <p className={errorText}>{errors.nomor_lantai}</p>}
             </div>
           </div>
 
-          {/* capacity */}
+          {/* Kapasitas */}
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              capacity <span className="text-red-500">*</span>
+              Kapasitas <span className="text-red-500">*</span>
             </label>
             <input
-              type="number" name="capacity" value={form.capacity} onChange={handleChange}
+              type="number" name="kapasitas" value={form.kapasitas} onChange={handleChange}
               placeholder="Jumlah orang" min={1}
-              className={`${inputBase} ${errors.capacity ? "border-red-400" : ""}`}
+              className={`${inputBase} ${errors.kapasitas ? "border-red-400" : ""}`}
             />
-            {errors.capacity && <p className={errorText}>{errors.capacity}</p>}
+            {errors.kapasitas && <p className={errorText}>{errors.kapasitas}</p>}
           </div>
 
           {/* PIC Dropdown */}
@@ -403,8 +403,8 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
             </label>
             <div className="relative">
               <select
-                name="room_status" value={form.room_status} onChange={handleChange}
-                className={`${selectBase} ${errors.room_status ? "border-red-400" : ""}`}
+                name="status_ruangan" value={form.status_ruangan} onChange={handleChange}
+                className={`${selectBase} ${errors.status_ruangan ? "border-red-400" : ""}`}
               >
                 <option value="tersedia">Tersedia</option>
                 <option value="maintenance">Maintenance</option>
@@ -412,21 +412,21 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
               </select>
               <Icon icon="mdi:chevron-down" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width={16} />
             </div>
-            {errors.room_status && <p className={errorText}>{errors.room_status}</p>}
+            {errors.status_ruangan && <p className={errorText}>{errors.status_ruangan}</p>}
           </div>
 
-          {/* facility */}
+          {/* Fasilitas */}
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              facility <span className="text-red-500">*</span>
+              Fasilitas <span className="text-red-500">*</span>
             </label>
             <textarea
-              name="facility" value={form.facility} onChange={handleChange}
+              name="fasilitas" value={form.fasilitas} onChange={handleChange}
               placeholder="Contoh: AC, Proyektor, Whiteboard"
               rows={2}
-              className={`${inputBase} resize-none ${errors.facility ? "border-red-400" : ""}`}
+              className={`${inputBase} resize-none ${errors.fasilitas ? "border-red-400" : ""}`}
             />
-            {errors.facility && <p className={errorText}>{errors.facility}</p>}
+            {errors.fasilitas && <p className={errorText}>{errors.fasilitas}</p>}
           </div>
 
           {/* Deskripsi */}
@@ -435,8 +435,8 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
               Deskripsi <span className="text-gray-400 font-normal">(opsional)</span>
             </label>
             <textarea
-              name="room_description" value={form.room_description} onChange={handleChange}
-              placeholder="Deskripsi tambahan tentang room..."
+              name="deskripsi_ruangan" value={form.deskripsi_ruangan} onChange={handleChange}
+              placeholder="Deskripsi tambahan tentang ruangan..."
               rows={2}
               className={`${inputBase} resize-none`}
             />
@@ -445,7 +445,7 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
           {/* Foto Upload */}
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Foto room <span className="text-gray-400 font-normal">(opsional)</span>
+              Foto Ruangan <span className="text-gray-400 font-normal">(opsional)</span>
             </label>
             <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-pink-400 transition group">
               {fotoPreview ? (
@@ -500,7 +500,7 @@ const Modalroom = ({ onClose, onSave, editData, saving }) => {
 };
 
 // MAIN PAGE
-const Kelolaroom = () => {
+const KelolaRuangan = () => {
   const [rooms, setRooms]                 = useState([]);
   const [showModal, setShowModal]         = useState(false);
   const [editData, setEditData]           = useState(null);
@@ -518,47 +518,47 @@ const Kelolaroom = () => {
   }, []);
 
   // ── Fetch ────────────────────────────────────
-  const fetchroom = useCallback(() => {
+  const fetchRuangan = useCallback(() => {
     setLoading(true);
-    axiosClient.get("/get-room")
+    axiosClient.get("/get-ruangan")
       .then(({ data }) => {
         const mapped = data.data.map((item) => ({
           id:                item.id,
-          room_code:      item.room_code,
-          room_name:      item.room_name,
-          capacity:         item.capacity,
-          facility:         item.facility,
-          room_description: item.room_description,
-          room_status:    item.room_status,
+          kode_ruangan:      item.kode_ruangan,
+          name_ruangan:      item.name_ruangan,
+          kapasitas:         item.kapasitas,
+          fasilitas:         item.fasilitas,
+          deskripsi_ruangan: item.deskripsi_ruangan,
+          status_ruangan:    item.status_ruangan,
           path_foto:         item.path_foto ?? null,
-          floor_number:      item.floor_number,
-          building_id:         item.building_id,
-          building_name:       item.building_name ?? "-",
+          nomor_lantai:      item.nomor_lantai,
+          id_gedung:         item.id_gedung,
+          name_gedung:       item.name_gedung ?? "-",
           pic:               item.pic ?? "-",
           id_number_pic:   item.id_number_pic != null ? String(item.id_number_pic) : "",
         }));
         setRooms(mapped);
       })
       .catch((err) => {
-        console.error("Gagal memuat data room:", err);
-        showToast("Gagal memuat data room. Silakan muat ulang halaman.", "error");
+        console.error("Gagal memuat data ruangan:", err);
+        showToast("Gagal memuat data ruangan. Silakan muat ulang halaman.", "error");
       })
       .finally(() => setLoading(false));
   }, [showToast]);
 
-  useEffect(() => { fetchroom(); }, [fetchroom]);
+  useEffect(() => { fetchRuangan(); }, [fetchRuangan]);
 
   // ── Save (Create / Update) ───────────────────
   const handleSave = (formData, fotoFile) => {
     const payload = new FormData();
-    payload.append("room_code",      formData.room_code.trim());
-    payload.append("room_name",      formData.room_name.trim());
-    payload.append("capacity",         Number(formData.capacity));
-    payload.append("facility",         formData.facility.trim());
-    payload.append("room_description", formData.room_description?.trim() ?? "");
-    payload.append("room_status",    formData.room_status);
-    payload.append("floor_number",      Number(formData.floor_number));
-    payload.append("building_id",         Number(formData.building_id));
+    payload.append("kode_ruangan",      formData.kode_ruangan.trim());
+    payload.append("name_ruangan",      formData.name_ruangan.trim());
+    payload.append("kapasitas",         Number(formData.kapasitas));
+    payload.append("fasilitas",         formData.fasilitas.trim());
+    payload.append("deskripsi_ruangan", formData.deskripsi_ruangan?.trim() ?? "");
+    payload.append("status_ruangan",    formData.status_ruangan);
+    payload.append("nomor_lantai",      Number(formData.nomor_lantai));
+    payload.append("id_gedung",         Number(formData.id_gedung));
     payload.append("id_number_pic",   Number(formData.id_number_pic));
     if (fotoFile) {
       payload.append("foto", fotoFile);
@@ -569,7 +569,7 @@ const Kelolaroom = () => {
 
     setSaving(true);
 
-    const url     = editData ? `/room/${editData.id}` : "/room";
+    const url     = editData ? `/ruangan/${editData.id}` : "/ruangan";
     const request = axiosClient.post(url, payload, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -577,14 +577,14 @@ const Kelolaroom = () => {
     request
       .then(() => {
         showToast(
-          editData ? "room berhasil diperbarui." : "room berhasil ditambahkan.",
+          editData ? "Ruangan berhasil diperbarui." : "Ruangan berhasil ditambahkan.",
           "success"
         );
-        fetchroom();
+        fetchRuangan();
         closeModal();
       })
       .catch((err) => {
-        console.error("Gagal menyimpan room:", err);
+        console.error("Gagal menyimpan ruangan:", err);
         if (err.response?.data?.errors) {
           const messages = Object.values(err.response.data.errors).flat().join("\n");
           showToast("Validasi gagal: " + messages, "error");
@@ -600,10 +600,10 @@ const Kelolaroom = () => {
   // ── Delete ───────────────────────────────────
   const handleDeleteConfirmed = () => {
     if (!confirmDelete) return;
-    const { id, room_name } = confirmDelete;
+    const { id, name_ruangan } = confirmDelete;
     setConfirmDelete(null);
 
-    axiosClient.delete(`/room/${id}`)
+    axiosClient.delete(`/ruangan/${id}`)
       .then(() => {
         setRooms((prev) => {
           const updated = prev.filter((r) => r.id !== id);
@@ -611,11 +611,11 @@ const Kelolaroom = () => {
           setCurrentPage((p) => Math.min(p, maxPage));
           return updated;
         });
-        showToast(`room "${room_name}" berhasil dihapus.`, "success");
+        showToast(`Ruangan "${name_ruangan}" berhasil dihapus.`, "success");
       })
       .catch((err) => {
-        console.error("Gagal menghapus room:", err);
-        showToast("Gagal menghapus room. Silakan coba lagi.", "error");
+        console.error("Gagal menghapus ruangan:", err);
+        showToast("Gagal menghapus ruangan. Silakan coba lagi.", "error");
       });
   };
 
@@ -625,10 +625,10 @@ const Kelolaroom = () => {
 
   // ── Search & Pagination ──────────────────────
   const filtered = rooms.filter((r) =>
-    r.room_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.room_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.name_ruangan.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.kode_ruangan.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (r.pic ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (r.building_name ?? "").toLowerCase().includes(searchQuery.toLowerCase())
+    (r.name_gedung ?? "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => { setCurrentPage(1); }, [searchQuery]);
@@ -639,9 +639,9 @@ const Kelolaroom = () => {
     .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1);
 
   // ── Stats ────────────────────────────────────
-  const tersedia      = rooms.filter((r) => r.room_status === "tersedia").length;
-  const dipinjam      = rooms.filter((r) => r.room_status === "dipinjam").length;
-  const tidakTersedia = rooms.filter((r) => r.room_status === "maintenance" || r.room_status === "tidak_tersedia").length;
+  const tersedia      = rooms.filter((r) => r.status_ruangan === "tersedia").length;
+  const dipinjam      = rooms.filter((r) => r.status_ruangan === "dipinjam").length;
+  const tidakTersedia = rooms.filter((r) => r.status_ruangan === "maintenance" || r.status_ruangan === "tidak_tersedia").length;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#FFF6F1] via-[#FFE4E6] to-[#FFD1D1]">
@@ -653,10 +653,10 @@ const Kelolaroom = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>
             <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
-              Kelola room
+              Kelola Ruangan
             </h1>
             <p className="text-gray-500 text-[13px] mt-1">
-              Lihat dan kelola seluruh room yang dapat dipinjam dalam sistem
+              Lihat dan kelola seluruh ruangan yang dapat dipinjam dalam sistem
             </p>
           </div>
           <button
@@ -664,15 +664,15 @@ const Kelolaroom = () => {
             className="self-start sm:self-auto flex items-center gap-2 bg-orange-400 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold transition shadow-md hover:shadow-lg"
           >
             <Icon icon="mdi:plus" width={16} />
-            Tambah room
+            Tambah Ruangan
           </button>
         </div>
 
         {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {[
-            { label: "room Tersedia",  value: tersedia,      sub: "Dapat dipinjam",              from: "#8B1E3F", to: "#C0254A", icon: "mdi:check-circle-outline" },
-            { label: "Dalam loan",  value: dipinjam,      sub: "Sedang digunakan",             from: "#C0254A", to: "#FF4D8D", icon: "mdi:clock-outline" },
+            { label: "Ruangan Tersedia",  value: tersedia,      sub: "Dapat dipinjam",              from: "#8B1E3F", to: "#C0254A", icon: "mdi:check-circle-outline" },
+            { label: "Dalam Peminjaman",  value: dipinjam,      sub: "Sedang digunakan",             from: "#C0254A", to: "#FF4D8D", icon: "mdi:clock-outline" },
             { label: "Tidak Tersedia",    value: tidakTersedia, sub: "Maintenance / Tidak tersedia", from: "#FF4D8D", to: "#F8BFA6", icon: "mdi:tools" },
           ].map((s) => (
             <div
@@ -697,7 +697,7 @@ const Kelolaroom = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari name, kode, building, atau PIC..."
+            placeholder="Cari name, kode, gedung, atau PIC..."
             className="flex-1 text-[13px] outline-none text-gray-700 placeholder-gray-400 bg-transparent"
           />
           {searchQuery && (
@@ -711,13 +711,13 @@ const Kelolaroom = () => {
         {loading ? (
           <div className="flex flex-col justify-center items-center h-48 gap-3">
             <Icon icon="mdi:loading" className="animate-spin text-[#C0254A]" width={36} />
-            <p className="text-[#C0254A] font-semibold text-[14px]">Memuat data room...</p>
+            <p className="text-[#C0254A] font-semibold text-[14px]">Memuat data ruangan...</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col justify-center items-center h-48 gap-2 text-gray-400">
             <Icon icon="mdi:door-open" width={40} />
             <p className="text-[14px]">
-              {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : "Tidak ada data room."}
+              {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : "Tidak ada data ruangan."}
             </p>
           </div>
         ) : (
@@ -778,19 +778,19 @@ const Kelolaroom = () => {
             )}
 
             <p className="text-center text-[11px] text-gray-400 mt-3">
-              Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} dari {filtered.length} room
+              Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} dari {filtered.length} ruangan
             </p>
           </>
         )}
       </div>
 
       {showModal && (
-        <Modalroom onClose={closeModal} onSave={handleSave} editData={editData} saving={saving} />
+        <ModalRuangan onClose={closeModal} onSave={handleSave} editData={editData} saving={saving} />
       )}
 
       {confirmDelete && (
         <ConfirmDialog
-          message={`Apakah kamu yakin ingin menghapus room "${confirmDelete.room_name}"? Tindakan ini tidak dapat dibatalkan.`}
+          message={`Apakah kamu yakin ingin menghapus ruangan "${confirmDelete.name_ruangan}"? Tindakan ini tidak dapat dibatalkan.`}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -803,4 +803,4 @@ const Kelolaroom = () => {
   );
 };
 
-export default Kelolaroom;
+export default KelolaRuangan;

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\buildings;
+use App\Models\Gedungs;
 use Illuminate\Http\Request;
 
-class buildingsController extends Controller
+class GedungsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class buildingsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(buildings $buildings)
+    public function show(Gedungs $gedungs)
     {
         //
     }
@@ -42,7 +42,7 @@ class buildingsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(buildings $buildings)
+    public function edit(Gedungs $gedungs)
     {
         //
     }
@@ -50,7 +50,7 @@ class buildingsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, buildings $buildings)
+    public function update(Request $request, Gedungs $gedungs)
     {
         //
     }
@@ -58,7 +58,7 @@ class buildingsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(buildings $buildings)
+    public function destroy(Gedungs $gedungs)
     {
         //
     }

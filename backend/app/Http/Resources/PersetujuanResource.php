@@ -15,7 +15,7 @@ class PersetujuanResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'loan_id' => $this->loan_id,
+            'id_peminjaman' => $this->id_peminjaman,
             'status_persetujuan' => $this->status_persetujuan,
             'penyetuju' => $this->user?->name ?? null,
             'role_penyetuju' => $this->user?->role ?? null,
