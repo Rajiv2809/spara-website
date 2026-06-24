@@ -169,7 +169,7 @@ const ModalProfile = ({ onClose }) => {
                 No. Telepon
               </span>
               <span className="text-[13px] font-semibold text-gray-700 truncate">
-                {currentUser.no_telepon || "-"}
+                {currentUser.phone_number || "-"}
               </span>
             </div>
           </div>
