@@ -7,9 +7,17 @@ use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
+    private function formatProfilePhoto($user)
+    {
+        if ($user && $user->fotoprofil && !str_starts_with($user->fotoprofil, 'http')) {
+            $user->fotoprofil = asset('storage/' . $user->fotoprofil);
+        }
+        return $user;
+    }
 
     public function register(Request $request)
 {
@@ -57,6 +65,7 @@ class AuthController extends Controller
 
         // ambil data user yang login
         $user = auth()->user();
+        $user = $this->formatProfilePhoto($user);
 
         return $this->respondWithToken($token, $user);
     }
@@ -73,6 +82,9 @@ class AuthController extends Controller
     public function me()
     {
         $user = auth()->user();
+        $user = $this->formatProfilePhoto($user);
+
+
         return response()->json([
             'user' => $user
         ],200);
@@ -89,5 +101,34 @@ class AuthController extends Controller
         return response()->json([
             'test' => 'berhasil test'
         ],200);
+    }
+    public function updateProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'fotoprofil' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = auth()->user();
+
+        // Ambil path asli dari DB
+        $oldPath = $user->getRawOriginal('fotoprofil') ?: $user->fotoprofil;
+
+        if ($oldPath && !str_starts_with($oldPath, 'http')) {
+            if (Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
+            }
+        }
+
+        // simpan foto baru ke folder storage/fotoprofil
+        $path = $request->file('fotoprofil')->store('fotoprofil', 'public');
+
+        // update path ke database
+        $user->fotoprofil = $path;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Foto profil berhasil diperbarui',
+            'user' => $this->formatProfilePhoto($user), 
+        ]);
     }
 }

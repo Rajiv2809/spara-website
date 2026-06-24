@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import logo2 from "../Pages/Assets/logo2.png";
 import { Icon } from "@iconify/react";
-import pakari from "../Pages/Assets/pakari.png";
 import { useStateContext } from "../Contexts/context.jsx";
 import axiosClient from "../axios";
 import { useNavigate } from "react-router-dom";
@@ -68,7 +67,11 @@ const menuByRole = {
       label: "Kelola Ruangan",
       href: "/kelola-ruangan",
     },
-    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender-peminjaman" },
+    {
+      icon: "mdi:calendar-month",
+      label: "Kalender",
+      href: "/kalender-peminjaman",
+    },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
@@ -102,7 +105,11 @@ const menuByRole = {
       label: "Peminjaman",
       href: "/peminjaman-kepala",
     },
-    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender-peminjaman" },
+    {
+      icon: "mdi:calendar-month",
+      label: "Kalender",
+      href: "/kalender-peminjaman",
+    },
     { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
@@ -115,10 +122,7 @@ const menuByRole = {
       href: "/kelola-admin",
     },
   ],
-  loading: [
-
-    {label: "loading"},  
-  ],
+  loading: [{ label: "loading" }],
 };
 
 const Sidebar = () => {
@@ -139,9 +143,8 @@ const Sidebar = () => {
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
- 
   }, []);
-  
+
   const handleLogoutClick = (e) => {
     e.preventDefault();
     setShowLogoutModal(true);
@@ -220,29 +223,32 @@ const Sidebar = () => {
       <div
         onClick={() => {
           setShowProfileModal(true);
-          setIsOpen(false); // 
+          setIsOpen(false); //
         }}
         className="mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors group"
       >
-        <img
-          src={currentUser?.fotoprofil || pakari}
-          alt="Profile"
-          className="w-9 h-9 rounded-full object-cover shrink-0"
-        />
+        {currentUser?.fotoprofil ? (
+          <img
+            src={currentUser.fotoprofil}
+            alt="Profile"
+            className="w-9 h-9 rounded-full object-cover shrink-0"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+            <Icon icon="fa6-solid:user" className="text-gray-400" width="14" />
+          </div>
+        )}
         <div className="text-left flex-1 min-w-0">
           <h1 className="text-[15px] truncate font-medium group-hover:underline">
             {currentUser?.nama || "Nama Pengguna"}
           </h1>
-          <h3 className="text-[10px] text-[#B1B1B1] truncate">
-            Lihat Profil
-          </h3>
+          <h3 className="text-[10px] text-[#B1B1B1] truncate">Lihat Profil</h3>
         </div>
-        
-        
-        <button 
+
+        <button
           onClick={(e) => {
-            e.stopPropagation(); 
-            handleLogoutClick(e); 
+            e.stopPropagation();
+            handleLogoutClick(e);
           }}
           className="p-1 rounded hover:bg-[#862440] text-[#FFEDDD] transition-colors shrink-0 ml-1 flex items-center justify-center"
           title="Keluar Aplikasi"
@@ -252,7 +258,6 @@ const Sidebar = () => {
       </div>
     </div>
   );
-
 
   return (
     <>
