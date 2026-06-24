@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lantai', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('nomor_lantai')->unique(); // penting!
-            $table->string('nama_lantai')->nullable();
+            $table->string('name_lantai')->nullable();
             $table->timestamps();
         });
     }

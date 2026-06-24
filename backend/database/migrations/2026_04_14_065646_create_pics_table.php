@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('pics', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('nomor_induk');
+            $table->unsignedBigInteger('id_number');
             
             $table->timestamps();
 
-            $table->foreign('nomor_induk')
-                ->references('nomor_induk')
+            $table->foreign('id_number')
+                ->references('id_number')
                 ->on('users')
                 ->onDelete('cascade');
         });

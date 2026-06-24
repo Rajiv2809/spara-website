@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     protected $fillable = [
-        'nomor_induk', 'type', 'judul', 'pesan', 'peminjaman_id', 'read_at',
+        'id_number', 'type', 'judul', 'pesan', 'peminjaman_id', 'read_at',
     ];
 
     protected $casts = [
@@ -16,7 +16,7 @@ class Notification extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'nomor_induk', 'nomor_induk');
+        return $this->belongsTo(User::class, 'id_number', 'id_number');
     }
 
     public function peminjaman()

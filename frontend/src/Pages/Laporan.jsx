@@ -259,9 +259,9 @@ export default function Laporan() {
                         {data.map((p) => {
                             const st   = STATUS_CONFIG[p.status_persetujuan];
                             const aset = p.alat
-                                ? { icon: '🖥', label: p.alat.nama_alat }
+                                ? { icon: '🖥', label: p.alat.name_alat }
                                 : p.ruangan
-                                ? { icon: '🚪', label: `${p.ruangan.nama_ruangan} (${p.ruangan.kode_ruangan})` }
+                                ? { icon: '🚪', label: `${p.ruangan.name_ruangan} (${p.ruangan.kode_ruangan})` }
                                 : null;
 
                             return (
@@ -271,9 +271,9 @@ export default function Laporan() {
                                 >
                                     <div className="flex items-start justify-between gap-3 mb-2">
                                         <div>
-                                            <p className="text-sm font-medium text-gray-800">{p.nama_kegiatan}</p>
+                                            <p className="text-sm font-medium text-gray-800">{p.name_kegiatan}</p>
                                             <p className="text-xs text-gray-400 mt-0.5">
-                                                {p.jenis_kegiatan} · {p.peminjam?.nama}
+                                                {p.jenis_kegiatan} · {p.peminjam?.name}
                                             </p>
                                         </div>
                                         <span className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${st.bg} ${st.text}`}>

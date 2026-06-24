@@ -79,7 +79,7 @@ const AlatCard = ({ alat, onEdit, onDelete }) => {
       <div className="relative h-[180px] overflow-hidden">
         <img
           src={alat.foto || peralatanImg}
-          alt={alat.nama}
+          alt={alat.name}
           className="w-full h-full object-cover"
         />
         <span
@@ -88,7 +88,7 @@ const AlatCard = ({ alat, onEdit, onDelete }) => {
           {statusCfg.label}
         </span>
         <div className="absolute bottom-0 left-0 right-0 px-3 py-3 bg-gradient-to-t from-black/70 to-transparent text-white">
-          <h2 className="font-bold text-[15px] leading-tight truncate">{alat.nama}</h2>
+          <h2 className="font-bold text-[15px] leading-tight truncate">{alat.name}</h2>
           <div className="flex items-center gap-1 text-[11px] opacity-90 mt-0.5">
             <Icon icon="mdi:tools" width={12} />
             <span className="truncate">{alat.kode}</span>
@@ -139,10 +139,10 @@ const AlatCard = ({ alat, onEdit, onDelete }) => {
 
 const EMPTY_FORM = {
   kode: "",
-  nama: "",
+  name: "",
   deskripsi: "",
   status: "tersedia",
-  nomor_induk_pic: "",
+  id_number_pic: "",
 };
 
 const ModalAlat = ({ onClose, onSave, editData, saving }) => {
@@ -150,10 +150,10 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
     editData
       ? {
           kode:            editData.kode ?? "",
-          nama:            editData.nama ?? "",
+          name:            editData.name ?? "",
           deskripsi:       editData.deskripsi ?? "",
           status:          editData.status ?? "tersedia",
-          nomor_induk_pic: editData.nomor_induk_pic ?? "",
+          id_number_pic: editData.id_number_pic ?? "",
         }
       : { ...EMPTY_FORM }
   );
@@ -203,7 +203,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
   const validate = () => {
     const e = {};
     if (!form.kode.trim()) e.kode = "Kode alat wajib diisi.";
-    if (!form.nama.trim()) e.nama = "Nama alat wajib diisi.";
+    if (!form.name.trim()) e.name = "name alat wajib diisi.";
     if (!form.status)      e.status = "Status wajib dipilih.";
     return e;
   };
@@ -219,7 +219,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
   const errorText = "text-red-500 text-[10px] mt-0.5";
 
   const selectedPic = picList.find(
-    (p) => String(p.nomor_induk) === String(form.nomor_induk_pic)
+    (p) => String(p.id_number) === String(form.id_number_pic)
   );
 
   return (
@@ -261,16 +261,16 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
 
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Nama Peralatan <span className="text-red-500">*</span>
+              name Peralatan <span className="text-red-500">*</span>
             </label>
             <input
-              name="nama"
-              value={form.nama}
+              name="name"
+              value={form.name}
               onChange={handleChange}
               placeholder="Contoh: Obeng Set Philips"
-              className={`${inputBase} w-full ${errors.nama ? "border-red-400" : ""}`}
+              className={`${inputBase} w-full ${errors.name ? "border-red-400" : ""}`}
             />
-            {errors.nama && <p className={errorText}>{errors.nama}</p>}
+            {errors.name && <p className={errorText}>{errors.name}</p>}
           </div>
 
           <div>
@@ -306,15 +306,15 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
             ) : (
               <div className="relative">
                 <select
-                  name="nomor_induk_pic"
-                  value={form.nomor_induk_pic}
+                  name="id_number_pic"
+                  value={form.id_number_pic}
                   onChange={handleChange}
                   className={`${inputBase} w-full pr-8 appearance-none cursor-pointer`}
                 >
                   <option value="">— Tidak ada PIC —</option>
                   {picList.map((pic) => (
-                    <option key={pic.nomor_induk} value={pic.nomor_induk}>
-                      {pic.nama} ({pic.nomor_induk})
+                    <option key={pic.id_number} value={pic.id_number}>
+                      {pic.name} ({pic.id_number})
                     </option>
                   ))}
                 </select>
@@ -329,7 +329,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
             {selectedPic && (
               <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-emerald-600">
                 <Icon icon="mdi:account-check-outline" width={13} />
-                <span>Terpilih: <b>{selectedPic.nama}</b></span>
+                <span>Terpilih: <b>{selectedPic.name}</b></span>
               </div>
             )}
           </div>
@@ -463,11 +463,11 @@ const KelolaPeralatan = () => {
         const mapped = data.data.map((item) => ({
           id:              item.id,
           kode:            item.kode_alat,
-          nama:            item.nama_alat,
+          name:            item.name_alat,
           deskripsi:       item.deskripsi_alat,
           status:          item.status_alat,
           pic:             item.pic ?? "-",
-          nomor_induk_pic: item.nomor_induk_pic != null ? String(item.nomor_induk_pic) : "",
+          id_number_pic: item.id_number_pic != null ? String(item.id_number_pic) : "",
           foto:            item.path_foto ?? null,
         }));
         setAlat(mapped);
@@ -486,10 +486,10 @@ const KelolaPeralatan = () => {
   const handleSave = (formData, fotoFile) => {
     const payload = new FormData();
     payload.append("kode_alat",       formData.kode.trim());
-    payload.append("nama_alat",       formData.nama.trim());
+    payload.append("name_alat",       formData.name.trim());
     payload.append("deskripsi_alat",  formData.deskripsi.trim());
     payload.append("status_alat",     formData.status);
-    payload.append("nomor_induk_pic", formData.nomor_induk_pic || "");
+    payload.append("id_number_pic", formData.id_number_pic || "");
     if (fotoFile) {
       payload.append("foto", fotoFile);
     }
@@ -523,7 +523,7 @@ const KelolaPeralatan = () => {
 
   const handleDeleteConfirmed = () => {
     if (!confirmDelete) return;
-    const { id, nama } = confirmDelete;
+    const { id, name } = confirmDelete;
     setConfirmDelete(null);
 
     axiosClient
@@ -535,7 +535,7 @@ const KelolaPeralatan = () => {
           setCurrentPage((p) => Math.min(p, maxPage));
           return updated;
         });
-        showToast(`Alat "${nama}" berhasil dihapus.`, "success");
+        showToast(`Alat "${name}" berhasil dihapus.`, "success");
       })
       .catch((err) => {
         console.error("Gagal menghapus alat:", err);
@@ -557,7 +557,7 @@ const KelolaPeralatan = () => {
 
   const filtered = alat.filter(
     (a) =>
-      a.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.kode.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (a.pic ?? "").toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -659,7 +659,7 @@ const KelolaPeralatan = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari nama, kode, atau PIC..."
+            placeholder="Cari name, kode, atau PIC..."
             className="flex-1 text-[13px] outline-none text-gray-700 placeholder-gray-400 bg-transparent"
           />
           {searchQuery && (
@@ -787,7 +787,7 @@ const KelolaPeralatan = () => {
       {/* CONFIRM DELETE */}
       {confirmDelete && (
         <ConfirmDialog
-          message={`Apakah kamu yakin ingin menghapus alat "${confirmDelete.nama}"? Tindakan ini tidak dapat dibatalkan.`}
+          message={`Apakah kamu yakin ingin menghapus alat "${confirmDelete.name}"? Tindakan ini tidak dapat dibatalkan.`}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmDelete(null)}
         />

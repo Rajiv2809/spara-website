@@ -14,9 +14,9 @@ class JurusanSeeder extends Seeder
     public function run(): void
     {
         DB::table('jurusans')->insert([
-            ['id_jurusan' => 1, 'nama_jurusan' => 'Teknik Informatika', 'created_at' => now(), 'updated_at' => now()],
-            ['id_jurusan' => 2, 'nama_jurusan' => 'Teknik Permesinan', 'created_at' => now(), 'updated_at' => now()],
-            ['id_jurusan' => 3, 'nama_jurusan' => 'Teknik Elektro', 'created_at' => now(), 'updated_at' => now()],
+            ['id_jurusan' => 1, 'name_jurusan' => 'Teknik Informatika', 'created_at' => now(), 'updated_at' => now()],
+            ['id_jurusan' => 2, 'name_jurusan' => 'Teknik Permesinan', 'created_at' => now(), 'updated_at' => now()],
+            ['id_jurusan' => 3, 'name_jurusan' => 'Teknik Elektro', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

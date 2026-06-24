@@ -76,7 +76,7 @@ const menuByRole = {
       href: "/persetujuan-peminjaman",
     },
   ],
-  dosen: [
+  lecturer: [
     { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
     {
       icon: "octicon:checklist-16",
@@ -225,13 +225,13 @@ const Sidebar = () => {
         className="mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors group"
       >
         <img
-          src={currentUser?.fotoprofil || pakari}
+          src={currentUser?.profile_picture || pakari}
           alt="Profile"
           className="w-9 h-9 rounded-full object-cover shrink-0"
         />
         <div className="text-left flex-1 min-w-0">
           <h1 className="text-[15px] truncate font-medium group-hover:underline">
-            {currentUser?.nama || "Nama Pengguna"}
+            {currentUser?.name || "name Pengguna"}
           </h1>
           <h3 className="text-[10px] text-[#B1B1B1] truncate">
             Lihat Profil

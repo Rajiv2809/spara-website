@@ -11,7 +11,7 @@ class Gedungs extends Model
     protected $primaryKey = 'id_gedung';
 
     protected $fillable = [
-        'nama_gedung',
+        'name_gedung',
     ];
 
     public function lantai(): HasMany

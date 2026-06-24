@@ -26,10 +26,10 @@ class AlatController extends Controller
     {
         $validated = $request->validate([
             'kode_alat'        => 'required|unique:alats,kode_alat',
-            'nama_alat'        => 'required|string|max:255',
+            'name_alat'        => 'required|string|max:255',
             'deskripsi_alat'   => 'nullable|string',
             'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
-            'nomor_induk_pic'  => 'nullable|exists:users,nomor_induk',
+            'id_number_pic'  => 'nullable|exists:users,id_number',
             'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -53,10 +53,10 @@ class AlatController extends Controller
 
         $validated = $request->validate([
             'kode_alat'        => 'required|unique:alats,kode_alat,' . $id . ',id_alat',
-            'nama_alat'        => 'required|string|max:255',
+            'name_alat'        => 'required|string|max:255',
             'deskripsi_alat'   => 'nullable|string',
             'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
-            'nomor_induk_pic'  => 'nullable|exists:users,nomor_induk',
+            'id_number_pic'  => 'nullable|exists:users,id_number',
             'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 

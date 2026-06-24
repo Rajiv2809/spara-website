@@ -12,9 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dosens', function (Blueprint $table) {
-            $table->unsignedBigInteger('nomor_induk')->primary();
-            $table->foreign('nomor_induk')->references('nomor_induk')->on('users')->onDelete('cascade');
+        Schema::create('lecturers', function (Blueprint $table) {
+            $table->unsignedBigInteger('id_number')->primary();
+            $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('id_jurusan')->nullable();
             $table->foreign('id_jurusan')->references('id_jurusan')->on('jurusans')->onDelete('set null');
             $table->timestamps();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dosens');
+        Schema::dropIfExists('lecturers');
     }
 };

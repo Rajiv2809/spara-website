@@ -12,16 +12,16 @@ class User extends Authenticatable implements JWTSubject
     use HasFactory, Notifiable;
 
     protected $fillable = [
-    'nomor_induk',
-    'nama',
+    'id_number',
+    'name',
     'email',
-    'no_telepon',
+    'phone_number',
     'password',
-    'fotoprofil',
+    'profile_picture',
     'role',
     ];
 
-    protected $primaryKey = 'nomor_induk';
+    protected $primaryKey = 'id_number';
     public $incrementing = false;
     protected $keyType = 'int';
 

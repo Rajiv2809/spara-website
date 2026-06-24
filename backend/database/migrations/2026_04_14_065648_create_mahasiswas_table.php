@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mahasiswas', function (Blueprint $table) {
-            $table->unsignedBigInteger('nomor_induk')->primary();
-            $table->foreign('nomor_induk')->references('nomor_induk')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('id_number')->primary();
+            $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
             $table->string('kelas')->nullable();
             $table->string('angkatan')->nullable();
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');

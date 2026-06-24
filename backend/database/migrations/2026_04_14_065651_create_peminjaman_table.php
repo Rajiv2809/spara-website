@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('peminjaman', function (Blueprint $table) {
             $table->id('id_peminjaman');
-            $table->string('nama_kegiatan');
+            $table->string('name_kegiatan');
             $table->enum('jenis_kegiatan', ['akademik', 'non-akademik']);
             $table->date('hari_tanggal');
             $table->time('jam_mulai')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_alat')->nullable();
             $table->unsignedBigInteger('id_ruangan')->nullable();
 
-            $table->foreign('id_peminjam')->references('nomor_induk')->on('users')->onDelete('cascade');
+            $table->foreign('id_peminjam')->references('id_number')->on('users')->onDelete('cascade');
             $table->foreign('id_alat')->references('id_alat')->on('alats')->onDelete('set null');
             $table->foreign('id_ruangan')->references('id_ruangan')->on('ruangans')->onDelete('set null');
             

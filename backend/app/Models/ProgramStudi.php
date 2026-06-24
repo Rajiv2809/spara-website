@@ -13,7 +13,7 @@ class ProgramStudi extends Model
     protected $primaryKey = 'id_prodi';
 
     protected $fillable = [
-        'nama_prodi',
+        'name_prodi',
         'id_jurusan'
     ];
 
@@ -29,7 +29,7 @@ class ProgramStudi extends Model
      public function mahasiswas(): HasMany
     {
         return $this->hasMany(
-            Mahasiswa::class,
+            mahasiswa::class,
             'id_prodi',
             'id_prodi'
         );

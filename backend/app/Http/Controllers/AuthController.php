@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Mahasiswa;
+use App\Models\mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,25 +14,25 @@ class AuthController extends Controller
     public function register(Request $request)
 {
     $request->validate([
-        'nomor_induk' => 'required|unique:users,nomor_induk',
-        'nama' => 'required',
+        'id_number' => 'required|unique:users,id_number',
+        'name' => 'required',
         'email' => 'required|email|unique:users,email',
-        'no_telepon' => 'required',
+        'phone_number' => 'required',
         'id_prodi' => 'required',
         'password' => 'required|confirmed|min:8',
     ]);
 
     User::create([
-        'nomor_induk' => $request->nomor_induk,
-        'nama' => $request->nama,
+        'id_number' => $request->id_number,
+        'name' => $request->name,
         'email' => $request->email,
-        'no_telepon' => $request->no_telepon,
+        'phone_number' => $request->phone_number,
         'password' => Hash::make($request->password),
         'role' => 'mahasiswa'
     ]);
 
-    Mahasiswa::create([
-        'nomor_induk' => $request->nomor_induk,
+    mahasiswa::create([
+        'id_number' => $request->id_number,
         'id_prodi' => $request->id_prodi,
         'status' => 'aktif'
     ]);
@@ -45,7 +45,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = [
-            'nomor_induk' => $request->nomor_induk,
+            'id_number' => $request->id_number,
             'password' => $request->password
         ];
 

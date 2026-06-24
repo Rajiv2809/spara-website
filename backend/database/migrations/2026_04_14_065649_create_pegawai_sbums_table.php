@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pegawai_sbums', function (Blueprint $table) {
-            $table->unsignedBigInteger('nomor_induk')->primary();
-            $table->foreign('nomor_induk')->references('nomor_induk')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('id_number')->primary();
+            $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
             $table->enum('role', ['admin', 'ketua'])->nullable();
             $table->timestamps();
         });

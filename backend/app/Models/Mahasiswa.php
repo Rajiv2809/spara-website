@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Mahasiswa extends Model
+class mahasiswa extends Model
 {
     protected $table = 'mahasiswas';
 
-    protected $primaryKey = 'nomor_induk';
+    protected $primaryKey = 'id_number';
 
     public $incrementing = false;
 
     protected $keyType = 'int';
 
     protected $fillable = [
-        'nomor_induk',
+        'id_number',
         'kelas',
         'angkatan',
         'status',
@@ -27,8 +27,8 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(
             User::class,
-            'nomor_induk',
-            'nomor_induk'
+            'id_number',
+            'id_number'
         );
     }
 

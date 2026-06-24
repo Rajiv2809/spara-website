@@ -10,7 +10,7 @@ class PeminjamanSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = DB::table('users')->pluck('nomor_induk')->toArray();
+        $users = DB::table('users')->pluck('id_number')->toArray();
         $alats = DB::table('alats')->pluck('id_alat')->toArray();
 
         $jenisKegiatan = [
@@ -91,7 +91,7 @@ class PeminjamanSeeder extends Seeder
                 $now = Carbon::now();
 
                 $data[] = [
-                    'nama_kegiatan'      => $jenisKegiatan[array_rand($jenisKegiatan)]
+                    'name_kegiatan'      => $jenisKegiatan[array_rand($jenisKegiatan)]
                                             . ' ' .
                                             strtoupper(substr(md5(uniqid()), 0, 4)),
                     'jenis_kegiatan'     => $jenisKegiatan[array_rand($jenisKegiatan)],

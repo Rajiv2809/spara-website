@@ -15,7 +15,7 @@ export default function Register() {
   const [step, setStep] = useState(1);
 
   const [nomorInduk, setNomorInduk] = useState("");
-  const [nama, setNama] = useState("");
+  const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [telepon, setTelepon] = useState("");
   const [jurusan, setJurusan] = useState("");
@@ -25,12 +25,12 @@ export default function Register() {
 
   const jurusanProdi = {
     "Teknik Informatika": [
-      { id: 101, nama: "S1 Teknik Informatika" },
-      { id: 102, nama: "D3 Teknik Informatika" },
-      { id: 201, nama: "S1 Sistem Informasi" },
+      { id: 101, name: "S1 Teknik Informatika" },
+      { id: 102, name: "D3 Teknik Informatika" },
+      { id: 201, name: "S1 Sistem Informasi" },
     ],
 
-    "Teknik Elektro": [{ id: 301, nama: "S1 Teknik Elektro" }],
+    "Teknik Elektro": [{ id: 301, name: "S1 Teknik Elektro" }],
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function Register() {
     if (step === 1) {
       const missing = [];
       if (!nomorInduk) missing.push("NIM");
-      if (!nama) missing.push("Nama Lengkap");
+      if (!name) missing.push("name Lengkap");
 
       if (missing.length > 0) {
         // Menggabungkan pesan jika ada lebih dari 1 data yang kosong
@@ -72,10 +72,10 @@ export default function Register() {
 
     axiosClient
       .post("/register", {
-        nomor_induk: nomorInduk,
-        nama,
+        id_number: nomorInduk,
+        name,
         email,
-        no_telepon: telepon,
+        phone_number: telepon,
         id_prodi: prodi,
         password,
         password_confirmation: confirmPassword,
@@ -162,9 +162,9 @@ export default function Register() {
                 />
                 <input
                   type="text"
-                  placeholder="Nama Lengkap"
-                  value={nama}
-                  onChange={(e) => setNama(e.target.value)}
+                  placeholder="name Lengkap"
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
                   disabled={isLoading}
                   className="w-full pl-12 pr-4 py-2 border-b-2 border-[#862440] focus:outline-none disabled:opacity-50"
                 />
@@ -252,7 +252,7 @@ export default function Register() {
 
                     {jurusanProdi[jurusan]?.map((item) => (
                       <option key={item.id} value={item.id}>
-                        {item.nama}
+                        {item.name}
                       </option>
                     ))}
                   </select>

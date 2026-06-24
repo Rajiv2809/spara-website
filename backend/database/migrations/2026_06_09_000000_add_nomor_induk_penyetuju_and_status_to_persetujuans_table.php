@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('persetujuans', function (Blueprint $table) {
-            if (!Schema::hasColumn('persetujuans', 'nomor_induk_penyetuju')) {
-                $table->unsignedBigInteger('nomor_induk_penyetuju')->nullable()->after('id_peminjaman');
-                $table->foreign('nomor_induk_penyetuju')->references('nomor_induk')->on('users')->onDelete('cascade');
+            if (!Schema::hasColumn('persetujuans', 'id_number_penyetuju')) {
+                $table->unsignedBigInteger('id_number_penyetuju')->nullable()->after('id_peminjaman');
+                $table->foreign('id_number_penyetuju')->references('id_number')->on('users')->onDelete('cascade');
             }
 
             if (!Schema::hasColumn('persetujuans', 'status_persetujuan')) {
-                $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu')->after('nomor_induk_penyetuju');
+                $table->enum('status_persetujuan', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu')->after('id_number_penyetuju');
             }
         });
     }
@@ -32,9 +32,9 @@ return new class extends Migration
             if (Schema::hasColumn('persetujuans', 'status_persetujuan')) {
                 $table->dropColumn('status_persetujuan');
             }
-            if (Schema::hasColumn('persetujuans', 'nomor_induk_penyetuju')) {
-                $table->dropForeign(['nomor_induk_penyetuju']);
-                $table->dropColumn('nomor_induk_penyetuju');
+            if (Schema::hasColumn('persetujuans', 'id_number_penyetuju')) {
+                $table->dropForeign(['id_number_penyetuju']);
+                $table->dropColumn('id_number_penyetuju');
             }
         });
     }

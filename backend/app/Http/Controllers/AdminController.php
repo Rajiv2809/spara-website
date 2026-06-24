@@ -24,12 +24,12 @@ class AdminController extends Controller
         return response()->json($admins);
     }
 
-    public function show($nomor_induk)
+    public function show($id_number)
     {
         $this->checkKetua();
 
         $admin = User::where('role', 'admin')
-            ->where('nomor_induk', $nomor_induk)
+            ->where('id_number', $id_number)
             ->firstOrFail();
 
         return response()->json($admin);
@@ -40,10 +40,10 @@ class AdminController extends Controller
         $this->checkKetua();
 
         $validated = $request->validate([
-            'nomor_induk' => 'required|unique:users,nomor_induk',
-            'nama' => 'required|string|max:255',
+            'id_number' => 'required|unique:users,id_number',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'no_telepon' => 'required|string|max:20',
+            'phone_number' => 'required|string|max:20',
             'password' => 'required|min:6',
         ]);
 
@@ -58,18 +58,18 @@ class AdminController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, $nomor_induk)
+    public function update(Request $request, $id_number)
     {
         $this->checkKetua();
 
         $admin = User::where('role', 'admin')
-            ->where('nomor_induk', $nomor_induk)
+            ->where('id_number', $id_number)
             ->firstOrFail();
 
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $nomor_induk . ',nomor_induk',
-            'no_telepon' => 'required|string|max:20',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id_number . ',id_number',
+            'phone_number' => 'required|string|max:20',
         ]);
 
         $admin->update($validated);
@@ -80,12 +80,12 @@ class AdminController extends Controller
         ]);
     }
 
-    public function destroy($nomor_induk)
+    public function destroy($id_number)
     {
         $this->checkKetua();
 
         $admin = User::where('role', 'admin')
-            ->where('nomor_induk', $nomor_induk)
+            ->where('id_number', $id_number)
             ->firstOrFail();
 
         $admin->delete();

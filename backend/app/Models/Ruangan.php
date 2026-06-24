@@ -12,14 +12,14 @@ class Ruangan extends Model
 
     protected $fillable = [
         'kode_ruangan',
-        'nama_ruangan',
+        'name_ruangan',
         'kapasitas',
         'fasilitas',
         'deskripsi_ruangan',
         'status_ruangan',
         'nomor_lantai',
         'id_gedung',
-        'nomor_induk_pic',
+        'id_number_pic',
         'path_foto',
     ];
 
@@ -35,7 +35,7 @@ class Ruangan extends Model
 
     public function pic(): BelongsTo
     {
-        return $this->belongsTo(Pic::class, 'nomor_induk_pic', 'nomor_induk');
+        return $this->belongsTo(Pic::class, 'id_number_pic', 'id_number');
     }
 
     public function penanggungJawab()

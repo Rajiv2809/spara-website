@@ -10,6 +10,6 @@ class Pic extends Model
     
        public function user()
     {
-        return $this->belongsTo(User::class, 'nomor_induk', 'nomor_induk');
+        return $this->belongsTo(User::class, 'id_number', 'id_number');
     }
 }

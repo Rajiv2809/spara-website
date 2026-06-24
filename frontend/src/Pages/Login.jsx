@@ -22,7 +22,7 @@ export default function Login() {
 
     axiosClient
       .post("/login", {
-        nomor_induk: nomorInduk,
+        id_number: nomorInduk,
         password: password,
       })
       .then(({ data }) => {

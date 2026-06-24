@@ -98,7 +98,7 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
       <div className="relative h-[180px] overflow-hidden">
         <img
           src={room.path_foto || gedung_utama}
-          alt={room.nama_ruangan}
+          alt={room.name_ruangan}
           className="w-full h-full object-cover"
           onError={(e) => { e.target.src = gedung_utama; }}
         />
@@ -106,10 +106,10 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
           {statusCfg.label}
         </span>
         <div className="absolute bottom-0 left-0 right-0 px-3 py-3 bg-gradient-to-t from-black/70 to-transparent text-white">
-          <h2 className="font-bold text-[15px] leading-tight truncate">{room.nama_ruangan}</h2>
+          <h2 className="font-bold text-[15px] leading-tight truncate">{room.name_ruangan}</h2>
           <div className="flex items-center gap-1 text-[11px] opacity-90 mt-0.5">
             <Icon icon="mdi:map-marker" width={12} />
-            <span className="truncate">{room.nama_gedung} - Lantai {room.nomor_lantai}</span>
+            <span className="truncate">{room.name_gedung} - Lantai {room.nomor_lantai}</span>
           </div>
         </div>
       </div>
@@ -158,28 +158,28 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
 // MODAL FORM
 const EMPTY_FORM = {
   kode_ruangan:      "",
-  nama_ruangan:      "",
+  name_ruangan:      "",
   id_gedung:         "",
   nomor_lantai:      "",
   kapasitas:         "",
   fasilitas:         "",
   deskripsi_ruangan: "",
   status_ruangan:    "tersedia",
-  nomor_induk_pic:   "",
+  id_number_pic:   "",
 };
 
 const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
   const [form, setForm] = useState(
     editData ? {
       kode_ruangan:      editData.kode_ruangan      ?? "",
-      nama_ruangan:      editData.nama_ruangan      ?? "",
+      name_ruangan:      editData.name_ruangan      ?? "",
       id_gedung:         String(editData.id_gedung  ?? ""),
       nomor_lantai:      String(editData.nomor_lantai ?? ""),
       kapasitas:         editData.kapasitas          ?? "",
       fasilitas:         editData.fasilitas          ?? "",
       deskripsi_ruangan: editData.deskripsi_ruangan ?? "",
       status_ruangan:    editData.status_ruangan    ?? "tersedia",
-      nomor_induk_pic:   editData.nomor_induk_pic != null ? String(editData.nomor_induk_pic) : "",
+      id_number_pic:   editData.id_number_pic != null ? String(editData.id_number_pic) : "",
     } : { ...EMPTY_FORM }
   );
 
@@ -251,12 +251,12 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
   const validate = () => {
     const e = {};
     if (!form.kode_ruangan.trim())  e.kode_ruangan   = "Kode ruangan wajib diisi.";
-    if (!form.nama_ruangan.trim())  e.nama_ruangan   = "Nama ruangan wajib diisi.";
+    if (!form.name_ruangan.trim())  e.name_ruangan   = "name ruangan wajib diisi.";
     if (!form.id_gedung)            e.id_gedung      = "Gedung wajib dipilih.";
     if (!form.nomor_lantai)         e.nomor_lantai   = "Lantai wajib dipilih.";
     if (!form.kapasitas)            e.kapasitas      = "Kapasitas wajib diisi.";
     if (!form.fasilitas.trim())     e.fasilitas      = "Fasilitas wajib diisi.";
-    if (!form.nomor_induk_pic)      e.nomor_induk_pic = "PIC wajib dipilih.";
+    if (!form.id_number_pic)      e.id_number_pic = "PIC wajib dipilih.";
     if (!form.status_ruangan)       e.status_ruangan = "Status wajib dipilih.";
     return e;
   };
@@ -271,7 +271,7 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
   const selectBase = `${inputBase} pr-8 appearance-none cursor-pointer`;
   const errorText  = "text-red-500 text-[10px] mt-0.5";
 
-  const selectedPic = picList.find((p) => String(p.nomor_induk) === String(form.nomor_induk_pic));
+  const selectedPic = picList.find((p) => String(p.id_number) === String(form.id_number_pic));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -304,17 +304,17 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
             {errors.kode_ruangan && <p className={errorText}>{errors.kode_ruangan}</p>}
           </div>
 
-          {/* Nama Ruangan */}
+          {/* name Ruangan */}
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Nama Ruangan <span className="text-red-500">*</span>
+              name Ruangan <span className="text-red-500">*</span>
             </label>
             <input
-              name="nama_ruangan" value={form.nama_ruangan} onChange={handleChange}
+              name="name_ruangan" value={form.name_ruangan} onChange={handleChange}
               placeholder="Contoh: Ruang Rapat Utama"
-              className={`${inputBase} ${errors.nama_ruangan ? "border-red-400" : ""}`}
+              className={`${inputBase} ${errors.name_ruangan ? "border-red-400" : ""}`}
             />
-            {errors.nama_ruangan && <p className={errorText}>{errors.nama_ruangan}</p>}
+            {errors.name_ruangan && <p className={errorText}>{errors.name_ruangan}</p>}
           </div>
 
           {/* Gedung & Lantai — 2 kolom */}
@@ -330,7 +330,7 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
                 >
                   <option value="">— Pilih Gedung —</option>
                   {gedungList.map((g) => (
-                    <option key={g.id_gedung} value={g.id_gedung}>{g.nama_gedung}</option>
+                    <option key={g.id_gedung} value={g.id_gedung}>{g.name_gedung}</option>
                   ))}
                 </select>
               </DropdownField>
@@ -349,7 +349,7 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
                   <option value="">— Pilih Lantai —</option>
                   {lantaiList.map((l) => (
                     <option key={l.nomor_lantai} value={l.nomor_lantai}>
-                      {l.nama_lantai ? `${l.nama_lantai} (${l.nomor_lantai})` : `Lantai ${l.nomor_lantai}`}
+                      {l.name_lantai ? `${l.name_lantai} (${l.nomor_lantai})` : `Lantai ${l.nomor_lantai}`}
                     </option>
                   ))}
                 </select>
@@ -378,20 +378,20 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
             </label>
             <DropdownField loading={picLoading} error={picError} onRetry={fetchPic}>
               <select
-                name="nomor_induk_pic" value={form.nomor_induk_pic} onChange={handleChange}
-                className={`${selectBase} ${errors.nomor_induk_pic ? "border-red-400" : ""}`}
+                name="id_number_pic" value={form.id_number_pic} onChange={handleChange}
+                className={`${selectBase} ${errors.id_number_pic ? "border-red-400" : ""}`}
               >
                 <option value="">— Pilih PIC —</option>
                 {picList.map((pic) => (
-                  <option key={pic.nomor_induk} value={pic.nomor_induk}>{pic.nama}</option>
+                  <option key={pic.id_number} value={pic.id_number}>{pic.name}</option>
                 ))}
               </select>
             </DropdownField>
-            {errors.nomor_induk_pic && <p className={errorText}>{errors.nomor_induk_pic}</p>}
+            {errors.id_number_pic && <p className={errorText}>{errors.id_number_pic}</p>}
             {selectedPic && (
               <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-emerald-600">
                 <Icon icon="mdi:account-check-outline" width={13} />
-                <span>Terpilih: <b>{selectedPic.nama}</b></span>
+                <span>Terpilih: <b>{selectedPic.name}</b></span>
               </div>
             )}
           </div>
@@ -525,7 +525,7 @@ const KelolaRuangan = () => {
         const mapped = data.data.map((item) => ({
           id:                item.id,
           kode_ruangan:      item.kode_ruangan,
-          nama_ruangan:      item.nama_ruangan,
+          name_ruangan:      item.name_ruangan,
           kapasitas:         item.kapasitas,
           fasilitas:         item.fasilitas,
           deskripsi_ruangan: item.deskripsi_ruangan,
@@ -533,9 +533,9 @@ const KelolaRuangan = () => {
           path_foto:         item.path_foto ?? null,
           nomor_lantai:      item.nomor_lantai,
           id_gedung:         item.id_gedung,
-          nama_gedung:       item.nama_gedung ?? "-",
+          name_gedung:       item.name_gedung ?? "-",
           pic:               item.pic ?? "-",
-          nomor_induk_pic:   item.nomor_induk_pic != null ? String(item.nomor_induk_pic) : "",
+          id_number_pic:   item.id_number_pic != null ? String(item.id_number_pic) : "",
         }));
         setRooms(mapped);
       })
@@ -552,14 +552,14 @@ const KelolaRuangan = () => {
   const handleSave = (formData, fotoFile) => {
     const payload = new FormData();
     payload.append("kode_ruangan",      formData.kode_ruangan.trim());
-    payload.append("nama_ruangan",      formData.nama_ruangan.trim());
+    payload.append("name_ruangan",      formData.name_ruangan.trim());
     payload.append("kapasitas",         Number(formData.kapasitas));
     payload.append("fasilitas",         formData.fasilitas.trim());
     payload.append("deskripsi_ruangan", formData.deskripsi_ruangan?.trim() ?? "");
     payload.append("status_ruangan",    formData.status_ruangan);
     payload.append("nomor_lantai",      Number(formData.nomor_lantai));
     payload.append("id_gedung",         Number(formData.id_gedung));
-    payload.append("nomor_induk_pic",   Number(formData.nomor_induk_pic));
+    payload.append("id_number_pic",   Number(formData.id_number_pic));
     if (fotoFile) {
       payload.append("foto", fotoFile);
     }
@@ -600,7 +600,7 @@ const KelolaRuangan = () => {
   // ── Delete ───────────────────────────────────
   const handleDeleteConfirmed = () => {
     if (!confirmDelete) return;
-    const { id, nama_ruangan } = confirmDelete;
+    const { id, name_ruangan } = confirmDelete;
     setConfirmDelete(null);
 
     axiosClient.delete(`/ruangan/${id}`)
@@ -611,7 +611,7 @@ const KelolaRuangan = () => {
           setCurrentPage((p) => Math.min(p, maxPage));
           return updated;
         });
-        showToast(`Ruangan "${nama_ruangan}" berhasil dihapus.`, "success");
+        showToast(`Ruangan "${name_ruangan}" berhasil dihapus.`, "success");
       })
       .catch((err) => {
         console.error("Gagal menghapus ruangan:", err);
@@ -625,10 +625,10 @@ const KelolaRuangan = () => {
 
   // ── Search & Pagination ──────────────────────
   const filtered = rooms.filter((r) =>
-    r.nama_ruangan.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.name_ruangan.toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.kode_ruangan.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (r.pic ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (r.nama_gedung ?? "").toLowerCase().includes(searchQuery.toLowerCase())
+    (r.name_gedung ?? "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => { setCurrentPage(1); }, [searchQuery]);
@@ -697,7 +697,7 @@ const KelolaRuangan = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari nama, kode, gedung, atau PIC..."
+            placeholder="Cari name, kode, gedung, atau PIC..."
             className="flex-1 text-[13px] outline-none text-gray-700 placeholder-gray-400 bg-transparent"
           />
           {searchQuery && (
@@ -790,7 +790,7 @@ const KelolaRuangan = () => {
 
       {confirmDelete && (
         <ConfirmDialog
-          message={`Apakah kamu yakin ingin menghapus ruangan "${confirmDelete.nama_ruangan}"? Tindakan ini tidak dapat dibatalkan.`}
+          message={`Apakah kamu yakin ingin menghapus ruangan "${confirmDelete.name_ruangan}"? Tindakan ini tidak dapat dibatalkan.`}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmDelete(null)}
         />

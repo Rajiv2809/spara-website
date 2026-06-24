@@ -167,7 +167,7 @@ const Dashboard = () => {
                                 PIC: {item.pic ?? "-"}
                               </p>
                               <p className="text-[12px] text-[#606060] mt-1">
-                                {item.nama_kegiatan}
+                                {item.name_kegiatan}
                               </p>
                               <p className="text-[12px] text-[#606060]">
                                 {formatTanggal(item.hari_tanggal)} · {item.jam_mulai?.slice(0, 5)} - {item.jam_selesai?.slice(0, 5)}

@@ -13,16 +13,16 @@ class Alat extends Model
 
     protected $fillable = [
         'kode_alat',
-        'nama_alat',
+        'name_alat',
         'deskripsi_alat',
         'status_alat',
-        'nomor_induk_pic',
+        'id_number_pic',
         'path_foto',
     ];
 
     public function pic(): BelongsTo
     {
-        return $this->belongsTo(Pic::class, 'nomor_induk_pic', 'nomor_induk');
+        return $this->belongsTo(Pic::class, 'id_number_pic', 'id_number');
     }
 
     public function peminjaman(): HasMany

@@ -32,7 +32,7 @@ class KepalaController extends Controller
         $data = $peminjamans->map(function ($p) {
             return [
                 'id_peminjaman'        => $p->id_peminjaman,
-                'nama_kegiatan'        => $p->nama_kegiatan,
+                'name_kegiatan'        => $p->name_kegiatan,
                 'jenis_kegiatan'       => $p->jenis_kegiatan,
                 'hari_tanggal'         => $p->hari_tanggal?->toDateString(),
                 'jam_mulai'            => $p->jam_mulai,
@@ -42,14 +42,14 @@ class KepalaController extends Controller
                 'alasan_kepala'         => $p->alasan_kepala,
                 'dibuat_pada'          => $p->dibuat_pada?->toDateTimeString(),
                 'jenis'                => $p->id_ruangan ? 'ruangan' : 'alat',
-                'nama_peminjam'        => $p->peminjam?->nama,
-                'nomor_induk_peminjam' => $p->id_peminjam,
+                'name_peminjam'        => $p->peminjam?->name,
+                'id_number_peminjam' => $p->id_peminjam,
                 'unit_peminjam'        => $p->peminjam?->unit ?? $p->peminjam?->jabatan ?? null,
                 'id_ruangan'           => $p->id_ruangan,
-                'nama_ruangan'         => $p->ruangan?->nama_ruangan,
+                'name_ruangan'         => $p->ruangan?->name_ruangan,
                 'kode_ruangan'         => $p->ruangan?->kode_ruangan,
                 'id_alat'              => $p->id_alat,
-                'nama_alat'            => $p->alat?->nama_alat,
+                'name_alat'            => $p->alat?->name_alat,
                 'kode_alat'            => $p->alat?->kode_alat,
             ];
         });
@@ -106,11 +106,11 @@ class KepalaController extends Controller
                 'updated_at'         => Carbon::now(),
             ]);
 
-        $itemName = $peminjaman->ruangan?->nama_ruangan
-            ?? $peminjaman->alat?->nama_alat
+        $itemName = $peminjaman->ruangan?->name_ruangan
+            ?? $peminjaman->alat?->name_alat
             ?? 'Item';
         Notification::create([
-            'nomor_induk'   => $peminjaman->id_peminjam,
+            'id_number'   => $peminjaman->id_peminjam,
             'type'          => 'dibatalkan',
             'judul'         => 'Peminjaman Dibatalkan Kepala SBUM',
             'pesan'         => "Peminjaman {$itemName} dibatalkan oleh Kepala SBUM. Alasan: {$request->alasan_kepala}.",
@@ -238,17 +238,17 @@ class KepalaController extends Controller
                 ->orderBy('id')
                 ->first();
 
-            $nomorIndukPj = $pjLama?->nomor_induk_penyetuju ?? $peminjaman->id_peminjam;
+            $nomorIndukPj = $pjLama?->id_number_penyetuju ?? $peminjaman->id_peminjam;
 
             // Nomor induk PIC dari ruangan/alat yang dipakai (baru atau lama)
             $nomorIndukPic = null;
             if ($peminjaman->id_ruangan || $request->filled('id_ruangan_baru')) {
                 $idRuangan = $request->id_ruangan_baru ?? $peminjaman->id_ruangan;
                 $ruangan = DB::table('ruangans')->where('id_ruangan', $idRuangan)->first();
-                $nomorIndukPic = $ruangan?->nomor_induk_pic;
+                $nomorIndukPic = $ruangan?->id_number_pic;
             } elseif ($peminjaman->id_alat) {
                 $alat = DB::table('alats')->where('id_alat', $peminjaman->id_alat)->first();
-                $nomorIndukPic = $alat?->nomor_induk_pic;
+                $nomorIndukPic = $alat?->id_number_pic;
             }
 
             // ── 4. Hapus persetujuan lama, buat ulang 3 tahap ──────────────────
@@ -259,7 +259,7 @@ class KepalaController extends Controller
                 // Tahap 1: Penanggungjawab
                 [
                     'id_peminjaman'         => $id,
-                    'nomor_induk_penyetuju' => $nomorIndukPj,
+                    'id_number_penyetuju' => $nomorIndukPj,
                     'status_persetujuan'    => 'menunggu',
                     'created_at'            => $now,
                     'updated_at'            => $now,
@@ -267,7 +267,7 @@ class KepalaController extends Controller
                 // Tahap 2: PIC
                 [
                     'id_peminjaman'         => $id,
-                    'nomor_induk_penyetuju' => $nomorIndukPic,
+                    'id_number_penyetuju' => $nomorIndukPic,
                     'status_persetujuan'    => 'menunggu',
                     'created_at'            => $now,
                     'updated_at'            => $now,
@@ -275,7 +275,7 @@ class KepalaController extends Controller
                 // Tahap 3: Admin SBUM
                 [
                     'id_peminjaman'         => $id,
-                    'nomor_induk_penyetuju' => null,
+                    'id_number_penyetuju' => null,
                     'status_persetujuan'    => 'menunggu',
                     'created_at'            => $now,
                     'updated_at'            => $now,
@@ -285,13 +285,13 @@ class KepalaController extends Controller
             Persetujuan::insert($persetujuans);
 
             // ── 5. Notifikasi ───────────────────────────────────────────────────
-            $itemName = $peminjaman->ruangan?->nama_ruangan
-                ?? $peminjaman->alat?->nama_alat
+            $itemName = $peminjaman->ruangan?->name_ruangan
+                ?? $peminjaman->alat?->name_alat
                 ?? 'Item';
 
             // Ke peminjam
             Notification::create([
-                'nomor_induk'   => $peminjaman->id_peminjam,
+                'id_number'   => $peminjaman->id_peminjam,
                 'type'          => 'menunggu',
                 'judul'         => 'Jadwal Diubah — Perlu Persetujuan Ulang',
                 'pesan'         => "Jadwal peminjaman {$itemName} diubah oleh Kepala SBUM. Persetujuan direset ke tahap awal.",
@@ -301,7 +301,7 @@ class KepalaController extends Controller
             // Ke penanggung jawab
             if ($nomorIndukPj) {
                 Notification::create([
-                    'nomor_induk'   => $nomorIndukPj,
+                    'id_number'   => $nomorIndukPj,
                     'type'          => 'menunggu',
                     'judul'         => 'Persetujuan Ulang Diperlukan',
                     'pesan'         => "Peminjaman {$itemName} dijadwalkan ulang oleh Kepala SBUM dan memerlukan persetujuan Anda kembali.",

@@ -48,10 +48,10 @@ const ModalProfile = ({ onClose }) => {
         {/* Informasi Utama */}
         <div className="text-center w-full px-2 mb-6">
           <h2 className="text-lg font-bold text-gray-800 truncate">
-            {currentUser.nama || "Nama Pengguna"}
+            {currentUser.name || "name Pengguna"}
           </h2>
           <p className="text-xs text-gray-400 font-mono mt-0.5 tracking-wider">
-            {currentUser.nomor_induk || "-"}
+            {currentUser.id_number || "-"}
           </p>
         </div>
 
@@ -78,7 +78,7 @@ const ModalProfile = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Baris Kondisional 3: Program Studi ( jika Mahasiswa) */}
+          {/* Baris Kondisional 3: Program Studi ( jika mahasiswa) */}
           {role === "mahasiswa" && currentUser.prodi && (
             <div className="flex items-center gap-3 text-gray-700">
               <Icon icon="academicons:education" width="20" className="text-[#862440] shrink-0" />

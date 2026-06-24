@@ -11,7 +11,7 @@ class Jurusan extends Model
     protected $primaryKey = 'id_jurusan';
 
     protected $fillable = [
-        'nama_jurusan',
+        'name_jurusan',
     ];
 
     public function programStudi(): HasMany

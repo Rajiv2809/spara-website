@@ -21,7 +21,7 @@ class JadwaRuanganResource extends JsonResource
         return [
             'jam_mulai' => $this->jam_mulai,
             'jam_selesai' => $this->jam_selesai,
-            'nama_kegiatan' => $this->nama_kegiatan,
+            'name_kegiatan' => $this->name_kegiatan,
             'jenis_kegiatan' => $this->jenis_kegiatan,
             'status_konfirmasi' => $allDisetujui ? 'disetujui' : ($hasDitolak ? 'ditolak' : 'pending'),
         ];
