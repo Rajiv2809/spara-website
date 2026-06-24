@@ -437,7 +437,7 @@ class PeminjamanController extends Controller
             ->where('id_peminjam', request()->user()->id_number)
             ->first();
 
-        if (!$peminjaman) {
+        if        (!$peminjaman) {
             return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
         }
 

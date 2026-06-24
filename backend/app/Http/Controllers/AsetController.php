@@ -12,7 +12,7 @@ class AsetController extends Controller
      */
     public function index()
     {
-        //
+    //
     }
 
     /**
