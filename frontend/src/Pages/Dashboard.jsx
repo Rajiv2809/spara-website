@@ -52,10 +52,10 @@ const Dashboard = () => {
       <Sidebar />
       <div className="min-w-[300px] min-h-screen text-white flex flex-col px-3">
         <div className="dasboard md:p-[50px] p-4 lg:ml-[300px]">
-          <h1 className="text-[#481020] text-[36px] font-extrabold font-poppins">
+          <h1 className="text-[#481020] text-[36px] font-extrabold">
             Halaman Dasbor
           </h1>
-          <h1 className="text-[#666666] text-[20px] font-regular font-poppins">
+          <h1 className="text-[#666666] text-[20px] font-normal">
             Lihat ringkasan data secara keseluruhan dalam aplikasi
           </h1>
 
@@ -69,13 +69,13 @@ const Dashboard = () => {
                 width="160"
               />
               <div className="relative z-10">
-                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
+                <h3 className="text-[#EEEEEE] text-[18px] font-bold">
                   TOTAL PERALATAN
                 </h3>
-                <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
+                <h1 className="text-[#EEEEEE] text-[64px] font-extrabold leading-none mt-2">
                   {loading ? "..." : stats.total_alat}
                 </h1>
-                <h1 className="text-[#EEEEEE] text-[14px] italic font-thin font-poppins text-end leading-none">
+                <h1 className="text-[#EEEEEE] text-[14px] italic font-thin text-end leading-none">
                   {stats.alat_dipinjam} Dalam peminjaman
                 </h1>
               </div>
@@ -89,13 +89,13 @@ const Dashboard = () => {
                 width="160"
               />
               <div className="relative z-10">
-                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
+                <h3 className="text-[#EEEEEE] text-[18px] font-bold">
                   TOTAL RUANGAN
                 </h3>
-                <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
+                <h1 className="text-[#EEEEEE] text-[64px] font-extrabold leading-none mt-2">
                   {loading ? "..." : stats.total_ruangan}
                 </h1>
-                <h1 className="text-[#EEEEEE] text-[14px] italic font-thin font-poppins text-end leading-none">
+                <h1 className="text-[#EEEEEE] text-[14px] italic font-thin text-end leading-none">
                   {stats.ruangan_dipinjam} Dalam peminjaman
                 </h1>
               </div>
@@ -109,13 +109,13 @@ const Dashboard = () => {
                 width="130"
               />
               <div className="relative z-10">
-                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
+                <h3 className="text-[#EEEEEE] text-[18px] font-bold">
                   PERLU DISETUJUI
                 </h3>
-                <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
+                <h1 className="text-[#EEEEEE] text-[64px] font-extrabold leading-none mt-2">
                   {loading ? "..." : stats.perlu_disetujui}
                 </h1>
-                <h1 className="text-[#EEEEEE] text-[14px] italic font-thin font-poppins text-end leading-none">
+                <h1 className="text-[#EEEEEE] text-[14px] italic font-thin text-end leading-none">
                   Menunggu Disetujui
                 </h1>
               </div>
@@ -133,7 +133,7 @@ const Dashboard = () => {
                 <button onClick={() => navigate("/riwayat")} className="absolute top-2 right-2 border-2 border-[#F2A31A] text-[#F2A31A] px-4 py-1 rounded-xl font-semibold hover:bg-[#F2A31A] hover:text-white transition duration-300">
                   Lihat Semua
                 </button>
-                <h2 className="text-[#BC8D9B] text-[14px] font-regular">
+                <h2 className="text-[#BC8D9B] text-[14px] font-normal">
                   Beberapa peminjaman yang baru-baru ini diajukan
                 </h2>
 

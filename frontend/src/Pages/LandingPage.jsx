@@ -3,8 +3,6 @@ import bekgron from "../assets/bg.jpg";
 import logo from "../assets/logo.png";
 import githap from "../assets/githap.png";
 import ige from "../assets/ige.png";
-import login from "../Pages/Login.jsx";
-import tentangkami from "../Pages/TentangKami.jsx";
 
 const sosmetLink = [
   {
@@ -29,9 +27,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-6 text-white text-sm">
             <a href="#" className="hover:text-pink-300 transition-colors">Beranda</a>
-            <Link to="/tentangkami">
-            <a href="#" className="hover:text-pink-300 transition-colors">Tentang kami</a>
-            </Link>
+            <Link to="/tentangkami" className="hover:text-pink-300 transition-colors">Tentang kami</Link>
             <Link to="/login">
               <button className="bg-pink-500 hover:bg-pink-600 px-5 py-1.5 rounded-full font-semibold">
                 Masuk

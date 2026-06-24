@@ -17,9 +17,9 @@ const DefaultLayout = () => {
         .then(({data}) => {
             setCurrentUser(data.user);
         })
-        .catch(({res}) => {
-            console.log(res);
-            setToken(null)
+        .catch((error) => {
+            console.log(error.response);
+            setToken(null);
         })
 
     },[])
