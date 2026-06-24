@@ -218,7 +218,7 @@ const Riwayat = () => {
               )}
             </div>
 
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               {statusTabs.map((st) => (
                 <button
                   key={st.key}
