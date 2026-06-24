@@ -18,7 +18,7 @@ class AuthController extends Controller
         'name' => 'required',
         'email' => 'required|email|unique:users,email',
         'phone_number' => 'required',
-        'id_prodi' => 'required',
+        'study_program_id' => 'required',
         'password' => 'required|confirmed|min:8',
     ]);
 
@@ -33,7 +33,7 @@ class AuthController extends Controller
 
     mahasiswa::create([
         'id_number' => $request->id_number,
-        'id_prodi' => $request->id_prodi,
+        'study_program_id' => $request->study_program_id,
         'status' => 'aktif'
     ]);
 

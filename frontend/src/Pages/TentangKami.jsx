@@ -41,7 +41,7 @@ const member_suki = [
 
 const pak_mr_manpro = {
   name: "Gilang Bagus Ramadhan, A.Md.Kom.",
-  title: "lecturer dan Laboran Jurusan Teknik Informatika",
+  title: "lecturer dan Laboran department Teknik Informatika",
   foto: pak_gilang
 };
 

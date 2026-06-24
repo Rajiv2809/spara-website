@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Jurusan extends Model
+class department extends Model
 {
-    protected $table = 'jurusan';
-    protected $primaryKey = 'id_jurusan';
+    protected $table = 'department';
+    protected $primaryKey = 'department_id';
 
     protected $fillable = [
-        'name_jurusan',
+        'department_name',
     ];
 
-    public function programStudi(): HasMany
+    public function StudyProgram(): HasMany
     {
-        return $this->hasMany(ProgramStudi::class, 'id_jurusan', 'id_jurusan');
+        return $this->hasMany(StudyProgram::class, 'department_id', 'department_id');
     }
 }

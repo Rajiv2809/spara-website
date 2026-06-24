@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Jurusan;
+use App\Models\department;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('lecturers', function (Blueprint $table) {
             $table->unsignedBigInteger('id_number')->primary();
             $table->foreign('id_number')->references('id_number')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('id_jurusan')->nullable();
-            $table->foreign('id_jurusan')->references('id_jurusan')->on('jurusans')->onDelete('set null');
+            $table->unsignedBigInteger('department_id')->nullable();
+            $table->foreign('department_id')->references('department_id')->on('departments')->onDelete('set null');
             $table->timestamps();
         });
     }

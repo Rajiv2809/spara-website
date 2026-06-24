@@ -6,23 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProgramStudi extends Model
+class StudyProgram extends Model
 {
-    protected $table = 'program_studis';
+    protected $table = 'study_programs';
 
-    protected $primaryKey = 'id_prodi';
+    protected $primaryKey = 'study_program_id';
 
     protected $fillable = [
-        'name_prodi',
-        'id_jurusan'
+        'study_program_name',
+        'department_id'
     ];
 
-    public function jurusan(): BelongsTo
+    public function department(): BelongsTo
     {
         return $this->belongsTo(
-            Jurusan::class,
-            'id_jurusan',
-            'id_jurusan'
+            department::class,
+            'department_id',
+            'department_id'
         );
     }
 
@@ -30,8 +30,8 @@ class ProgramStudi extends Model
     {
         return $this->hasMany(
             mahasiswa::class,
-            'id_prodi',
-            'id_prodi'
+            'study_program_id',
+            'study_program_id'
         );
     }
 }

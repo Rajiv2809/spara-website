@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Jurusan;
+use App\Models\department;
 use Illuminate\Http\Request;
 
-class JurusanController extends Controller
+class departmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class JurusanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Jurusan $jurusan)
+    public function show(department $department)
     {
         //
     }
@@ -42,7 +42,7 @@ class JurusanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Jurusan $jurusan)
+    public function edit(department $department)
     {
         //
     }
@@ -50,7 +50,7 @@ class JurusanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Jurusan $jurusan)
+    public function update(Request $request, department $department)
     {
         //
     }
@@ -58,7 +58,7 @@ class JurusanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Jurusan $jurusan)
+    public function destroy(department $department)
     {
         //
     }

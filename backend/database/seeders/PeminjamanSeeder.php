@@ -22,7 +22,7 @@ class PeminjamanSeeder extends Seeder
             'Kebutuhan ruangan untuk kegiatan akademik',
             'Peminjaman alat untuk keperluan praktikum',
             'Kegiatan organisasi mahasiswa',
-            'Seminar nasional jurusan',
+            'Seminar nasional department',
             'Workshop pengembangan soft skill',
             'Presentasi tugas akhir mahasiswa',
             null,

@@ -15,7 +15,7 @@ class mahasiswaSeeder extends Seeder
                 'kelas'       => 'TI-3A',
                 'angkatan'    => '2021',
                 'status'      => 'aktif',
-                'id_prodi'    => 101,
+                'study_program_id'    => 101,
                 'created_at'  => now(), 'updated_at' => now(),
             ],
             [
@@ -23,7 +23,7 @@ class mahasiswaSeeder extends Seeder
                 'kelas'       => 'TI-3A',
                 'angkatan'    => '2021',
                 'status'      => 'aktif',
-                'id_prodi'    => 101,
+                'study_program_id'    => 101,
                 'created_at'  => now(), 'updated_at' => now(),
             ],
             [
@@ -31,7 +31,7 @@ class mahasiswaSeeder extends Seeder
                 'kelas'       => 'SI-2B',
                 'angkatan'    => '2022',
                 'status'      => 'aktif',
-                'id_prodi'    => 201,
+                'study_program_id'    => 201,
                 'created_at'  => now(), 'updated_at' => now(),
             ],
         ]);

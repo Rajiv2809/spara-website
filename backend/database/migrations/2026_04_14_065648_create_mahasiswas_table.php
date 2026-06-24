@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('kelas')->nullable();
             $table->string('angkatan')->nullable();
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-            $table->unsignedBigInteger('id_prodi')->nullable();
-            $table->foreign('id_prodi')->references('id_prodi')->on('program_studis')->onDelete('set null');
+            $table->unsignedBigInteger('study_program_id')->nullable();
+            $table->foreign('study_program_id')->references('study_program_id')->on('study_programs')->onDelete('set null');
             $table->timestamps();
         });
     }

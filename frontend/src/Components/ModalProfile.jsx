@@ -79,23 +79,23 @@ const ModalProfile = ({ onClose }) => {
           </div>
 
           {/* Baris Kondisional 3: Program Studi ( jika mahasiswa) */}
-          {role === "mahasiswa" && currentUser.prodi && (
+          {role === "mahasiswa" && currentUser.study_program && (
             <div className="flex items-center gap-3 text-gray-700">
               <Icon icon="academicons:education" width="20" className="text-[#862440] shrink-0" />
               <div className="flex flex-col min-w-0">
                 <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Program Studi</span>
-                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.prodi}</span>
+                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.study_program}</span>
               </div>
             </div>
           )}
 
-          {/* Baris Kondisional 4: Jurusan */}
-          {currentUser.jurusan && (
+          {/* Baris Kondisional 4: department */}
+          {currentUser.department && (
             <div className="flex items-center gap-3 text-gray-700">
               <Icon icon="teal:building-columns" width="20" className="text-[#862440] shrink-0" />
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Jurusan</span>
-                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.jurusan}</span>
+                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">department</span>
+                <span className="text-[13px] font-semibold text-gray-700 truncate">{currentUser.department}</span>
               </div>
             </div>
           )}

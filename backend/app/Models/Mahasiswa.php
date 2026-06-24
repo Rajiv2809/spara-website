@@ -20,7 +20,7 @@ class mahasiswa extends Model
         'kelas',
         'angkatan',
         'status',
-        'id_prodi'
+        'study_program_id'
     ];
 
     public function user(): BelongsTo
@@ -32,12 +32,12 @@ class mahasiswa extends Model
         );
     }
 
-    public function programStudi(): BelongsTo
+    public function StudyProgram(): BelongsTo
     {
         return $this->belongsTo(
-            ProgramStudi::class,
-            'id_prodi',
-            'id_prodi'
+            StudyProgram::class,
+            'study_program_id',
+            'study_program_id'
         );
     }
 }
