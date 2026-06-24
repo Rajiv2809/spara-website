@@ -13,8 +13,8 @@ class AuthController extends Controller
 {
     private function formatProfilePhoto($user)
     {
-        if ($user && $user->fotoprofil && !str_starts_with($user->fotoprofil, 'http')) {
-            $user->fotoprofil = asset('storage/' . $user->fotoprofil);
+        if ($user && $user->profile_picture && !str_starts_with($user->profile_picture, 'http')) {
+            $user->profile_picture = asset('storage/' . $user->profile_picture);
         }
         return $user;
     }
@@ -105,13 +105,13 @@ class AuthController extends Controller
     public function updateProfilePhoto(Request $request)
     {
         $request->validate([
-            'fotoprofil' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'profile_picture' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $user = auth()->user();
 
         // Ambil path asli dari DB
-        $oldPath = $user->getRawOriginal('fotoprofil') ?: $user->fotoprofil;
+        $oldPath = $user->getRawOriginal('profile_picture') ?: $user->profile_picture;
 
         if ($oldPath && !str_starts_with($oldPath, 'http')) {
             if (Storage::disk('public')->exists($oldPath)) {
@@ -119,16 +119,16 @@ class AuthController extends Controller
             }
         }
 
-        // simpan foto baru ke folder storage/fotoprofil
-        $path = $request->file('fotoprofil')->store('fotoprofil', 'public');
+        // simpan foto baru ke folder storage/profile_picture
+        $path = $request->file('profile_picture')->store('profile_picture', 'public');
 
         // update path ke database
-        $user->fotoprofil = $path;
+        $user->profile_picture = $path;
         $user->save();
 
         return response()->json([
             'message' => 'Foto profil berhasil diperbarui',
-            'user' => $this->formatProfilePhoto($user), 
+            'user' => $this->formatProfilePhoto($user),
         ]);
     }
 }

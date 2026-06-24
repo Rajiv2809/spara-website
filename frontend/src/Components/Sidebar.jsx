@@ -227,11 +227,21 @@ const Sidebar = () => {
         }}
         className="mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors group"
       >
-        <img
-          src={currentUser?.fotoprofil || pakari}
-          alt="Profile"
-          className="w-9 h-9 rounded-full object-cover shrink-0"
-        />
+        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+  {currentUser?.profile_picture ? (
+    <img
+      src={currentUser.profile_picture}
+      alt="Profil"
+          className="w-full h-full rounded-full object-cover"
+              />
+        ) : (
+    <Icon
+      icon="fa6-solid:user"
+      className="text-gray-400"
+      width="20"
+    />
+  )}
+</div>
         <div className="text-left flex-1 min-w-0">
           <h1 className="text-[15px] truncate font-medium group-hover:underline">
             {currentUser?.name || "name Pengguna"}

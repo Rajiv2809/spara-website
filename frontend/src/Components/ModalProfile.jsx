@@ -36,7 +36,7 @@ const ModalProfile = ({ onClose }) => {
     if (!selectedFile) return;
 
     const formData = new FormData();
-    formData.append("fotoprofil", selectedFile);
+    formData.append("profile_picture", selectedFile);
 
     setIsUploading(true);
     try {
@@ -94,9 +94,9 @@ const ModalProfile = ({ onClose }) => {
         {/* Header Profil  */}
         <div className="relative mt-2 mb-4 flex justify-center items-center w-full ">
           <div className="relative w-24 h-24 rounded-full border-4 border-[#862440] p-0.5 shadow-md bg-gray-100 flex items-center justify-center">
-            {previewUrl || currentUser?.fotoprofil ? (
+            {previewUrl || currentUser?.profile_picture ? (
               <img
-                src={previewUrl || currentUser.fotoprofil}
+                src={previewUrl || currentUser.profile_picture}
                 alt="Profil"
                 className="w-full h-full rounded-full object-cover"
               />
@@ -174,6 +174,25 @@ const ModalProfile = ({ onClose }) => {
             </div>
           </div>
         </div>
+
+        {selectedFile && (
+          <div className="w-full flex gap-2 mb-4">
+            <button
+              onClick={handleUpload}
+              disabled={isUploading}
+              className="flex-1 bg-[#862440] text-white py-2 rounded-xl hover:opacity-90"
+            >
+              {isUploading ? "Mengunggah..." : "Simpan Foto"}
+            </button>
+
+            <button
+              onClick={handleCancelSelection}
+              className="flex-1 border border-gray-300 py-2 rounded-xl"
+            >
+              Batal
+            </button>
+          </div>
+        )}
 
         {/* Tombol Aksi di bagian bawah */}
         <button
