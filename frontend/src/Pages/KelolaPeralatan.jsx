@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
-import peralatanImg from "../assets/peralatan.jpg";
+import pertoolanImg from "../assets/pertoolan.jpg";
 import axiosClient from "../axios";
 
 const STATUS_STYLES = {
   tersedia:    { badge: "bg-emerald-500",  label: "Tersedia" },
-  dipinjam:    { badge: "bg-orange-400",   label: "Dalam Peminjaman" },
+  dipinjam:    { badge: "bg-orange-400",   label: "Dalam loan" },
   rusak:       { badge: "bg-red-500",      label: "Rusak" },
   maintenance: { badge: "bg-red-500",      label: "Maintenance" },
 };
@@ -71,15 +71,15 @@ const ConfirmDialog = ({ message, onConfirm, onCancel }) => (
   </div>
 );
 
-const AlatCard = ({ alat, onEdit, onDelete }) => {
-  const statusCfg = STATUS_STYLES[alat.status] ?? STATUS_STYLES.tersedia;
+const toolCard = ({ tool, onEdit, onDelete }) => {
+  const statusCfg = STATUS_STYLES[tool.status] ?? STATUS_STYLES.tersedia;
 
   return (
     <div className="bg-[#F5EDED] rounded-2xl shadow-md border border-pink-100 flex flex-col overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
       <div className="relative h-[180px] overflow-hidden">
         <img
-          src={alat.foto || peralatanImg}
-          alt={alat.name}
+          src={tool.foto || pertoolanImg}
+          alt={tool.name}
           className="w-full h-full object-cover"
         />
         <span
@@ -88,46 +88,46 @@ const AlatCard = ({ alat, onEdit, onDelete }) => {
           {statusCfg.label}
         </span>
         <div className="absolute bottom-0 left-0 right-0 px-3 py-3 bg-gradient-to-t from-black/70 to-transparent text-white">
-          <h2 className="font-bold text-[15px] leading-tight truncate">{alat.name}</h2>
+          <h2 className="font-bold text-[15px] leading-tight truncate">{tool.name}</h2>
           <div className="flex items-center gap-1 text-[11px] opacity-90 mt-0.5">
             <Icon icon="mdi:tools" width={12} />
-            <span className="truncate">{alat.kode}</span>
+            <span className="truncate">{tool.kode}</span>
           </div>
         </div>
       </div>
 
       <div className="p-3 flex flex-col flex-1 text-[12px] text-[#3D0C1F]">
         <span className="inline-block self-start border border-gray-400 rounded-full px-3 py-0.5 text-[10px] font-semibold mb-2 truncate max-w-full">
-          {alat.kode}
+          {tool.kode}
         </span>
 
         <div className="space-y-1.5 flex-1">
           <div className="flex gap-2 items-start">
             <Icon icon="mdi:account" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
             <p className="leading-snug line-clamp-1">
-              <b>PIC</b>: {alat.pic || "-"}
+              <b>PIC</b>: {tool.pic || "-"}
             </p>
           </div>
           <div className="flex gap-2 items-start">
             <Icon icon="mdi:information-outline" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
             <p className="leading-snug line-clamp-2">
-              <b>Deskripsi</b>: {alat.deskripsi || "-"}
+              <b>Deskripsi</b>: {tool.deskripsi || "-"}
             </p>
           </div>
         </div>
 
         <div className="flex gap-2 mt-3 pt-3 border-t border-pink-100">
           <button
-            onClick={() => onEdit(alat)}
+            onClick={() => onEdit(tool)}
             className="flex-1 flex items-center justify-center gap-1 bg-[#862440] text-white px-3 py-2 rounded-lg text-[11px] hover:bg-[#6e1d35] hover:scale-105 transition-all"
           >
             <Icon icon="mdi:pencil-outline" width={12} />
             Ubah
           </button>
           <button
-            onClick={() => onDelete(alat)}
+            onClick={() => onDelete(tool)}
             className="bg-[#862440] text-white p-2 rounded-lg hover:bg-[#6e1d35] hover:scale-105 transition-all"
-            title="Hapus alat"
+            title="Hapus tool"
           >
             <Icon icon="mdi:delete-outline" width={14} />
           </button>
@@ -145,7 +145,7 @@ const EMPTY_FORM = {
   id_number_pic: "",
 };
 
-const ModalAlat = ({ onClose, onSave, editData, saving }) => {
+const Modaltool = ({ onClose, onSave, editData, saving }) => {
   const [form, setForm] = useState(
     editData
       ? {
@@ -202,8 +202,8 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
 
   const validate = () => {
     const e = {};
-    if (!form.kode.trim()) e.kode = "Kode alat wajib diisi.";
-    if (!form.name.trim()) e.name = "name alat wajib diisi.";
+    if (!form.kode.trim()) e.kode = "Kode tool wajib diisi.";
+    if (!form.name.trim()) e.name = "name tool wajib diisi.";
     if (!form.status)      e.status = "Status wajib dipilih.";
     return e;
   };
@@ -232,7 +232,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
               width={20}
             />
             <h2 className="font-bold text-[17px]">
-              {editData ? "Edit Alat" : "Tambah Alat Baru"}
+              {editData ? "Edit tool" : "Tambah tool Baru"}
             </h2>
           </div>
           <button
@@ -247,7 +247,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
         <div className="p-5 flex flex-col gap-4 overflow-y-auto">
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Kode Alat <span className="text-red-500">*</span>
+              Kode tool <span className="text-red-500">*</span>
             </label>
             <input
               name="kode"
@@ -261,7 +261,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
 
           <div>
             <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              name Peralatan <span className="text-red-500">*</span>
+              name Pertoolan <span className="text-red-500">*</span>
             </label>
             <input
               name="name"
@@ -369,7 +369,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
               name="deskripsi"
               value={form.deskripsi}
               onChange={handleChange}
-              placeholder="Deskripsi singkat tentang alat ini..."
+              placeholder="Deskripsi singkat tentang tool ini..."
               rows={3}
               className={`${inputBase} w-full resize-none`}
             />
@@ -378,7 +378,7 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
 
         <div>
           <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-            Foto Alat{" "}
+            Foto tool{" "}
             <span className="text-gray-400 font-normal">(opsional)</span>
           </label>
           <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-pink-400 transition group">
@@ -438,8 +438,8 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
   );
 };
 
-const KelolaPeralatan = () => {
-  const [alat, setAlat]               = useState([]);
+const KelolaPertoolan = () => {
+  const [tool, settool]               = useState([]);
   const [showModal, setShowModal]     = useState(false);
   const [editData, setEditData]       = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -455,40 +455,40 @@ const KelolaPeralatan = () => {
     setToast({ message, type });
   }, []);
 
-  const fetchAlat = useCallback(() => {
+  const fetchtool = useCallback(() => {
     setLoading(true);
     axiosClient
-      .get("/get-alat")
+      .get("/get-tool")
       .then(({ data }) => {
         const mapped = data.data.map((item) => ({
           id:              item.id,
-          kode:            item.kode_alat,
-          name:            item.name_alat,
-          deskripsi:       item.deskripsi_alat,
-          status:          item.status_alat,
+          kode:            item.tool_code,
+          name:            item.tool_name,
+          deskripsi:       item.tool_description,
+          status:          item.tool_status,
           pic:             item.pic ?? "-",
           id_number_pic: item.id_number_pic != null ? String(item.id_number_pic) : "",
           foto:            item.path_foto ?? null,
         }));
-        setAlat(mapped);
+        settool(mapped);
       })
       .catch((err) => {
-        console.error("Gagal memuat data alat:", err);
-        showToast("Gagal memuat data peralatan. Silakan muat ulang halaman.", "error");
+        console.error("Gagal memuat data tool:", err);
+        showToast("Gagal memuat data pertoolan. Silakan muat ulang halaman.", "error");
       })
       .finally(() => setLoading(false));
   }, [showToast]);
 
   useEffect(() => {
-    fetchAlat();
-  }, [fetchAlat]);
+    fetchtool();
+  }, [fetchtool]);
 
   const handleSave = (formData, fotoFile) => {
     const payload = new FormData();
-    payload.append("kode_alat",       formData.kode.trim());
-    payload.append("name_alat",       formData.name.trim());
-    payload.append("deskripsi_alat",  formData.deskripsi.trim());
-    payload.append("status_alat",     formData.status);
+    payload.append("tool_code",       formData.kode.trim());
+    payload.append("tool_name",       formData.name.trim());
+    payload.append("tool_description",  formData.deskripsi.trim());
+    payload.append("tool_status",     formData.status);
     payload.append("id_number_pic", formData.id_number_pic || "");
     if (fotoFile) {
       payload.append("foto", fotoFile);
@@ -499,13 +499,13 @@ const KelolaPeralatan = () => {
 
     setSaving(true);
 
-    const url = editData ? `/alat/${editData.id}` : "/alat";
+    const url = editData ? `/tool/${editData.id}` : "/tool";
     axiosClient.post(url, payload, {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then(() => {
-        showToast(editData ? "Alat berhasil diperbarui." : "Alat berhasil ditambahkan.", "success");
-        fetchAlat();
+        showToast(editData ? "tool berhasil diperbarui." : "tool berhasil ditambahkan.", "success");
+        fetchtool();
         closeModal();
       })
       .catch((err) => {
@@ -527,19 +527,19 @@ const KelolaPeralatan = () => {
     setConfirmDelete(null);
 
     axiosClient
-      .delete(`/alat/${id}`)
+      .delete(`/tool/${id}`)
       .then(() => {
-        setAlat((prev) => {
+        settool((prev) => {
           const updated = prev.filter((a) => a.id !== id);
           const maxPage = Math.max(1, Math.ceil(updated.length / ITEMS_PER_PAGE));
           setCurrentPage((p) => Math.min(p, maxPage));
           return updated;
         });
-        showToast(`Alat "${name}" berhasil dihapus.`, "success");
+        showToast(`tool "${name}" berhasil dihapus.`, "success");
       })
       .catch((err) => {
-        console.error("Gagal menghapus alat:", err);
-        showToast("Gagal menghapus alat. Silakan coba lagi.", "error");
+        console.error("Gagal menghapus tool:", err);
+        showToast("Gagal menghapus tool. Silakan coba lagi.", "error");
       });
   };
 
@@ -555,7 +555,7 @@ const KelolaPeralatan = () => {
     }
   };
 
-  const filtered = alat.filter(
+  const filtered = tool.filter(
     (a) =>
       a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.kode.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -563,7 +563,7 @@ const KelolaPeralatan = () => {
   );
 
   const totalPages    = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginatedAlat = filtered.slice(
+  const paginatedtool = filtered.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -572,9 +572,9 @@ const KelolaPeralatan = () => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  const tersedia    = alat.filter((a) => a.status === "tersedia").length;
-  const dipinjam    = alat.filter((a) => a.status === "dipinjam").length;
-  const maintenance = alat.filter(
+  const tersedia    = tool.filter((a) => a.status === "tersedia").length;
+  const dipinjam    = tool.filter((a) => a.status === "dipinjam").length;
+  const maintenance = tool.filter(
     (a) => a.status === "maintenance" || a.status === "rusak"
   ).length;
 
@@ -592,10 +592,10 @@ const KelolaPeralatan = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>
             <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
-              Kelola Peralatan
+              Kelola Pertoolan
             </h1>
             <p className="text-gray-500 text-[13px] mt-1">
-              Lihat dan kelola seluruh alat yang dapat dipinjam dalam sistem
+              Lihat dan kelola seluruh tool yang dapat dipinjam dalam sistem
             </p>
           </div>
           <button
@@ -603,7 +603,7 @@ const KelolaPeralatan = () => {
             className="self-start sm:self-auto flex items-center gap-2 bg-orange-400 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold transition shadow-md hover:shadow-lg"
           >
             <Icon icon="mdi:plus" width={16} />
-            Tambah Alat
+            Tambah tool
           </button>
         </div>
 
@@ -611,7 +611,7 @@ const KelolaPeralatan = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {[
             {
-              label: "Peralatan Tersedia",
+              label: "Pertoolan Tersedia",
               value: tersedia,
               sub: "Dapat dipinjam",
               from: "#8B1E3F",
@@ -619,7 +619,7 @@ const KelolaPeralatan = () => {
               icon: "mdi:check-circle-outline",
             },
             {
-              label: "Dalam Peminjaman",
+              label: "Dalam loan",
               value: dipinjam,
               sub: "Sedang dipinjam",
               from: "#C0254A",
@@ -674,24 +674,24 @@ const KelolaPeralatan = () => {
           <div className="flex flex-col justify-center items-center h-48 gap-3">
             <Icon icon="mdi:loading" className="animate-spin text-[#C0254A]" width={36} />
             <p className="text-[#C0254A] font-semibold text-[14px]">
-              Memuat data peralatan...
+              Memuat data pertoolan...
             </p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col justify-center items-center h-48 gap-2 text-gray-400">
             <Icon icon="mdi:tool-off-outline" width={40} />
             <p className="text-[14px]">
-              {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : "Tidak ada data peralatan."}
+              {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : "Tidak ada data pertoolan."}
             </p>
           </div>
         ) : (
           <>
             {/* Responsive grid: 1 → 2 → 3 → 4 cols */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {paginatedAlat.map((item) => (
-                <AlatCard
+              {paginatedtool.map((item) => (
+                <toolCard
                   key={item.id}
-                  alat={item}
+                  tool={item}
                   onEdit={openEdit}
                   onDelete={(a) => setConfirmDelete(a)}
                 />
@@ -768,7 +768,7 @@ const KelolaPeralatan = () => {
             <p className="text-center text-[11px] text-gray-400 mt-3">
               Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
               {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} dari{" "}
-              {filtered.length} alat
+              {filtered.length} tool
             </p>
           </>
         )}
@@ -776,7 +776,7 @@ const KelolaPeralatan = () => {
 
       {/* MODAL */}
       {showModal && (
-        <ModalAlat
+        <Modaltool
           onClose={closeModal}
           onSave={handleSave}
           editData={editData}
@@ -787,7 +787,7 @@ const KelolaPeralatan = () => {
       {/* CONFIRM DELETE */}
       {confirmDelete && (
         <ConfirmDialog
-          message={`Apakah kamu yakin ingin menghapus alat "${confirmDelete.name}"? Tindakan ini tidak dapat dibatalkan.`}
+          message={`Apakah kamu yakin ingin menghapus tool "${confirmDelete.name}"? Tindakan ini tidak dapat dibatalkan.`}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -805,4 +805,4 @@ const KelolaPeralatan = () => {
   );
 };
 
-export default KelolaPeralatan;
+export default KelolaPertoolan;

@@ -10,7 +10,7 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Notification::where('id_number', auth('api')->user()->id_number)
-            ->with('peminjaman')
+            ->with('loan')
             ->orderBy('created_at', 'desc')
             ->limit(20)
             ->get();

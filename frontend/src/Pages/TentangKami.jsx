@@ -341,7 +341,7 @@ export default function TeamIntro() {
         <section className="ti-hero">
           <h1 className="ti-h1">Tim Pengembang SPARA Polibatam</h1>
           <p className="ti-hero-sub">
-            Aplikasi ini dikembangkan oleh Tim PBL-TRPL209 yang merupakan mahasiswa program studi Teknik Rekayasa Perangkat Lunak. SPARA Polibatam merupakan solusi cerdas untuk peminjaman serta pendataan alat dan ruangan di Politeknik Negeri Batam.
+            Aplikasi ini dikembangkan oleh Tim PBL-TRPL209 yang merupakan mahasiswa program studi Teknik Rekayasa Perangkat Lunak. SPARA Polibatam merupakan solusi cerdas untuk loan serta pendataan tool dan room di Politeknik Negeri Batam.
           </p>
         </section>
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('persetujuans', function (Blueprint $table) {
             if (!Schema::hasColumn('persetujuans', 'id_number_penyetuju')) {
-                $table->unsignedBigInteger('id_number_penyetuju')->nullable()->after('id_peminjaman');
+                $table->unsignedBigInteger('id_number_penyetuju')->nullable()->after('loan_id');
                 $table->foreign('id_number_penyetuju')->references('id_number')->on('users')->onDelete('cascade');
             }
 

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
-import ModalPengajuan from "../Components/ModalPengajuanPeralatan";
+import ModalPengajuan from "../Components/ModalPengajuanPertoolan";
 import axiosClient from "../axios";
-import peralatanImg from "../assets/peralatan.jpg";
+import pertoolanImg from "../assets/pertoolan.jpg";
 
 const statusStyles = {
   tersedia: { bg: "bg-green-500", text: "TERSEDIA" },
@@ -23,7 +23,7 @@ const EquipmentCard = ({ name, deskripsi, status, onDetail, onAjukan }) => {
 
       <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
         <img
-          src={peralatanImg}
+          src={pertoolanImg}
           alt="equipment"
           className="w-full h-full object-cover"
         />
@@ -87,19 +87,19 @@ const EquipmentCard = ({ name, deskripsi, status, onDetail, onAjukan }) => {
 const initialEquipments = [
   { id: 1, name: "Kamera Luminux", kode: "KMR-001", deskripsi: "Kamera Lumix GH5 Lensa Kit dengan 1 baterai", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
   { id: 2, name: "Kamera Sony FX 3", kode: "KMR-002", deskripsi: "Kamera Sony FX 3, Body Only - Lensa Terpisah.", status: "tersedia", jenis: "FOTOGRAFI", stok: 1 },
-  { id: 3, name: "GPS Handheld 73", kode: "GPS-001", deskripsi: "Alat Survey Terestris", status: "maintenance", jenis: "PROG PK", stok: 2 },
-  { id: 4, name: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK", stok: 0 },
+  { id: 3, name: "GPS Handheld 73", kode: "GPS-001", deskripsi: "tool Survey Terestris", status: "maintenance", jenis: "PROG PK", stok: 2 },
+  { id: 4, name: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "tool Survey Terestris", status: "dipinjam", jenis: "PROG PK", stok: 0 },
   { id: 5, name: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI", stok: 0 },
   { id: 6, name: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
-  { id: 7, name: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK", stok: 2 },
-  { id: 8, name: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK", stok: 2 },
-  { id: 9, name: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK", stok: 0 },
-  { id: 10, name: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK", stok: 4 },
+  { id: 7, name: "USB to HDMI Cable", kode: "USB-001", deskripsi: "tool untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK", stok: 2 },
+  { id: 8, name: "USB Cable", kode: "USB-002", deskripsi: "tool untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK", stok: 2 },
+  { id: 9, name: "Solder Sucker", kode: "SLDR-001", deskripsi: "tool untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK", stok: 0 },
+  { id: 10, name: "Soldering Stand", kode: "SLDR-002", deskripsi: "tool untuk Menopang solder", status: "tersedia", jenis: "PROG PK", stok: 4 },
   { id: 11, name: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM", stok: 1 },
 ];
 
 /* MAIN PAGE */
-const PeminjamanPeralatan = () => {
+const loanPertoolan = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
@@ -135,21 +135,21 @@ const PeminjamanPeralatan = () => {
 
   useEffect(() => {
     axiosClient
-      .get("/get-alat")
+      .get("/get-tool")
       .then(({ data }) => {
         if (Array.isArray(data.data)) {
           const mapped = data.data.map((item) => ({
             id: item.id,
-            name: item.name_alat,
-            kode: item.kode_alat,
-            deskripsi: item.deskripsi_alat,
-            status: item.status_alat,
-            jenis: item.jenis || "Peralatan",
+            name: item.tool_name,
+            kode: item.tool_code,
+            deskripsi: item.tool_description,
+            status: item.tool_status,
+            jenis: item.jenis || "Pertoolan",
           }));
           setEquipments(mapped);
         }
       })
-      .catch((err) => console.error("Gagal memuat peralatan:", err));
+      .catch((err) => console.error("Gagal memuat pertoolan:", err));
   }, []);
 
   const statusOptions = [
@@ -157,7 +157,7 @@ const PeminjamanPeralatan = () => {
   ];
 
   const jenisOptions = [
-    ...new Set(equipments.map((item) => item.jenis || "Peralatan"))
+    ...new Set(equipments.map((item) => item.jenis || "Pertoolan"))
   ];
 
   return (
@@ -196,7 +196,7 @@ const PeminjamanPeralatan = () => {
             {/* BODY */}
             <div className="relative h-[120px] bg-[#DC4C75] overflow-hidden">
               <img
-                src={peralatanImg}
+                src={pertoolanImg}
                 alt="equipment"
                 className="w-full h-full object-cover"
               />
@@ -235,7 +235,7 @@ const PeminjamanPeralatan = () => {
                 className="flex-1 flex items-center justify-center gap-1 border border-pink-300 text-pink-200 text-[10px] px-2 py-1 rounded-full hover:bg-pink-800/30 transition"
               >
                 <Icon icon="mdi:plus" width={11} />
-                Ajukan Peminjaman
+                Ajukan loan
               </button>
             </div>
           </div>
@@ -246,11 +246,11 @@ const PeminjamanPeralatan = () => {
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4">
 
         <h1 className="text-[32px] font-extrabold lg:mt-2 mt-12 text-[#2D0A18]">
-          Daftar Peralatan
+          Daftar Pertoolan
         </h1>
 
         <p className="text-gray-500 text-[14px] mb-6">
-          Memilih Peralatan yang tersedia berdasarkan kebutuhan
+          Memilih Pertoolan yang tersedia berdasarkan kebutuhan
         </p>
 
         {/* SEARCH */}
@@ -261,7 +261,7 @@ const PeminjamanPeralatan = () => {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="telusuri peralatan..."
+                placeholder="telusuri pertoolan..."
                 className="flex-1 outline-none text-sm"
               />
               <button className="bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white rounded-full w-9 h-9 flex items-center justify-center">
@@ -297,7 +297,7 @@ const PeminjamanPeralatan = () => {
               }}
               className="border border-pink-300 text-[#C0254A] bg-white rounded-full px-4 py-2 text-sm outline-none"
             >
-              <option value="">Jenis alat</option>
+              <option value="">Jenis tool</option>
               {jenisOptions.map((jenis) => (
                 <option key={jenis} value={jenis}>
                   {jenis}
@@ -422,7 +422,7 @@ const PeminjamanPeralatan = () => {
       </div>
       {showModal && (
         <ModalPengajuan
-          peralatan={selectedItem}
+          pertoolan={selectedItem}
           onClose={() => setShowModal(false)}
           onSuccess={() => {
             setShowModal(false);
@@ -434,4 +434,4 @@ const PeminjamanPeralatan = () => {
   );
 };
 
-export default PeminjamanPeralatan;
+export default loanPertoolan;

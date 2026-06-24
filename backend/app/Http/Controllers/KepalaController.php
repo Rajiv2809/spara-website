@@ -5,20 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Validator};
 use Carbon\Carbon;
-use App\Models\{Peminjaman, Persetujuan, Notification};
+use App\Models\{loan, Persetujuan, Notification};
 
 class KepalaController extends Controller
 {
-    public function getMonitoringPeminjaman(Request $request)
+    public function getMonitoringloan(Request $request)
     {
-        $query = Peminjaman::with(['peminjam', 'alat', 'ruangan', 'persetujuans'])
+        $query = loan::with(['peminjam', 'tool', 'room', 'persetujuans'])
             ->orderBy('hari_tanggal', 'asc')
             ->orderBy('jam_mulai', 'asc');
 
-        if ($request->jenis === 'ruangan') {
-            $query->whereNotNull('id_ruangan');
-        } elseif ($request->jenis === 'alat') {
-            $query->whereNotNull('id_alat');
+        if ($request->jenis === 'room') {
+            $query->whereNotNull('room_id');
+        } elseif ($request->jenis === 'tool') {
+            $query->whereNotNull('tool_id');
         }
 
         if ($request->filled('status')) {
@@ -27,11 +27,11 @@ class KepalaController extends Controller
             $query->whereIn('status_persetujuan', ['menunggu', 'disetujui']);
         }
 
-        $peminjamans = $query->get();
+        $loans = $query->get();
 
-        $data = $peminjamans->map(function ($p) {
+        $data = $loans->map(function ($p) {
             return [
-                'id_peminjaman'        => $p->id_peminjaman,
+                'loan_id'        => $p->loan_id,
                 'name_kegiatan'        => $p->name_kegiatan,
                 'jenis_kegiatan'       => $p->jenis_kegiatan,
                 'hari_tanggal'         => $p->hari_tanggal?->toDateString(),
@@ -41,26 +41,26 @@ class KepalaController extends Controller
                 'status_persetujuan'   => $p->status_persetujuan,
                 'alasan_kepala'         => $p->alasan_kepala,
                 'dibuat_pada'          => $p->dibuat_pada?->toDateTimeString(),
-                'jenis'                => $p->id_ruangan ? 'ruangan' : 'alat',
+                'jenis'                => $p->room_id ? 'room' : 'tool',
                 'name_peminjam'        => $p->peminjam?->name,
                 'id_number_peminjam' => $p->id_peminjam,
                 'unit_peminjam'        => $p->peminjam?->unit ?? $p->peminjam?->jabatan ?? null,
-                'id_ruangan'           => $p->id_ruangan,
-                'name_ruangan'         => $p->ruangan?->name_ruangan,
-                'kode_ruangan'         => $p->ruangan?->kode_ruangan,
-                'id_alat'              => $p->id_alat,
-                'name_alat'            => $p->alat?->name_alat,
-                'kode_alat'            => $p->alat?->kode_alat,
+                'room_id'           => $p->room_id,
+                'room_name'         => $p->room?->room_name,
+                'room_code'         => $p->room?->room_code,
+                'tool_id'              => $p->tool_id,
+                'tool_name'            => $p->tool?->tool_name,
+                'tool_code'            => $p->tool?->tool_code,
             ];
         });
 
-        $allActive = Peminjaman::whereIn('status_persetujuan', ['menunggu', 'disetujui'])->get();
+        $allActive = loan::whereIn('status_persetujuan', ['menunggu', 'disetujui'])->get();
         $stats = [
             'total'     => $allActive->count(),
             'menunggu'  => $allActive->where('status_persetujuan', 'menunggu')->count(),
             'disetujui' => $allActive->where('status_persetujuan', 'disetujui')->count(),
-            'ruangan'   => $allActive->whereNotNull('id_ruangan')->count(),
-            'alat'      => $allActive->whereNotNull('id_alat')->count(),
+            'room'   => $allActive->whereNotNull('room_id')->count(),
+            'tool'      => $allActive->whereNotNull('tool_id')->count(),
         ];
 
         return response()->json([
@@ -69,7 +69,7 @@ class KepalaController extends Controller
         ]);
     }
 
-    public function batalkanPeminjaman(Request $request, $id)
+    public function batalkanloan(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'alasan_kepala' => 'required|string|max:1000',
@@ -82,55 +82,55 @@ class KepalaController extends Controller
             ], 422);
         }
 
-        $peminjaman = Peminjaman::find($id);
+        $loan = loan::find($id);
 
-        if (!$peminjaman) {
-            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
+        if (!$loan) {
+            return response()->json(['message' => 'loan tidak ditemukan.'], 404);
         }
 
-        if (in_array($peminjaman->status_persetujuan, ['dibatalkan', 'ditolak'])) {
+        if (in_array($loan->status_persetujuan, ['dibatalkan', 'ditolak'])) {
             return response()->json([
-                'message' => 'Peminjaman sudah dalam status dibatalkan atau ditolak.',
+                'message' => 'loan sudah dalam status dibatalkan atau ditolak.',
             ], 422);
         }
 
-        $peminjaman->status_persetujuan = 'dibatalkan';
-        $peminjaman->alasan_kepala       = $request->alasan_kepala;
-        $peminjaman->diubah_pada        = Carbon::now();
-        $peminjaman->save();
+        $loan->status_persetujuan = 'dibatalkan';
+        $loan->alasan_kepala       = $request->alasan_kepala;
+        $loan->diubah_pada        = Carbon::now();
+        $loan->save();
 
-        Persetujuan::where('id_peminjaman', $id)
+        Persetujuan::where('loan_id', $id)
             ->where('status_persetujuan', 'menunggu')
             ->update([
                 'status_persetujuan' => 'ditolak',
                 'updated_at'         => Carbon::now(),
             ]);
 
-        $itemName = $peminjaman->ruangan?->name_ruangan
-            ?? $peminjaman->alat?->name_alat
+        $itemName = $loan->room?->room_name
+            ?? $loan->tool?->tool_name
             ?? 'Item';
         Notification::create([
-            'id_number'   => $peminjaman->id_peminjam,
+            'id_number'   => $loan->id_peminjam,
             'type'          => 'dibatalkan',
-            'judul'         => 'Peminjaman Dibatalkan Kepala SBUM',
-            'pesan'         => "Peminjaman {$itemName} dibatalkan oleh Kepala SBUM. Alasan: {$request->alasan_kepala}.",
-            'peminjaman_id' => $peminjaman->id_peminjaman,
+            'judul'         => 'loan Dibatalkan Kepala SBUM',
+            'pesan'         => "loan {$itemName} dibatalkan oleh Kepala SBUM. Alasan: {$request->alasan_kepala}.",
+            'loan_id' => $loan->loan_id,
         ]);
 
         return response()->json([
-            'message' => 'Peminjaman berhasil dibatalkan.',
+            'message' => 'loan berhasil dibatalkan.',
         ]);
     }
 
     public function cekKetersediaan(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'jenis'        => 'required|in:ruangan,alat',
+            'jenis'        => 'required|in:room,tool',
             'hari_tanggal' => 'required|date_format:Y-m-d',
             'jam_mulai'    => 'required|date_format:H:i',
             'jam_selesai'  => 'required|date_format:H:i|after:jam_mulai',
-            'id_ruangan'   => 'required_if:jenis,ruangan|integer|nullable',
-            'id_alat'      => 'required_if:jenis,alat|integer|nullable',
+            'room_id'   => 'required_if:jenis,room|integer|nullable',
+            'tool_id'      => 'required_if:jenis,tool|integer|nullable',
             'exclude_id'   => 'nullable|integer',
         ]);
 
@@ -141,19 +141,19 @@ class KepalaController extends Controller
             ], 422);
         }
 
-        $overlap = Peminjaman::where('status_persetujuan', '!=', 'dibatalkan')
+        $overlap = loan::where('status_persetujuan', '!=', 'dibatalkan')
             ->where('status_persetujuan', '!=', 'ditolak')
             ->where('hari_tanggal', $request->hari_tanggal)
             ->when($request->exclude_id, function ($q) use ($request) {
-                $q->where('id_peminjaman', '!=', $request->exclude_id);
+                $q->where('loan_id', '!=', $request->exclude_id);
             })
             ->where('jam_mulai', '<', $request->jam_selesai)
             ->where('jam_selesai', '>', $request->jam_mulai)
-            ->when($request->jenis === 'ruangan', function ($q) use ($request) {
-                $q->where('id_ruangan', $request->id_ruangan);
+            ->when($request->jenis === 'room', function ($q) use ($request) {
+                $q->where('room_id', $request->room_id);
             })
-            ->when($request->jenis === 'alat', function ($q) use ($request) {
-                $q->where('id_alat', $request->id_alat);
+            ->when($request->jenis === 'tool', function ($q) use ($request) {
+                $q->where('tool_id', $request->tool_id);
             })
             ->exists();
 
@@ -171,7 +171,7 @@ class KepalaController extends Controller
             'hari_tanggal_baru' => 'required|date_format:Y-m-d|after_or_equal:today',
             'jam_mulai_baru'    => 'required|date_format:H:i',
             'jam_selesai_baru'  => 'required|date_format:H:i|after:jam_mulai_baru',
-            'id_ruangan_baru'   => 'nullable|exists:ruangans,id_ruangan',
+            'room_id_baru'   => 'nullable|exists:rooms,room_id',
             'alasan_kepala'     => 'required|string|max:1000',
         ]);
 
@@ -182,36 +182,36 @@ class KepalaController extends Controller
             ], 422);
         }
 
-        $peminjaman = Peminjaman::find($id);
+        $loan = loan::find($id);
 
-        if (!$peminjaman) {
-            return response()->json(['message' => 'Peminjaman tidak ditemukan.'], 404);
+        if (!$loan) {
+            return response()->json(['message' => 'loan tidak ditemukan.'], 404);
         }
 
-        if (in_array($peminjaman->status_persetujuan, ['dibatalkan', 'ditolak'])) {
+        if (in_array($loan->status_persetujuan, ['dibatalkan', 'ditolak'])) {
             return response()->json([
-                'message' => 'Peminjaman sudah dalam status dibatalkan atau ditolak.',
+                'message' => 'loan sudah dalam status dibatalkan atau ditolak.',
             ], 422);
         }
 
         // ── 1. Cek ketersediaan (overlap) ───────────────────────────────────
-        $overlapQuery = Peminjaman::where('status_persetujuan', '!=', 'dibatalkan')
+        $overlapQuery = loan::where('status_persetujuan', '!=', 'dibatalkan')
             ->where('status_persetujuan', '!=', 'ditolak')
             ->where('hari_tanggal', $request->hari_tanggal_baru)
-            ->where('id_peminjaman', '!=', $id)
+            ->where('loan_id', '!=', $id)
             ->where('jam_mulai', '<', $request->jam_selesai_baru)
             ->where('jam_selesai', '>', $request->jam_mulai_baru);
 
-        if ($peminjaman->id_ruangan || $request->filled('id_ruangan_baru')) {
-            $idRuangan = $request->id_ruangan_baru ?? $peminjaman->id_ruangan;
-            $overlapQuery->where('id_ruangan', $idRuangan);
-        } elseif ($peminjaman->id_alat) {
-            $overlapQuery->where('id_alat', $peminjaman->id_alat);
+        if ($loan->room_id || $request->filled('room_id_baru')) {
+            $idroom = $request->room_id_baru ?? $loan->room_id;
+            $overlapQuery->where('room_id', $idroom);
+        } elseif ($loan->tool_id) {
+            $overlapQuery->where('tool_id', $loan->tool_id);
         }
 
         if ($overlapQuery->exists()) {
             return response()->json([
-                'message' => 'Ruangan/alat sudah dibooking pada tanggal & jam tersebut.',
+                'message' => 'room/tool sudah dibooking pada tanggal & jam tersebut.',
             ], 409);
         }
 
@@ -219,46 +219,46 @@ class KepalaController extends Controller
             DB::beginTransaction();
 
             // ── 2. Update jadwal + RESET status ke menunggu ───────────────────
-            $peminjaman->hari_tanggal       = $request->hari_tanggal_baru;
-            $peminjaman->jam_mulai          = $request->jam_mulai_baru;
-            $peminjaman->jam_selesai        = $request->jam_selesai_baru;
-            $peminjaman->status_persetujuan = 'menunggu'; // ← RESET KE AWAL
-            $peminjaman->alasan_kepala      = $request->alasan_kepala;
-            $peminjaman->diubah_pada        = Carbon::now();
+            $loan->hari_tanggal       = $request->hari_tanggal_baru;
+            $loan->jam_mulai          = $request->jam_mulai_baru;
+            $loan->jam_selesai        = $request->jam_selesai_baru;
+            $loan->status_persetujuan = 'menunggu'; // ← RESET KE AWAL
+            $loan->alasan_kepala      = $request->alasan_kepala;
+            $loan->diubah_pada        = Carbon::now();
 
-            if ($peminjaman->id_ruangan && $request->filled('id_ruangan_baru')) {
-                $peminjaman->id_ruangan = $request->id_ruangan_baru;
+            if ($loan->room_id && $request->filled('room_id_baru')) {
+                $loan->room_id = $request->room_id_baru;
             }
 
-            $peminjaman->save();
+            $loan->save();
 
             // ── 3. Ambil data untuk reset persetujuan ─────────────────────────
             // Nomor induk Penanggung Jawab dari persetujuan pertama (id terkecil)
-            $pjLama = Persetujuan::where('id_peminjaman', $id)
+            $pjLama = Persetujuan::where('loan_id', $id)
                 ->orderBy('id')
                 ->first();
 
-            $nomorIndukPj = $pjLama?->id_number_penyetuju ?? $peminjaman->id_peminjam;
+            $nomorIndukPj = $pjLama?->id_number_penyetuju ?? $loan->id_peminjam;
 
-            // Nomor induk PIC dari ruangan/alat yang dipakai (baru atau lama)
+            // Nomor induk PIC dari room/tool yang dipakai (baru atau lama)
             $nomorIndukPic = null;
-            if ($peminjaman->id_ruangan || $request->filled('id_ruangan_baru')) {
-                $idRuangan = $request->id_ruangan_baru ?? $peminjaman->id_ruangan;
-                $ruangan = DB::table('ruangans')->where('id_ruangan', $idRuangan)->first();
-                $nomorIndukPic = $ruangan?->id_number_pic;
-            } elseif ($peminjaman->id_alat) {
-                $alat = DB::table('alats')->where('id_alat', $peminjaman->id_alat)->first();
-                $nomorIndukPic = $alat?->id_number_pic;
+            if ($loan->room_id || $request->filled('room_id_baru')) {
+                $idroom = $request->room_id_baru ?? $loan->room_id;
+                $room = DB::table('rooms')->where('room_id', $idroom)->first();
+                $nomorIndukPic = $room?->id_number_pic;
+            } elseif ($loan->tool_id) {
+                $tool = DB::table('tools')->where('tool_id', $loan->tool_id)->first();
+                $nomorIndukPic = $tool?->id_number_pic;
             }
 
             // ── 4. Hapus persetujuan lama, buat ulang 3 tahap ──────────────────
-            Persetujuan::where('id_peminjaman', $id)->delete();
+            Persetujuan::where('loan_id', $id)->delete();
 
             $now = Carbon::now();
             $persetujuans = [
                 // Tahap 1: Penanggungjawab
                 [
-                    'id_peminjaman'         => $id,
+                    'loan_id'         => $id,
                     'id_number_penyetuju' => $nomorIndukPj,
                     'status_persetujuan'    => 'menunggu',
                     'created_at'            => $now,
@@ -266,7 +266,7 @@ class KepalaController extends Controller
                 ],
                 // Tahap 2: PIC
                 [
-                    'id_peminjaman'         => $id,
+                    'loan_id'         => $id,
                     'id_number_penyetuju' => $nomorIndukPic,
                     'status_persetujuan'    => 'menunggu',
                     'created_at'            => $now,
@@ -274,7 +274,7 @@ class KepalaController extends Controller
                 ],
                 // Tahap 3: Admin SBUM
                 [
-                    'id_peminjaman'         => $id,
+                    'loan_id'         => $id,
                     'id_number_penyetuju' => null,
                     'status_persetujuan'    => 'menunggu',
                     'created_at'            => $now,
@@ -285,17 +285,17 @@ class KepalaController extends Controller
             Persetujuan::insert($persetujuans);
 
             // ── 5. Notifikasi ───────────────────────────────────────────────────
-            $itemName = $peminjaman->ruangan?->name_ruangan
-                ?? $peminjaman->alat?->name_alat
+            $itemName = $loan->room?->room_name
+                ?? $loan->tool?->tool_name
                 ?? 'Item';
 
             // Ke peminjam
             Notification::create([
-                'id_number'   => $peminjaman->id_peminjam,
+                'id_number'   => $loan->id_peminjam,
                 'type'          => 'menunggu',
                 'judul'         => 'Jadwal Diubah — Perlu Persetujuan Ulang',
-                'pesan'         => "Jadwal peminjaman {$itemName} diubah oleh Kepala SBUM. Persetujuan direset ke tahap awal.",
-                'peminjaman_id' => $peminjaman->id_peminjaman,
+                'pesan'         => "Jadwal loan {$itemName} diubah oleh Kepala SBUM. Persetujuan direset ke tahap awal.",
+                'loan_id' => $loan->loan_id,
             ]);
 
             // Ke penanggung jawab
@@ -304,8 +304,8 @@ class KepalaController extends Controller
                     'id_number'   => $nomorIndukPj,
                     'type'          => 'menunggu',
                     'judul'         => 'Persetujuan Ulang Diperlukan',
-                    'pesan'         => "Peminjaman {$itemName} dijadwalkan ulang oleh Kepala SBUM dan memerlukan persetujuan Anda kembali.",
-                    'peminjaman_id' => $peminjaman->id_peminjaman,
+                    'pesan'         => "loan {$itemName} dijadwalkan ulang oleh Kepala SBUM dan memerlukan persetujuan Anda kembali.",
+                    'loan_id' => $loan->loan_id,
                 ]);
             }
 
@@ -313,7 +313,7 @@ class KepalaController extends Controller
 
             return response()->json([
                 'message' => 'Jadwal berhasil diperbarui. Persetujuan direset ke tahap awal.',
-                'data'    => $peminjaman->fresh(),
+                'data'    => $loan->fresh(),
             ]);
 
         } catch (\Exception $e) {

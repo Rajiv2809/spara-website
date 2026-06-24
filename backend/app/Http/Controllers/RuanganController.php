@@ -4,120 +4,120 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\{Peminjaman, Ruangan, Gedungs, Lantai};
-use App\Http\Resources\{RuanganResource, JadwaRuanganResource};
+use App\Models\{loan, room, buildings, floor};
+use App\Http\Resources\{roomResource, JadwaroomResource};
 
-class RuanganController extends Controller
+class roomController extends Controller
 {
 
-    public function getRuangan()
+    public function getroom()
     {
-        $ruangan = Ruangan::with(['gedung', 'pic.user'])->get();
-        return RuanganResource::collection($ruangan);
+        $room = room::with(['building', 'pic.user'])->get();
+        return roomResource::collection($room);
     }
 
     public function show(int $id)
     {
-        $ruangan = Ruangan::with(['gedung', 'pic.user'])->findOrFail($id);
-        return new RuanganResource($ruangan);
+        $room = room::with(['building', 'pic.user'])->findOrFail($id);
+        return new roomResource($room);
     }
 
-    public function jadwalRuangan(int $id, string $tanggal)
+    public function jadwalroom(int $id, string $tanggal)
     {
-        $peminjaman = Peminjaman::with('persetujuans')
-            ->where('id_ruangan', $id)
+        $loan = loan::with('persetujuans')
+            ->where('room_id', $id)
             ->whereDate('hari_tanggal', $tanggal)
             ->get();
 
-        return JadwaRuanganResource::collection($peminjaman);
+        return JadwaroomResource::collection($loan);
     }
 
-    public function getGedung()
+    public function getbuilding()
     {
-        $gedung = Gedungs::all(['id_gedung', 'name_gedung']);
-        return response()->json(['data' => $gedung]);
+        $building = buildings::all(['building_id', 'building_name']);
+        return response()->json(['data' => $building]);
     }
 
-    public function getLantai()
+    public function getfloor()
     {
-        $lantai = Lantai::all(['nomor_lantai', 'name_lantai'])
-            ->sortBy('nomor_lantai')
+        $floor = floor::all(['floor_number', 'floor_name'])
+            ->sortBy('floor_number')
             ->values();
-        return response()->json(['data' => $lantai]);
+        return response()->json(['data' => $floor]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode_ruangan'      => 'required|unique:ruangans,kode_ruangan',
-            'name_ruangan'      => 'required|string|max:255',
-            'kapasitas'         => 'required|integer|min:1',
-            'fasilitas'         => 'required|string',
-            'deskripsi_ruangan' => 'nullable|string',
-            'status_ruangan'    => 'required|in:tersedia,maintenance,tidak_tersedia',
-            'nomor_lantai'      => 'required|exists:lantai,nomor_lantai',
-            'id_gedung'         => 'required|exists:gedungs,id_gedung',
+            'room_code'      => 'required|unique:rooms,room_code',
+            'room_name'      => 'required|string|max:255',
+            'capacity'         => 'required|integer|min:1',
+            'facility'         => 'required|string',
+            'room_description' => 'nullable|string',
+            'room_status'    => 'required|in:tersedia,maintenance,tidak_tersedia',
+            'floor_number'      => 'required|exists:floor,floor_number',
+            'building_id'         => 'required|exists:buildings,building_id',
             'id_number_pic'   => 'required|exists:users,id_number',
             'foto'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
             $validated['path_foto'] = $request->file('foto')
-                ->store('ruangan', 'public');
+                ->store('room', 'public');
         }
         unset($validated['foto']);
 
-        $ruangan = Ruangan::create($validated);
-        $ruangan->load(['gedung', 'pic.user']);
+        $room = room::create($validated);
+        $room->load(['building', 'pic.user']);
 
         return response()->json([
-            'message' => 'Ruangan berhasil ditambahkan',
-            'data'    => new RuanganResource($ruangan),
+            'message' => 'room berhasil ditambahkan',
+            'data'    => new roomResource($room),
         ], 201);
     }
 
     public function update(Request $request, int $id)
     {
-        $ruangan = Ruangan::findOrFail($id);
+        $room = room::findOrFail($id);
 
         $validated = $request->validate([
-            'kode_ruangan'      => 'required|unique:ruangans,kode_ruangan,' . $id . ',id_ruangan',
-            'name_ruangan'      => 'required|string|max:255',
-            'kapasitas'         => 'required|integer|min:1',
-            'fasilitas'         => 'required|string',
-            'deskripsi_ruangan' => 'nullable|string',
-            'status_ruangan'    => 'required|in:tersedia,maintenance,tidak_tersedia',
-            'nomor_lantai'      => 'required|exists:lantai,nomor_lantai',
-            'id_gedung'         => 'required|exists:gedungs,id_gedung',
+            'room_code'      => 'required|unique:rooms,room_code,' . $id . ',room_id',
+            'room_name'      => 'required|string|max:255',
+            'capacity'         => 'required|integer|min:1',
+            'facility'         => 'required|string',
+            'room_description' => 'nullable|string',
+            'room_status'    => 'required|in:tersedia,maintenance,tidak_tersedia',
+            'floor_number'      => 'required|exists:floor,floor_number',
+            'building_id'         => 'required|exists:buildings,building_id',
             'id_number_pic'   => 'required|exists:users,id_number',
             'foto'              => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
-            if ($ruangan->path_foto) {
-                Storage::disk('public')->delete($ruangan->path_foto);
+            if ($room->path_foto) {
+                Storage::disk('public')->delete($room->path_foto);
             }
             $validated['path_foto'] = $request->file('foto')
-                ->store('ruangan', 'public');
+                ->store('room', 'public');
         }
         unset($validated['foto']);
 
-        $ruangan->update($validated);
-        $ruangan->load(['gedung', 'pic.user']);
+        $room->update($validated);
+        $room->load(['building', 'pic.user']);
 
         return response()->json([
-            'message' => 'Ruangan berhasil diperbarui',
-            'data'    => new RuanganResource($ruangan->fresh()),
+            'message' => 'room berhasil diperbarui',
+            'data'    => new roomResource($room->fresh()),
         ]);
     }
 
     public function destroy(int $id)
     {
-        $ruangan = Ruangan::findOrFail($id);
-        $ruangan->delete();
+        $room = room::findOrFail($id);
+        $room->delete();
 
         return response()->json([
-            'message' => 'Ruangan berhasil dihapus'
+            'message' => 'room berhasil dihapus'
         ]);
     }
 }

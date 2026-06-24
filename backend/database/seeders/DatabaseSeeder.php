@@ -12,15 +12,15 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             departmentSeeder::class,
             StudyProgramSeeder::class,
-            LantaiSeeder::class,
-            GedungSeeder::class,
+            floorSeeder::class,
+            buildingSeeder::class,
             PicSeeder::class,
             lecturerSeeder::class,
             mahasiswaSeeder::class,
             PegawaiSbumSeeder::class,
-            AlatSeeder::class,
-            RuanganSeeder::class,
-            PeminjamanSeeder::class,
+            toolSeeder::class,
+            roomSeeder::class,
+            loanSeeder::class,
             
         ]);
     }

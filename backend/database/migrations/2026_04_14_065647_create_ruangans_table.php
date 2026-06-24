@@ -11,26 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ruangans', function (Blueprint $table) {
-            $table->id('id_ruangan');
-            $table->string('kode_ruangan')->unique();
+        Schema::create('rooms', function (Blueprint $table) {
+            $table->id('room_id');
+            $table->string('room_code')->unique();
 
-            $table->string('name_ruangan');
-            $table->integer('kapasitas')->nullable();
-            $table->text('fasilitas')->nullable();
-            $table->text('deskripsi_ruangan')->nullable();
-            $table->enum('status_ruangan', ['tersedia', 'maintenance', 'tidak_tersedia'])->default('tersedia');
+            $table->string('room_name');
+            $table->integer('capacity')->nullable();
+            $table->text('facility')->nullable();
+            $table->text('room_description')->nullable();
+            $table->enum('room_status', ['tersedia', 'maintenance', 'tidak_tersedia'])->default('tersedia');
             $table->string('path_foto');
 
-            $table->unsignedBigInteger('id_gedung');
-            $table->foreign('id_gedung'
-            )->references('id_gedung')->on('gedungs')->onDelete('cascade');
+            $table->unsignedBigInteger('building_id');
+            $table->foreign('building_id'
+            )->references('building_id')->on('buildings')->onDelete('cascade');
 
             $table->unsignedBigInteger('id_number_pic');
             $table->foreign('id_number_pic')->references('id_number')->on('users');
 
-            $table->unsignedBigInteger('nomor_lantai');
-            $table->foreign('nomor_lantai')->references('nomor_lantai')->on('lantai')->onDelete('cascade');
+            $table->unsignedBigInteger('floor_number');
+            $table->foreign('floor_number')->references('floor_number')->on('floor')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ruangans');
+        Schema::dropIfExists('rooms');
     }
 };

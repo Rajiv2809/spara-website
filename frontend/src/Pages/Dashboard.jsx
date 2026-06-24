@@ -7,17 +7,17 @@ import axiosClient from "../axios"
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [peminjaman, setPeminjaman] = useState([]);
-  const [stats, setStats] = useState({ total_alat: 0, total_ruangan: 0, alat_dipinjam: 0, ruangan_dipinjam: 0, perlu_disetujui: 0 });
+  const [loan, setloan] = useState([]);
+  const [stats, setStats] = useState({ total_tool: 0, total_room: 0, tool_dipinjam: 0, room_dipinjam: 0, perlu_disetujui: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      axiosClient.get("/peminjaman"),
+      axiosClient.get("/loan"),
       axiosClient.get("/dashboard-stats"),
     ])
-      .then(([peminjamanRes, statsRes]) => {
-        setPeminjaman(peminjamanRes.data.peminjaman || []);
+      .then(([loanRes, statsRes]) => {
+        setloan(loanRes.data.loan || []);
         setStats(statsRes.data);
       })
       .catch((err) => {
@@ -61,7 +61,7 @@ const Dashboard = () => {
 
           {/* Stats Cards */}
           <div className="grid lg:grid-cols-3 grid-rows-3 lg:grid-rows-1 mt-8 gap-12">
-            {/* Card 1 — Total Peralatan */}
+            {/* Card 1 — Total Pertoolan */}
             <div className="bg-gradient-to-r relative h-[140px] from-[#FF3A72] to-[#C62E4D] p-4 rounded-2xl shadow">
               <Icon
                 icon="mingcute:projector-line"
@@ -70,18 +70,18 @@ const Dashboard = () => {
               />
               <div className="relative z-10">
                 <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  TOTAL PERALATAN
+                  TOTAL PERtoolAN
                 </h3>
                 <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
-                  {loading ? "..." : stats.total_alat}
+                  {loading ? "..." : stats.total_tool}
                 </h1>
                 <h1 className="text-[#EEEEEE] text-[14px] italic font-thin font-poppins text-end leading-none">
-                  {stats.alat_dipinjam} Dalam peminjaman
+                  {stats.tool_dipinjam} Dalam loan
                 </h1>
               </div>
             </div>
 
-            {/* Card 2 — Total Ruangan */}
+            {/* Card 2 — Total room */}
             <div className="bg-gradient-to-b relative h-[140px] from-[#FF3A72] to-[#C62E4D] p-4 rounded-2xl shadow">
               <Icon
                 icon="ph:door-open-bold"
@@ -90,13 +90,13 @@ const Dashboard = () => {
               />
               <div className="relative z-10">
                 <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  TOTAL RUANGAN
+                  TOTAL room
                 </h3>
                 <h1 className="text-[#EEEEEE] text-[64px] font-extrabold font-poppins leading-none mt-2">
-                  {loading ? "..." : stats.total_ruangan}
+                  {loading ? "..." : stats.total_room}
                 </h1>
                 <h1 className="text-[#EEEEEE] text-[14px] italic font-thin font-poppins text-end leading-none">
-                  {stats.ruangan_dipinjam} Dalam peminjaman
+                  {stats.room_dipinjam} Dalam loan
                 </h1>
               </div>
             </div>
@@ -124,28 +124,28 @@ const Dashboard = () => {
 
           {/* Bottom Section */}
           <div className="grid lg:grid-cols-[3fr_2fr] grid-cols-1 gap-6 mt-8">
-            {/* Peminjaman yang Diajukan */}
+            {/* loan yang Diajukan */}
             <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl">
               <div className="relative z-10">
                 <h3 className="text-[#471020] text-[24px] font-bold">
-                  Peminjaman yang Diajukan
+                  loan yang Diajukan
                 </h3>
                 <button onClick={() => navigate("/riwayat")} className="absolute top-2 right-2 border-2 border-[#F2A31A] text-[#F2A31A] px-4 py-1 rounded-xl font-semibold hover:bg-[#F2A31A] hover:text-white transition duration-300">
                   Lihat Semua
                 </button>
                 <h2 className="text-[#BC8D9B] text-[14px] font-regular">
-                  Beberapa peminjaman yang baru-baru ini diajukan
+                  Beberapa loan yang baru-baru ini diajukan
                 </h2>
 
                 <div className="custom-scroll bg-[#EEEEEE] relative p-4 rounded-2xl mt-4 max-h-[324px] overflow-y-auto pr-3 space-y-3">
                   {loading ? (
                     <p className="text-center text-[#999] py-8">Memuat data...</p>
-                  ) : peminjaman.length === 0 ? (
-                    <p className="text-center text-[#999] py-8">Belum ada peminjaman.</p>
+                  ) : loan.length === 0 ? (
+                    <p className="text-center text-[#999] py-8">Belum ada loan.</p>
                   ) : (
-                    peminjaman.map((item, index) => {
+                    loan.map((item, index) => {
                       const { bg, label } = getStatusStyle(item.status_persetujuan);
-                      const isAlat = item.id_alat !== null && item.id_ruangan === null;
+                      const istool = item.tool_id !== null && item.room_id === null;
 
                       return (
                         <div
@@ -155,13 +155,13 @@ const Dashboard = () => {
                           <div className="flex items-center gap-4">
                             <div className="bg-[#7A2E3A] text-white p-2 rounded-lg">
                               <Icon
-                                icon={isAlat ? "la:tools" : "ph:door-open-bold"}
+                                icon={istool ? "la:tools" : "ph:door-open-bold"}
                                 width="28"
                               />
                             </div>
                             <div>
                               <h4 className="font-semibold text-[#471020]">
-                                {item.ruangan || item.alat || (item.id_ruangan ? "Ruangan #" + item.id_ruangan : item.id_alat ? "Alat #" + item.id_alat : "-")}
+                                {item.room || item.tool || (item.room_id ? "room #" + item.room_id : item.tool_id ? "tool #" + item.tool_id : "-")}
                               </h4>
                               <p className="text-[12px] text-[#606060]">
                                 PIC: {item.pic ?? "-"}

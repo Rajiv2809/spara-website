@@ -22,7 +22,7 @@ const statusColors = {
   ditolak: 'bg-red-100 text-red-800',
 };
 
-export default function KalenderPeminjaman() {
+export default function Kalenderloan() {
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
   const [filterJenis, setFilterJenis] = useState('semua');
@@ -42,7 +42,7 @@ export default function KalenderPeminjaman() {
       if (filterJenis !== 'semua') params.jenis = filterJenis;
       if (filterStatus) params.status = filterStatus;
 
-      const response = await axiosClient.get('/kepala/monitoring-peminjaman', { params });
+      const response = await axiosClient.get('/kepala/monitoring-loan', { params });
       setEvents(response.data.data || []);
       setStats(response.data.stats || null);
       setSelectedDate((current) => current || new Date().toISOString().slice(0, 10));
@@ -115,9 +115,9 @@ export default function KalenderPeminjaman() {
       <Sidebar />
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4">
         <div className="mb-6">
-          <h1 className="text-xl font-semibold text-gray-800">Kalender Peminjaman</h1>
+          <h1 className="text-xl font-semibold text-gray-800">Kalender loan</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Lihat semua peminjaman ruangan dan alat dalam tampilan kalender.
+            Lihat semua loan room dan tool dalam tampilan kalender.
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export default function KalenderPeminjaman() {
               { label: 'Total aktif', value: stats?.total ?? '-', color: 'text-gray-800' },
               { label: 'Menunggu', value: stats?.menunggu ?? '-', color: 'text-amber-700' },
               { label: 'Disetujui', value: stats?.disetujui ?? '-', color: 'text-emerald-700' },
-              { label: 'Ruangan', value: stats?.ruangan ?? '-', color: 'text-[#6b21a8]' },
+              { label: 'room', value: stats?.room ?? '-', color: 'text-[#6b21a8]' },
             ].map((card) => (
               <div key={card.label} className="bg-white/70 rounded-xl p-4 shadow-sm">
                 <p className="text-xs text-gray-500 mb-1">{card.label}</p>
@@ -138,19 +138,19 @@ export default function KalenderPeminjaman() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full xl:w-[420px]">
             <div className="bg-white/80 rounded-xl p-4 shadow-sm">
-              <p className="text-xs text-gray-500 mb-2">Jenis peminjaman</p>
+              <p className="text-xs text-gray-500 mb-2">Jenis loan</p>
               <select
                 value={filterJenis}
                 onChange={(e) => setFilterJenis(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
               >
                 <option value="semua">Semua</option>
-                <option value="ruangan">Ruangan</option>
-                <option value="alat">Alat</option>
+                <option value="room">room</option>
+                <option value="tool">tool</option>
               </select>
             </div>
             <div className="bg-white/80 rounded-xl p-4 shadow-sm">
-              <p className="text-xs text-gray-500 mb-2">Status peminjaman</p>
+              <p className="text-xs text-gray-500 mb-2">Status loan</p>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -233,11 +233,11 @@ export default function KalenderPeminjaman() {
                       {dayEvents.length > 0 && (
                         <div className="mt-3 flex flex-col gap-1 text-[11px] text-gray-600">
                           {dayEvents.slice(0, 2).map((item) => (
-                            <div key={item.id_peminjaman} className="rounded-2xl bg-slate-50 px-2 py-1">
+                            <div key={item.loan_id} className="rounded-2xl bg-slate-50 px-2 py-1">
                               <span className="font-medium">{item.name_kegiatan}</span>
                               <div className="mt-0.5 flex items-center gap-1">
                                 <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-slate-100">
-                                  {item.jenis === 'ruangan' ? 'Ruangan' : 'Alat'}
+                                  {item.jenis === 'room' ? 'room' : 'tool'}
                                 </span>
                                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusColors[item.status_persetujuan] ?? 'bg-gray-100 text-gray-700'}`}>
                                   {item.status_persetujuan}
@@ -282,17 +282,17 @@ export default function KalenderPeminjaman() {
               )}
 
               {!loading && !error && selectedEvents.length === 0 && (
-                <div className="text-sm text-gray-500">Tidak ada peminjaman pada tanggal ini.</div>
+                <div className="text-sm text-gray-500">Tidak ada loan pada tanggal ini.</div>
               )}
 
               {!loading && !error && selectedEvents.length > 0 && (
                 <div className="space-y-3">
                   {selectedEvents.map((item) => (
-                    <div key={item.id_peminjaman} className="rounded-3xl border border-gray-200 bg-[#FEF5EE] p-4">
+                    <div key={item.loan_id} className="rounded-3xl border border-gray-200 bg-[#FEF5EE] p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-sm font-semibold text-gray-900">{item.name_kegiatan}</p>
-                          <p className="text-xs text-gray-500 mt-1">{item.name_peminjam} · {item.jenis === 'ruangan' ? item.name_ruangan : item.name_alat}</p>
+                          <p className="text-xs text-gray-500 mt-1">{item.name_peminjam} · {item.jenis === 'room' ? item.room_name : item.tool_name}</p>
                         </div>
                         <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusColors[item.status_persetujuan] ?? 'bg-gray-100 text-gray-700'}`}>
                           {item.status_persetujuan}

@@ -31,21 +31,21 @@ const ModalBatal = ({ item, onClose, onConfirm, loading }) => {
               <Icon icon="ph:prohibit-bold" width={28} color="white" />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-white leading-tight m-0">Batalkan Peminjaman</h2>
+              <h2 className="text-lg font-extrabold text-white leading-tight m-0">Batalkan loan</h2>
               <p className="text-xs text-white/75 mt-1 font-medium">Tindakan ini tidak dapat dibatalkan</p>
             </div>
           </div>
         </div>
         <div className="px-7 pt-6 pb-2">
           <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-            Apakah Anda yakin ingin <strong className="text-gray-700">membatalkan</strong> peminjaman berikut?
+            Apakah Anda yakin ingin <strong className="text-gray-700">membatalkan</strong> loan berikut?
           </p>
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
             <div className="flex items-center gap-2.5 mb-3">
-              <Icon icon={item.alat ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-gray-600" />
-              <span className="text-sm font-bold text-gray-900">{item.ruangan || item.alat || "-"}</span>
+              <Icon icon={item.tool ? "ph:wrench-bold" : "ph:door-open-bold"} width={16} className="text-gray-600" />
+              <span className="text-sm font-bold text-gray-900">{item.room || item.tool || "-"}</span>
               <span className="ml-auto text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded-full">
-                {item.alat ? "Peralatan" : "Ruangan"}
+                {item.tool ? "Pertoolan" : "room"}
               </span>
             </div>
             {[
@@ -88,7 +88,7 @@ const formatJam = (jam) => jam?.slice(0, 5) ?? "-";
 const Riwayat = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState("ruangan");
+  const [filterType, setFilterType] = useState("room");
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -108,9 +108,9 @@ const Riwayat = () => {
   }, []);
 
   const stats = useMemo(() => {
-    const scope = filterType === "ruangan"
-      ? data.filter((d) => d.ruangan != null)
-      : data.filter((d) => d.alat != null);
+    const scope = filterType === "room"
+      ? data.filter((d) => d.room != null)
+      : data.filter((d) => d.tool != null);
     return {
       approved: scope.filter((d) => d.status_persetujuan === "disetujui").length,
       waiting: scope.filter((d) => d.status_persetujuan === "menunggu").length,
@@ -120,14 +120,14 @@ const Riwayat = () => {
 
   const filtered = useMemo(() => {
     return data.filter((d) => {
-      const isRuangan = d.ruangan != null;
-      const matchType = filterType === "ruangan" ? isRuangan : !isRuangan;
+      const isroom = d.room != null;
+      const matchType = filterType === "room" ? isroom : !isroom;
       const matchStatus = !statusFilter || d.status_persetujuan === statusFilter;
       const searchTerm = search.toLowerCase();
       const matchSearch = !searchTerm
         || (d.name_kegiatan || "").toLowerCase().includes(searchTerm)
-        || (d.ruangan || "").toLowerCase().includes(searchTerm)
-        || (d.alat || "").toLowerCase().includes(searchTerm);
+        || (d.room || "").toLowerCase().includes(searchTerm)
+        || (d.tool || "").toLowerCase().includes(searchTerm);
       return matchType && matchStatus && matchSearch;
     });
   }, [data, filterType, statusFilter, search]);
@@ -139,10 +139,10 @@ const Riwayat = () => {
 
   const handleCancel = (item) => {
     setActionLoading(true);
-    axiosClient.post(`/peminjaman-batal/${item.id_peminjaman}`)
+    axiosClient.post(`/loan-batal/${item.loan_id}`)
       .then(() => {
         setData((prev) => prev.map((d) =>
-          d.id_peminjaman === item.id_peminjaman ? { ...d, status_persetujuan: "dibatalkan" } : d
+          d.loan_id === item.loan_id ? { ...d, status_persetujuan: "dibatalkan" } : d
         ));
         setModalBatal(null);
       })
@@ -154,8 +154,8 @@ const Riwayat = () => {
   };
 
   const tabs = [
-    { key: "ruangan", label: "Ruangan", icon: "ph:door-open-bold" },
-    { key: "peralatan", label: "Peralatan", icon: "ph:wrench-bold" },
+    { key: "room", label: "room", icon: "ph:door-open-bold" },
+    { key: "pertoolan", label: "Pertoolan", icon: "ph:wrench-bold" },
   ];
 
   const statusTabs = [
@@ -171,12 +171,12 @@ const Riwayat = () => {
       <Sidebar />
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4 overflow-y-auto">
         <div className="mb-8">
-          <h1 className="text-[#2D0A18] text-[32px] lg:mt-2 mt-12 font-extrabold">Riwayat Peminjaman</h1>
-          <p className="text-gray-500 text-[14px] mt-1">Riwayat peminjaman ruangan dan peralatan yang telah diajukan</p>
+          <h1 className="text-[#2D0A18] text-[32px] lg:mt-2 mt-12 font-extrabold">Riwayat loan</h1>
+          <p className="text-gray-500 text-[14px] mt-1">Riwayat loan room dan pertoolan yang telah diajukan</p>
         </div>
 
         <div className="bg-white/70 backdrop-blur-md border border-white/40 rounded-3xl p-6 shadow-lg">
-          {/* Tab Ruangan / Peralatan */}
+          {/* Tab room / Pertoolan */}
           <div className="flex gap-2 mb-6">
             {tabs.map((tab) => (
               <button
@@ -206,7 +206,7 @@ const Riwayat = () => {
             <div className="flex-1 min-w-[200px] flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <Icon icon="mdi:magnify" className="text-gray-400 mr-2" width={16} />
               <input
-                placeholder="Cari kegiatan, ruangan, atau alat..."
+                placeholder="Cari kegiatan, room, atau tool..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="flex-1 outline-none text-[13px] text-gray-600 bg-transparent"
@@ -251,13 +251,13 @@ const Riwayat = () => {
                   <div className="flex items-start gap-3 px-4 pt-4 pb-2.5">
                     <div className="w-10 h-10 rounded-xl flex-shrink-0 bg-[#FDEAF0] border border-[#F5C6D8] flex items-center justify-center">
                       <Icon
-                        icon={item.id_ruangan ? "ph:door-open-bold" : item.id_alat ? "ph:wrench-bold" : "ph:question"}
+                        icon={item.room_id ? "ph:door-open-bold" : item.tool_id ? "ph:wrench-bold" : "ph:question"}
                         width={20} color="#C92B58"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-bold text-[#481020] leading-tight m-0">
-{item.ruangan || item.alat || (item.id_ruangan ? "Ruangan #" + item.id_ruangan : item.id_alat ? "Alat #" + item.id_alat : "-")}
+{item.room || item.tool || (item.room_id ? "room #" + item.room_id : item.tool_id ? "tool #" + item.tool_id : "-")}
                       </p>
                       <p className="text-[11px] text-[#C92B58] opacity-60 mt-0.5 font-medium">
                         {item.name_kegiatan}
@@ -305,7 +305,7 @@ const Riwayat = () => {
                         className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-300 bg-white text-gray-500 text-[12px] font-bold cursor-pointer hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-all"
                       >
                         <Icon icon="ph:prohibit-bold" width={14} />
-                        Batalkan Peminjaman
+                        Batalkan loan
                       </button>
                     </div>
                   )}

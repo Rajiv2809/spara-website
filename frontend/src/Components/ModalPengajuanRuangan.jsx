@@ -196,7 +196,7 @@ const SearchableSelect = ({ label, name, value, onChange, required }) => {
   );
 };
 
-const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
+const ModalPengajuan = ({ room, onClose, onSuccess }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -224,32 +224,32 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     hari_tanggal: "",
     jam_mulai: "",
     jam_selesai: "",
-    id_ruangan: "",
+    room_id: "",
     id_number_penanggungjawab: "",
     keterangan: "",
   });
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, id_ruangan: ruangan?.id || "" }));
-  }, [ruangan]);
+    setForm((prev) => ({ ...prev, room_id: room?.id || "" }));
+  }, [room]);
 
   useEffect(() => {
     if (!tanggalCek) return;
-    const ruanganId = ruangan?.id_ruangan;
-    if (!ruanganId) return;
+    const roomId = room?.room_id;
+    if (!roomId) return;
 
     setIsLoadingJadwal(true);
     setJadwalTerpakai([]);
 
     axiosClient
-      .get(`/jadwal-ruangan/${ruanganId}/${tanggalCek}`)
+      .get(`/jadwal-room/${roomId}/${tanggalCek}`)
       .then(({ data }) => setJadwalTerpakai(data.data ?? []))
       .catch((err) => {
         console.error("Gagal mengambil jadwal:", err);
         setJadwalTerpakai([]);
       })
       .finally(() => setIsLoadingJadwal(false));
-  }, [tanggalCek, ruangan]);
+  }, [tanggalCek, room]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -292,7 +292,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
       hari_tanggal: form.hari_tanggal,
       jam_mulai: form.jam_mulai.slice(0, 5),
       jam_selesai: form.jam_selesai.slice(0, 5),
-      id_ruangan: form.id_ruangan,
+      room_id: form.room_id,
       id_number_penanggungjawab: form.id_number_penanggungjawab,
       keterangan: form.keterangan || null,
     };
@@ -302,7 +302,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
     setStep(3);
 
     axiosClient
-      .post("/peminjaman", payload)
+      .post("/loan", payload)
       .then(() => {
         setIsSuccess(true);
         setTimeout(() => {
@@ -352,7 +352,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
         >
           {/* Header */}
           <div className="bg-[#A3264C] text-white px-6 py-4 flex justify-between items-center rounded-t-2xl">
-            <h2 className="font-semibold text-lg">Form Pengajuan Peminjaman Ruangan</h2>
+            <h2 className="font-semibold text-lg">Form Pengajuan loan room</h2>
             <button onClick={onClose}>✕</button>
           </div>
 
@@ -386,15 +386,15 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
             {step === 1 && (
               <>
                 <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">
-                  Jadwal Pemakaian Ruangan
+                  Jadwal Pemakaian room
                 </h3>
                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-5">
-                  <p className="font-semibold text-[#A3264C] text-lg">{ruangan?.name}</p>
+                  <p className="font-semibold text-[#A3264C] text-lg">{room?.name}</p>
                   <p className="text-sm text-gray-500 mt-1 mb-4">
-                    Pilih tanggal untuk mengecek ketersediaan ruangan
+                    Pilih tanggal untuk mengecek ketersediaan room
                   </p>
                   <Input
-                    label="Cek Ketersediaan Ruangan"
+                    label="Cek Ketersediaan room"
                     type="date"
                     value={tanggalCek}
                     min={minDate}
@@ -421,11 +421,11 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                   </div>
                   {isBentrokConfirmed ? (
                     <p className="text-red-600 text-sm mt-2 font-medium">
-                      Jadwal yang dipilih bertabrakan dengan peminjaman lain yang sudah dikonfirmasi.
+                      Jadwal yang dipilih bertabrakan dengan loan lain yang sudah dikonfirmasi.
                     </p>
                   ) : isBentrokPending ? (
                     <p className="text-amber-600 text-sm mt-2 font-medium">
-                      Ada peminjaman yang diajukan di jam yang sama (belum disetujui). Anda tetap bisa melanjutkan.
+                      Ada loan yang diajukan di jam yang sama (belum disetujui). Anda tetap bisa melanjutkan.
                     </p>
                   ) : (
                     jamMulaiCek &&
@@ -470,7 +470,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     ) : (
                       <p className="text-sm text-gray-400">
                         {tanggalCek
-                          ? "Tidak ada peminjaman pada tanggal ini"
+                          ? "Tidak ada loan pada tanggal ini"
                           : "Pilih tanggal untuk melihat jadwal"}
                       </p>
                     )}
@@ -495,7 +495,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                       <span>{form.jam_mulai.slice(0, 5)} - {form.jam_selesai.slice(0, 5)}</span>
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-[#A3264C] mt-2">{ruangan?.name}</p>
+                  <p className="text-sm font-medium text-[#A3264C] mt-2">{room?.name}</p>
                 </div>
 
                 <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Detail Pengajuan</h3>
@@ -598,7 +598,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
                     }
 
                     if (isBentrokConfirmed) {
-                      alert("Jam yang dipilih sudah digunakan oleh peminjaman yang sudah dikonfirmasi.");
+                      alert("Jam yang dipilih sudah digunakan oleh loan yang sudah dikonfirmasi.");
                       return;
                     }
 
@@ -638,7 +638,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
             </div>
             <h2 className="text-xl font-bold text-[#3D0C1F] mt-4">Peringatan</h2>
             <p className="text-sm text-gray-500 mt-3">
-              Sudah ada orang lain yang mengajukan peminjaman diwaktu yang sama, apakah anda tetap mau pinjam?
+              Sudah ada orang lain yang mengajukan loan diwaktu yang sama, apakah anda tetap mau pinjam?
             </p>
             <div className="flex gap-3 justify-center mt-6">
               <button
@@ -676,8 +676,8 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
               Apakah Anda yakin ingin mengirim pengajuan ini?
             </p>
             <div className="mt-4 bg-gray-50 rounded-xl p-4 text-left space-y-2 text-sm text-gray-600">
-              <p><span className="font-medium">Ruangan:</span> {ruangan?.name}</p>
-              <p><span className="font-medium">ID Ruangan:</span> {form.id_ruangan}</p>
+              <p><span className="font-medium">room:</span> {room?.name}</p>
+              <p><span className="font-medium">ID room:</span> {form.room_id}</p>
               <p><span className="font-medium">Kegiatan:</span> {form.name_kegiatan}</p>
               <p><span className="font-medium">Jenis:</span> {form.jenis_kegiatan}</p>
               <p><span className="font-medium">Tanggal:</span> {form.hari_tanggal}</p>

@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Gedungs extends Model
+class buildings extends Model
 {
-    protected $table = 'gedungs';
-    protected $primaryKey = 'id_gedung';
+    protected $table = 'buildings';
+    protected $primaryKey = 'building_id';
 
     protected $fillable = [
-        'name_gedung',
+        'building_name',
     ];
 
-    public function lantai(): HasMany
+    public function floor(): HasMany
     {
-        return $this->hasMany(Lantai::class, 'id_gedung', 'id_gedung');
+        return $this->hasMany(floor::class, 'building_id', 'building_id');
     }
 }

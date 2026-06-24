@@ -5,32 +5,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
-class Ruangan extends Model
+class room extends Model
 {
-    protected $table      = 'ruangans';
-    protected $primaryKey = 'id_ruangan';
+    protected $table      = 'rooms';
+    protected $primaryKey = 'room_id';
 
     protected $fillable = [
-        'kode_ruangan',
-        'name_ruangan',
-        'kapasitas',
-        'fasilitas',
-        'deskripsi_ruangan',
-        'status_ruangan',
-        'nomor_lantai',
-        'id_gedung',
+        'room_code',
+        'room_name',
+        'capacity',
+        'facility',
+        'room_description',
+        'room_status',
+        'floor_number',
+        'building_id',
         'id_number_pic',
         'path_foto',
     ];
 
-    public function lantai(): BelongsTo
+    public function floor(): BelongsTo
     {
-        return $this->belongsTo(Lantai::class, 'nomor_lantai', 'nomor_lantai');
+        return $this->belongsTo(floor::class, 'floor_number', 'floor_number');
     }
 
-    public function gedung(): BelongsTo
+    public function building(): BelongsTo
     {
-        return $this->belongsTo(Gedungs::class, 'id_gedung', 'id_gedung');
+        return $this->belongsTo(buildings::class, 'building_id', 'building_id');
     }
 
     public function pic(): BelongsTo
@@ -43,8 +43,8 @@ class Ruangan extends Model
         return $this->pic?->user;
     }
 
-    public function peminjaman(): HasMany
+    public function loan(): HasMany
     {
-        return $this->hasMany(Peminjaman::class, 'id_ruangan', 'id_ruangan');
+        return $this->hasMany(loan::class, 'room_id', 'room_id');
     }
 }
