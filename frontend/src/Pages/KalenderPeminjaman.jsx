@@ -115,7 +115,9 @@ export default function KalenderPeminjaman() {
       <Sidebar />
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4">
         <div className="mb-6">
-          <h1 className="text-xl font-semibold text-gray-800">Kalender Peminjaman</h1>
+          <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
+            Kalender Peminjaman
+          </h1>
           <p className="text-sm text-gray-500 mt-1">
             Lihat semua peminjaman ruangan dan alat dalam tampilan kalender.
           </p>

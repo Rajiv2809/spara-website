@@ -114,7 +114,9 @@ export default function Laporan() {
             
                 {/* ── Header ─────────────────────────────────────────── */}
                 <div className="mb-6">
-                    <h1 className="text-xl font-semibold text-gray-800">Laporan Peminjaman</h1>
+                    <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
+                        Laporan Peminjaman
+                    </h1>
                     <p className="text-sm text-gray-500 mt-1">
                         Rekapitulasi data peminjaman ruangan &amp; alat
                     </p>
