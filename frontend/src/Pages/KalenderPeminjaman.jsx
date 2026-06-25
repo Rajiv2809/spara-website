@@ -232,26 +232,6 @@ export default function KalenderPeminjaman() {
                           )}
                         </div>
                       )}
-                      {dayEvents.length > 0 && (
-                        <div className="mt-3 flex flex-col gap-1 text-[11px] text-gray-600">
-                          {dayEvents.slice(0, 2).map((item) => (
-                            <div key={item.id_peminjaman} className="rounded-2xl bg-slate-50 px-2 py-1">
-                              <span className="font-medium">{item.name_kegiatan}</span>
-                              <div className="mt-0.5 flex items-center gap-1">
-                                <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-gray-700 bg-slate-100">
-                                  {item.jenis === 'ruangan' ? 'Ruangan' : 'Alat'}
-                                </span>
-                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusColors[item.status_persetujuan] ?? 'bg-gray-100 text-gray-700'}`}>
-                                  {item.status_persetujuan}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                          {dayEvents.length > 2 && (
-                            <div className="text-[11px] text-gray-500">+{dayEvents.length - 2} lainnya</div>
-                          )}
-                        </div>
-                      )}
                     </button>
                   );
                 })}
