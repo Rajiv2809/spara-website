@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('kode_alat')->unique();
             $table->string('name_alat');
             $table->text('deskripsi_alat')->nullable();
-            $table->enum('status_alat', ['tersedia', 'dipinjam', 'rusak', 'maintenance'])->default('tersedia');
+            $table->enum('status_alat', ['tersedia', 'maintenance'])->default('tersedia');
 
             $table->unsignedBigInteger('id_number_pic')->nullable();
             $table->foreign('id_number_pic')->references('id_number')->on('users')->onDelete('set null');

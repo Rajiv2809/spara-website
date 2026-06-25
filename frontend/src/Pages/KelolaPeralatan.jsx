@@ -6,8 +6,6 @@ import axiosClient from "../axios";
 
 const STATUS_STYLES = {
   tersedia:    { badge: "bg-emerald-500",  label: "Tersedia" },
-  dipinjam:    { badge: "bg-orange-400",   label: "Dalam Peminjaman" },
-  rusak:       { badge: "bg-red-500",      label: "Rusak" },
   maintenance: { badge: "bg-red-500",      label: "Maintenance" },
 };
 
@@ -348,8 +346,6 @@ const ModalAlat = ({ onClose, onSave, editData, saving }) => {
                 }`}
               >
                 <option value="tersedia">Tersedia</option>
-                <option value="dipinjam">Dipinjam</option>
-                <option value="rusak">Rusak</option>
                 <option value="maintenance">Maintenance</option>
               </select>
               <Icon
@@ -573,10 +569,7 @@ const KelolaPeralatan = () => {
   }, [searchQuery]);
 
   const tersedia    = alat.filter((a) => a.status === "tersedia").length;
-  const dipinjam    = alat.filter((a) => a.status === "dipinjam").length;
-  const maintenance = alat.filter(
-    (a) => a.status === "maintenance" || a.status === "rusak"
-  ).length;
+  const maintenance = alat.filter((a) => a.status === "maintenance").length;
 
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
     (p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1
@@ -608,7 +601,7 @@ const KelolaPeralatan = () => {
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           {[
             {
               label: "Peralatan Tersedia",
@@ -617,14 +610,6 @@ const KelolaPeralatan = () => {
               from: "#8B1E3F",
               to: "#C0254A",
               icon: "mdi:check-circle-outline",
-            },
-            {
-              label: "Dalam Peminjaman",
-              value: dipinjam,
-              sub: "Sedang dipinjam",
-              from: "#C0254A",
-              to: "#FF4D8D",
-              icon: "mdi:clock-outline",
             },
             {
               label: "Tidak Tersedia",

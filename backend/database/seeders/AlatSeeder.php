@@ -40,7 +40,7 @@ class AlatSeeder extends Seeder
                 'kode_alat'          => 'ALT-004',
                 'name_alat'          => 'Kamera DSLR Canon EOS',
                 'deskripsi_alat'     => 'Kamera dokumentasi kegiatan',
-                'status_alat'        => 'dipinjam',
+                'status_alat'        => 'tersedia',
                 'id_number_pic'    => $picNomorInduk,
                 'created_at'         => now(), 'updated_at' => now(),
             ],

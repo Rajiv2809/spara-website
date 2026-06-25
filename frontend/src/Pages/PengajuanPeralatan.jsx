@@ -7,8 +7,6 @@ import peralatanImg from "../assets/peralatan.jpg";
 
 const statusStyles = {
   tersedia: { bg: "bg-green-500", text: "TERSEDIA" },
-  dipinjam: { bg: "bg-blue-500", text: "DIPINJAM" },
-  rusak: { bg: "bg-red-500", text: "RUSAK" },
   maintenance: { bg: "bg-yellow-500", text: "MAINTENANCE" },
 };
 
@@ -88,12 +86,12 @@ const initialEquipments = [
   { id: 1, name: "Kamera Luminux", kode: "KMR-001", deskripsi: "Kamera Lumix GH5 Lensa Kit dengan 1 baterai", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
   { id: 2, name: "Kamera Sony FX 3", kode: "KMR-002", deskripsi: "Kamera Sony FX 3, Body Only - Lensa Terpisah.", status: "tersedia", jenis: "FOTOGRAFI", stok: 1 },
   { id: 3, name: "GPS Handheld 73", kode: "GPS-001", deskripsi: "Alat Survey Terestris", status: "maintenance", jenis: "PROG PK", stok: 2 },
-  { id: 4, name: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "dipinjam", jenis: "PROG PK", stok: 0 },
-  { id: 5, name: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "rusak", jenis: "FOTOGRAFI", stok: 0 },
+  { id: 4, name: "GPS Geodetik Topcon GR-5", kode: "GPS-002", deskripsi: "Alat Survey Terestris", status: "tersedia", jenis: "PROG PK", stok: 2 },
+  { id: 5, name: "Lightstick", kode: "LI-001", deskripsi: "Light stick portable RGB", status: "maintenance", jenis: "FOTOGRAFI", stok: 0 },
   { id: 6, name: "Lighting SL 60W", kode: "LI-002", deskripsi: "Lighting SL 60W dengan light stand", status: "tersedia", jenis: "FOTOGRAFI", stok: 2 },
   { id: 7, name: "USB to HDMI Cable", kode: "USB-001", deskripsi: "Alat untuk Menghubungkan USB ke HDMI", status: "tersedia", jenis: "PROG PK", stok: 2 },
   { id: 8, name: "USB Cable", kode: "USB-002", deskripsi: "Alat untuk Menghubungkan USB ke komputer", status: "maintenance", jenis: "PROG PK", stok: 2 },
-  { id: 9, name: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "rusak", jenis: "PROG PK", stok: 0 },
+  { id: 9, name: "Solder Sucker", kode: "SLDR-001", deskripsi: "Alat untuk Menyedot timah solder", status: "maintenance", jenis: "PROG PK", stok: 0 },
   { id: 10, name: "Soldering Stand", kode: "SLDR-002", deskripsi: "Alat untuk Menopang solder", status: "tersedia", jenis: "PROG PK", stok: 4 },
   { id: 11, name: "Wacom Intuos Pro Large", kode: "WCM-001", deskripsi: "Wacom Intuos Pro Large PTH-851 Pen Tablet", status: "tersedia", jenis: "WACOM", stok: 1 },
 ];

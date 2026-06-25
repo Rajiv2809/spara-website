@@ -28,7 +28,7 @@ class AlatController extends Controller
             'kode_alat'        => 'required|unique:alats,kode_alat',
             'name_alat'        => 'required|string|max:255',
             'deskripsi_alat'   => 'nullable|string',
-            'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
+            'status_alat'      => 'required|in:tersedia,maintenance',
             'id_number_pic'  => 'nullable|exists:users,id_number',
             'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -55,7 +55,7 @@ class AlatController extends Controller
             'kode_alat'        => 'required|unique:alats,kode_alat,' . $id . ',id_alat',
             'name_alat'        => 'required|string|max:255',
             'deskripsi_alat'   => 'nullable|string',
-            'status_alat'      => 'required|in:tersedia,dipinjam,rusak,maintenance',
+            'status_alat'      => 'required|in:tersedia,maintenance',
             'id_number_pic'  => 'nullable|exists:users,id_number',
             'foto'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
