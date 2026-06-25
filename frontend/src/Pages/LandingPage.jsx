@@ -181,7 +181,7 @@ export default function Home() {
         </div>
 
         <div className="flex justify-between items-center max-w-5xl mx-auto px-10 mt-10 pt-6 border-t border-white/10 text-xs opacity-30">
-          <p>© 2026 SPARA Polibatam. Seluruh hak cipta dilindungi.</p>
+          <p>© 2026 SPARA Polibatam</p>
           <p>Dikembangkan oleh Tim PBL-TRPL209</p>
         </div>
       </footer>
