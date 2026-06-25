@@ -17,6 +17,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/update-profile-photo', [AuthController::class, 'updateProfilePhoto']);
+    Route::post('/update-profile-phone', [AuthController::class, 'updateProfilePhone']);
 
     Route::get('/get-ruangan', [RuanganController::class, 'getRuangan']);
     Route::get('/ruangan/{id}', [RuanganController::class, 'show']);

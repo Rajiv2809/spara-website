@@ -11,7 +11,13 @@ const ModalProfile = ({ onClose }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Handle ketika user memilih gambar 
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(
+    currentUser?.phone_number || "",
+  );
+  const [isUpdatingPhone, setIsUpdatingPhone] = useState(false);
+
+  // Handle ketika user memilih gambar
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -45,7 +51,7 @@ const ModalProfile = ({ onClose }) => {
         formData,
       );
 
-      // Update state user 
+      // Update state user
       setCurrentUser(response.data.user);
 
       alert("Foto profil berhasil diperbarui!");
@@ -62,6 +68,33 @@ const ModalProfile = ({ onClose }) => {
       );
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  // Mengirim pembaruan nomor telepon ke Backend (API)
+  const handleUpdatePhone = async () => {
+    if (phoneNumber === currentUser?.phone_number) {
+      setIsEditingPhone(false);
+      return;
+    }
+
+    setIsUpdatingPhone(true);
+    try {
+      const response = await axiosClient.post("/update-profile-phone", {
+        phone_number: phoneNumber,
+      });
+
+      setCurrentUser(response.data.user);
+      alert("Nomor telepon berhasil diperbarui!");
+      setIsEditingPhone(false);
+    } catch (error) {
+      console.error("Gagal memperbarui nomor telepon:", error);
+      alert(
+        error.response?.data?.message ||
+          "Terjadi kesalahan saat memperbarui nomor telepon.",
+      );
+    } finally {
+      setIsUpdatingPhone(false);
     }
   };
 
@@ -158,19 +191,70 @@ const ModalProfile = ({ onClose }) => {
           </div>
 
           {/* Nomor Telepon */}
-          <div className="flex items-center gap-3 text-gray-700">
-            <Icon
-              icon="material-symbols:call-outline"
-              width="20"
-              className="text-[#862440] shrink-0"
-            />
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                No. Telepon
-              </span>
-              <span className="text-[13px] font-semibold text-gray-700 truncate">
-                {currentUser.phone_number || "-"}
-              </span>
+          <div className="flex items-center justify-between gap-3 text-gray-700 w-full min-h-[44px]">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <Icon
+                icon="material-symbols:call-outline"
+                width="20"
+                className="text-[#862440] shrink-0"
+              />
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                  No. Telepon
+                </span>
+                {isEditingPhone ? (
+                  <input
+                    type="number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    disabled={isUpdatingPhone}
+                    className="text-[13px] font-semibold text-gray-700 border-b border-gray-400 focus:outline-none focus:border-[#862440] bg-transparent py-0 w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    autoFocus
+                  />
+                ) : (
+                  <span className="text-[13px] font-semibold text-gray-700 truncate">
+                    {currentUser?.phone_number || "-"}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Ikon Edit */}
+            <div className="shrink-0 flex items-center gap-1">
+              {isEditingPhone ? (
+                <>
+                  <button
+                    onClick={handleUpdatePhone}
+                    disabled={isUpdatingPhone}
+                    className="text-green-600 hover:text-green-700 p-1"
+                    title="Simpan"
+                  >
+                    <Icon
+                      icon="material-symbols:check-circle-rounded"
+                      width="20"
+                    />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingPhone(false);
+                      setPhoneNumber(currentUser?.phone_number || "");
+                    }}
+                    disabled={isUpdatingPhone}
+                    className="text-gray-400 hover:text-gray-500 p-1"
+                    title="Batal"
+                  >
+                    <Icon icon="material-symbols:cancel-rounded" width="20" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditingPhone(true)}
+                  className="text-gray-400 hover:text-[#862440] p-1 transition-colors mt-[12px]"
+                  title="Ubah Nomor"
+                >
+                  <Icon icon="material-symbols:edit-outline" width="14" />
+                </button>
+              )}
             </div>
           </div>
         </div>

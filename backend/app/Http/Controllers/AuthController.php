@@ -131,4 +131,27 @@ class AuthController extends Controller
             'user' => $this->formatProfilePhoto($user),
         ]);
     }
+    public function updateProfilePhone(Request $request)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'phone_number' => 'required|numeric|digits_between:10,15',
+        ], [
+            'phone_number.required' => 'Nomor telepon tidak boleh kosong.',
+            'phone_number.numeric' => 'Nomor telepon harus berupa angka.',
+            'phone_number.digits_between' => 'Nomor telepon harus di antara 10 sampai 15 digit.',
+        ]);
+
+        // Ambil data user 
+        $user = auth()->user();
+
+        // 3. Update nomor telepon di database
+        $user->phone_number = $request->phone_number;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Nomor telepon berhasil diperbarui',
+            'user' => $this->formatProfilePhoto($user),
+        ], 200);
+    }
 }
