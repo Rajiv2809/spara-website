@@ -240,7 +240,7 @@ const Sidebar = () => {
         </div>
         <div className="text-left flex-1 min-w-0">
           <h1 className="text-[15px] truncate font-medium group-hover:underline">
-            {currentUser?.name || "name Pengguna"}
+            {currentUser?.name || "Nama Pengguna"}
           </h1>
           <h3 className="text-[10px] text-[#B1B1B1] truncate">Lihat Profil</h3>
         </div>

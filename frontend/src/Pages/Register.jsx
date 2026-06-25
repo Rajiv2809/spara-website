@@ -40,7 +40,7 @@ export default function Register() {
     if (step === 1) {
       const missing = [];
       if (!nomorInduk) missing.push("NIM");
-      if (!name) missing.push("name Lengkap");
+      if (!name) missing.push("Nama");
 
       if (missing.length > 0) {
         // Menggabungkan pesan jika ada lebih dari 1 data yang kosong
@@ -162,7 +162,7 @@ export default function Register() {
                 />
                 <input
                   type="text"
-                  placeholder="name Lengkap"
+                  placeholder="Nama"
                   value={name}
                   onChange={(e) => setname(e.target.value)}
                   disabled={isLoading}
