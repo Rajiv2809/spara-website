@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController};
+use App\Models\{Alat, Ruangan, User};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -10,6 +11,15 @@ use App\Http\Controllers\{AdminController, AuthController, PeminjamanController,
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/riwayat-debug', [PeminjamanController::class, 'riwayatDebug']);
+
+// Public stats for landing page (no auth required)
+Route::get('/public-stats', function () {
+    return response()->json([
+        'alat'    => Alat::count(),
+        'ruangan' => Ruangan::count(),
+        'users'   => User::count(),
+    ]);
+});
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/test', [AuthController::class, 'test']);
