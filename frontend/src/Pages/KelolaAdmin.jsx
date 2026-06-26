@@ -2,16 +2,12 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
-
-/* =========================
-   DATA AWAL
-========================= */
-const initialAdmin = [];
+import { useStateContext } from '../Contexts/context';
 
 /* =========================
    MODAL
 ========================= */
-const ModalAdmin = ({ onClose, onSave, editData }) => {
+const ModalAdmin = ({ onClose, onSave, editData, onValidationError }) => {
   const [form, setForm] = useState({
     name: "",
     nomorInduk: "",
@@ -56,7 +52,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
       !form.telepon.trim() ||
       (!editData && !form.password.trim())
     ) {
-      alert("Semua field wajib diisi!");
+      onValidationError("Semua field wajib diisi!");
       return;
     }
 
@@ -76,14 +72,14 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
         <div className="p-5 space-y-4 text-black">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              name Admin <span className="text-red-500">*</span>
+              Nama Admin <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="Masukkan name admin"
+              placeholder="Masukkan nama admin"
               className="border border-gray-300 p-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#862440]"
               required
             />
@@ -100,10 +96,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
               readOnly={!!editData}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "");
-                setForm((prev) => ({
-                  ...prev,
-                  nomorInduk: value,
-                }));
+                setForm((prev) => ({ ...prev, nomorInduk: value }));
               }}
               placeholder="Masukkan nomor induk"
               className="border border-gray-300 p-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#862440]"
@@ -128,7 +121,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              No Hp<span className="text-red-500">*</span>
+              No Hp <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -137,10 +130,7 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
               maxLength={15}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "");
-                setForm((prev) => ({
-                  ...prev,
-                  telepon: value,
-                }));
+                setForm((prev) => ({ ...prev, telepon: value }));
               }}
               placeholder="Masukkan nomor telepon"
               className="border border-gray-300 p-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#862440]"
@@ -165,7 +155,6 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
             </div>
           )}
 
-          {/* Status */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Status <span className="text-red-500">*</span>
@@ -186,7 +175,6 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
           <button onClick={onClose} className="flex-1 border rounded-lg py-2">
             Batal
           </button>
-
           <button
             onClick={handleSubmit}
             className="flex-1 bg-[#862440] text-white rounded-lg py-2"
@@ -203,10 +191,11 @@ const ModalAdmin = ({ onClose, onSave, editData }) => {
    MAIN PAGE
 ========================= */
 const KelolaAdmin = () => {
-  const [admins, setAdmins] = useState(initialAdmin);
+  const [admins, setAdmins] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editData, setEditData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useStateContext();
 
   const normalizeAdmin = (admin) => ({
     ...admin,
@@ -216,85 +205,89 @@ const KelolaAdmin = () => {
     status: admin.status || "aktif",
   });
 
-  const fetchAdmins = async () => {
+  const fetchAdmins = () => {
     setIsLoading(true);
-
-    try {
-      const response = await axiosClient.get("/get-admin");
-      const data = response.data || [];
-      setAdmins(data.map(normalizeAdmin));
-    } catch (error) {
-      console.error(error);
-      alert("Gagal memuat admin. Pastikan backend berjalan dan Anda sudah login.");
-    } finally {
-      setIsLoading(false);
-    }
+    axiosClient.get("/get-admin")
+      .then((response) => {
+        const data = response.data || [];
+        setAdmins(data.map(normalizeAdmin));
+      })
+      .catch((error) => {
+        console.error(error);
+        showToast("Gagal memuat data admin.", "red");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
     fetchAdmins();
   }, []);
 
-  const handleSave = async (data) => {
+  const handleSave = (data) => {
     if (editData) {
-      try {
-        const payload = {
-          name: data.name,
-          email: data.email,
-          phone_number: data.telepon,
-        };
+      const payload = {
+        name: data.name,
+        email: data.email,
+        phone_number: data.telepon,
+      };
 
-        await axiosClient.put(`/admin/${editData.nomorInduk}`, payload);
-        setAdmins((prev) =>
-          prev.map((a) =>
-            a.nomorInduk === editData.nomorInduk
-              ? { ...a, ...data, status: a.status || "aktif" }
-              : a,
-          ),
-        );
-      } catch (error) {
-        console.error(error);
-        alert("Gagal memperbarui admin.");
-        return;
-      }
+      axiosClient.put(`/admin/${editData.nomorInduk}`, payload)
+        .then(() => {
+          setAdmins((prev) =>
+            prev.map((a) =>
+              a.nomorInduk === editData.nomorInduk
+                ? { ...a, ...data, status: a.status || "aktif" }
+                : a
+            )
+          );
+          showToast("Admin berhasil diperbarui!", "green");
+          setShowModal(false);
+          setEditData(null);
+        })
+        .catch((error) => {
+          console.error(error);
+          showToast("Gagal memperbarui admin.", "red");
+        });
     } else {
-      try {
-        const payload = {
-          id_number: data.nomorInduk,
-          name: data.name,
-          email: data.email,
-          phone_number: data.telepon,
-          password: data.password,
-        };
+      const payload = {
+        id_number: data.nomorInduk,
+        name: data.name,
+        email: data.email,
+        phone_number: data.telepon,
+        password: data.password,
+      };
 
-        const response = await axiosClient.post("/admin", payload);
-        const createdAdmin = normalizeAdmin(response.data.data);
-
-        setAdmins((prev) => [...prev, createdAdmin]);
-      } catch (error) {
-        console.error(error);
-        alert("Gagal menambahkan admin.");
-        return;
-      }
+      axiosClient.post("/admin", payload)
+        .then((response) => {
+          const createdAdmin = normalizeAdmin(response.data.data);
+          setAdmins((prev) => [...prev, createdAdmin]);
+          showToast("Admin berhasil ditambahkan!", "green");
+          setShowModal(false);
+          setEditData(null);
+        })
+        .catch((error) => {
+          setShowModal(false);
+          console.error(error.response.data.message);
+          showToast(error.response.data.message , "red");
+        });
     }
-
-    setShowModal(false);
-    setEditData(null);
   };
 
-  const handleDelete = async (nomorInduk) => {
+  const handleDelete = (nomorInduk) => {
     const confirmed = window.confirm("Hapus admin ini?");
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
-    try {
-      await axiosClient.delete(`/admin/${nomorInduk}`);
-      setAdmins((prev) => prev.filter((a) => a.nomorInduk !== nomorInduk));
-    } catch (error) {
-      console.error(error);
-      alert("Gagal menghapus admin.");
-    }
+    axiosClient.delete(`/admin/${nomorInduk}`)
+      .then(() => {
+        setAdmins((prev) => prev.filter((a) => a.nomorInduk !== nomorInduk));
+        showToast("Admin berhasil dihapus!", "green");
+      })
+      .catch((error) => {
+        console.error(error);
+        showToast("Gagal menghapus admin.", "red");
+      });
   };
 
   const totalAdmin = admins.length;
@@ -315,7 +308,6 @@ const KelolaAdmin = () => {
               </h1>
               <p className="text-gray-500">Kelola akun administrator sistem</p>
             </div>
-
             <button
               onClick={() => setShowModal(true)}
               className="bg-[#862440] text-white px-5 py-2 rounded-lg"
@@ -324,11 +316,8 @@ const KelolaAdmin = () => {
             </button>
           </div>
 
-          {/* =========================
-            STATS CARD 
-        ========================= */}
+          {/* STATS CARD */}
           <div className="grid lg:grid-cols-3 grid-rows-3 lg:grid-rows-1 mt-8 gap-12">
-            {/* Card 1 */}
             <div className="bg-gradient-to-r relative h-[140px] from-[#FF3A72] to-[#C62E4D] p-4 rounded-2xl shadow">
               <Icon
                 icon="mingcute:projector-line"
@@ -336,12 +325,8 @@ const KelolaAdmin = () => {
                 width="160"
               />
               <div className="relative z-10">
-                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  TOTAL ADMIN
-                </h3>
-                <h1 className="text-white text-5xl font-bold mt-2">
-                  {totalAdmin}
-                </h1>
+                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">TOTAL ADMIN</h3>
+                <h1 className="text-white text-5xl font-bold mt-2">{totalAdmin}</h1>
               </div>
             </div>
 
@@ -352,9 +337,7 @@ const KelolaAdmin = () => {
                 width="160"
               />
               <div className="relative z-10">
-                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  ADMIN AKTIF
-                </h3>
+                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">ADMIN AKTIF</h3>
                 <h1 className="text-white text-5xl font-bold mt-2">{aktif}</h1>
               </div>
             </div>
@@ -366,25 +349,18 @@ const KelolaAdmin = () => {
                 width="130"
               />
               <div className="relative z-10">
-                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">
-                  ADMIN NONAKTIF
-                </h3>
-                <h1 className="text-white text-5xl font-bold mt-2">
-                  {nonaktif}
-                </h1>
+                <h3 className="text-[#EEEEEE] text-[18px] font-bold font-poppins">ADMIN NONAKTIF</h3>
+                <h1 className="text-white text-5xl font-bold mt-2">{nonaktif}</h1>
               </div>
             </div>
           </div>
 
-          {/* =========================
-            TABLE ADMIN (REPLACE CARD)
-        ========================= */}
+          {/* TABLE */}
           <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl mt-8">
             <h2 className="text-xl font-bold mb-4">Daftar Admin</h2>
 
-            {/* HEADER TABLE */}
             <div className="grid grid-cols-6 text-gray-500 text-sm font-semibold border-b pb-3">
-              <span>name</span>
+              <span>Nama</span>
               <span>Nomor Induk</span>
               <span>Email</span>
               <span>Telepon</span>
@@ -394,20 +370,18 @@ const KelolaAdmin = () => {
 
             {isLoading ? (
               <div className="py-8 text-center text-gray-500">Memuat admin...</div>
+            ) : admins.length === 0 ? (
+              <div className="py-8 text-center text-gray-400">Belum ada data admin.</div>
             ) : (
               admins.map((admin) => (
                 <div
                   key={admin.id}
                   className="grid grid-cols-6 items-center py-4 border-b last:border-none"
                 >
-                  <span className="font-semibold text-[#C0254A]">
-                    {admin.name}
-                  </span>
-
+                  <span className="font-semibold text-[#C0254A]">{admin.name}</span>
                   <span>{admin.nomorInduk}</span>
                   <span className="truncate">{admin.email}</span>
                   <span>{admin.telepon}</span>
-
                   <div className="flex justify-center">
                     <span
                       className={`text-white text-xs px-3 py-1 rounded-full ${
@@ -417,7 +391,6 @@ const KelolaAdmin = () => {
                       {admin.status.toUpperCase()}
                     </span>
                   </div>
-
                   <div className="flex justify-center gap-2">
                     <button
                       onClick={() => {
@@ -428,7 +401,6 @@ const KelolaAdmin = () => {
                     >
                       <Icon icon="mdi:pencil" />
                     </button>
-
                     <button
                       onClick={() => handleDelete(admin.nomorInduk)}
                       className="bg-red-500 text-white p-2 rounded-lg"
@@ -442,7 +414,6 @@ const KelolaAdmin = () => {
           </div>
         </div>
 
-        {/* MODAL */}
         {showModal && (
           <ModalAdmin
             editData={editData}
@@ -451,6 +422,7 @@ const KelolaAdmin = () => {
               setEditData(null);
             }}
             onSave={handleSave}
+            onValidationError={(msg) => showToast(msg, "red")}
           />
         )}
       </div>

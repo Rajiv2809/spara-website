@@ -21,6 +21,7 @@ Route::get('/public-stats', function () {
     ]);
 });
 
+Route::get('/get-ruangan', [RuanganController::class, 'getRuangan']);
 Route::middleware('auth:api')->group(function () {
     Route::get('/test', [AuthController::class, 'test']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -30,7 +31,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/update-profile-phone', [AuthController::class, 'updateProfilePhone']);
     Route::post('/update-password', [AuthController::class, 'updatePassword']);
 
-    Route::get('/get-ruangan', [RuanganController::class, 'getRuangan']);
     Route::get('/ruangan/{id}', [RuanganController::class, 'show']);
     Route::get('/jadwal-ruangan/{id}/{tanggal}', [RuanganController::class, 'jadwalRuangan']);
 
