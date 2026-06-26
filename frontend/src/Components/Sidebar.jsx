@@ -149,7 +149,7 @@ const Sidebar = () => {
       .then(() => {
         navigate("/login");
         setUserToken(null);
-        setCurrentUser({});
+        setCurrentUser(null);
       })
       .catch(({ res }) => {
         console.log(res);

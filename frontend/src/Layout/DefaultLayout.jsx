@@ -15,12 +15,8 @@ const DefaultLayout = () => {
     }
     useEffect(() => {
         const savedUser = Cookies.get("currentUser");
-
-        if (savedUser) {
-            setCurrentUser(JSON.parse(savedUser));
-            setLoading(false);
-            return;
-        }
+       
+       
 
         axiosClient.get('/me')
             .then(({ data }) => {
