@@ -24,10 +24,6 @@ const router = createBrowserRouter([
     element: <DefaultLayout />,
     children: [
       {
-        index: true,
-        element: <Navigate to="/dashboard" replace />,
-      },
-      {
         path: "/home",
         element: <Home />,
       },
@@ -85,6 +81,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <GuestLayout />,
     children: [
+      {
+        index: true,
+        element: <Navigate to="/landing-page" replace />,
+      },
       {
         path: "/login",
         element: <Login />,
