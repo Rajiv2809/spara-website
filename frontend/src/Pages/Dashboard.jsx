@@ -127,13 +127,13 @@ const Dashboard = () => {
             {/* Peminjaman yang Diajukan */}
             <div className="bg-[#EEEEEE] p-4 rounded-2xl shadow-xl">
               <div className="relative z-10">
-                <h3 className="text-[#471020] text-[24px] font-bold">
+                <h3 className="text-[#471020] pt-12 text-[24px] font-bold">
                   Peminjaman yang Diajukan
                 </h3>
                 <button onClick={() => navigate("/riwayat")} className="absolute top-2 right-2 border-2 border-[#F2A31A] text-[#F2A31A] px-4 py-1 rounded-xl font-semibold hover:bg-[#F2A31A] hover:text-white transition duration-300">
                   Lihat Semua
                 </button>
-                <h2 className="text-[#BC8D9B] text-[14px] font-normal">
+                <h2 className="text-[#BC8D9B] text-[14px]  font-normal">
                   Beberapa peminjaman yang baru-baru ini diajukan
                 </h2>
 

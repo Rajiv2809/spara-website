@@ -196,7 +196,7 @@ export default function KalenderPeminjaman() {
                   <div key={day} className="py-2">{day}</div>
                 ))}
               </div>
-              <div className="grid grid-cols-7 gap-1 mt-1">
+              <div className="grid md:grid-cols-7 grid-cols-3 gap-1 mt-1">
                 {Array.from({ length: totalCells }).map((_, index) => {
                   const dayNumber = index - startWeekDay + 1;
                   const inMonth = index >= startWeekDay && dayNumber <= totalDays;
@@ -211,26 +211,71 @@ export default function KalenderPeminjaman() {
                       key={index}
                       type="button"
                       onClick={() => dateKey && setSelectedDate(dateKey)}
-                      className={`min-h-[96px] rounded-3xl border px-2 py-2 text-left transition-colors ${
-                        inMonth
+                      className={`
+    min-h-[48px] sm:min-h-[72px] lg:min-h-[96px]
+    rounded-2xl sm:rounded-3xl border
+    px-1 sm:px-2 py-1 sm:py-2
+    text-left transition-colors
+    ${inMonth
                           ? isSelected
                             ? 'border-[#D85A30] bg-[#FFF2E9]'
                             : 'border-gray-200 bg-white hover:border-[#D85A30] hover:bg-orange-50'
                           : 'border-transparent bg-transparent'
-                      }`}
+                        }
+  `}
                       disabled={!inMonth}
                     >
                       {inMonth && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className={`text-sm font-semibold ${isToday(currentYear, currentMonth, dayNumber) ? 'text-[#D85A30]' : 'text-gray-700'}`}>
-                            {dayNumber}
-                          </span>
-                          {dayEvents.length > 0 && (
-                            <span className="inline-flex items-center rounded-full bg-[#FDE8D8] px-2 py-0.5 text-[11px] font-semibold text-[#B45309]">
-                              {dayEvents.length}
+                        <>
+                          {/* Baris atas: tanggal + badge jumlah */}
+                          <div className="flex items-center justify-between gap-1">
+                            <span
+                              className={`
+            text-[11px] sm:text-sm font-semibold leading-none
+            ${isToday(currentYear, currentMonth, dayNumber)
+                                  ? 'text-[#D85A30]'
+                                  : 'text-gray-700'
+                                }
+          `}
+                            >
+                              {dayNumber}
                             </span>
+<<<<<<< Updated upstream
                           )}
                         </div>
+=======
+                            {dayEvents.length > 0 && (
+                              <span className="inline-flex items-center rounded-full bg-[#FDE8D8] px-1 sm:px-2 py-0.5 text-[10px] font-semibold text-[#B45309] leading-none">
+                                {dayEvents.length}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Event previews — hanya muncul di sm ke atas */}
+                          {dayEvents.length > 0 && (
+                            <div className="hidden sm:flex mt-1.5 sm:mt-2 flex-col gap-1 text-[11px] text-gray-600">
+                              {dayEvents.slice(0, 2).map((item) => (
+                                <div key={item.id_peminjaman} className="rounded-xl bg-slate-50 px-1.5 py-1">
+                                  <span className="font-medium line-clamp-1">{item.name_kegiatan}</span>
+                                  <div className="mt-0.5 flex flex-wrap items-center gap-1">
+                                    <span className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-gray-700 bg-slate-100">
+                                      {item.jenis === 'ruangan' ? 'Ruangan' : 'Alat'}
+                                    </span>
+                                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${statusColors[item.status_persetujuan] ?? 'bg-gray-100 text-gray-700'}`}>
+                                      {item.status_persetujuan}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                              {dayEvents.length > 2 && (
+                                <span className="text-[10px] text-gray-500">
+                                  +{dayEvents.length - 2} lainnya
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </>
+>>>>>>> Stashed changes
                       )}
                     </button>
                   );

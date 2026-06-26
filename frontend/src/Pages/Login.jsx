@@ -30,7 +30,7 @@ export default function Login() {
         navigate("/dashboard");
         showToast(data.message, "green");
       })
-      .catch((error) => {
+      .catch(( error ) => {
           const message = error.response?.data?.message || "Login gagal. Silakan coba lagi.";
           showToast(message, "red");
       })
