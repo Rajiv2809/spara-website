@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { Icon } from "@iconify/react";
 import { useStateContext } from "../Contexts/context.jsx";
 import axiosClient from "../axios";
@@ -20,6 +20,7 @@ const ModalProfile = ({ onClose }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   // Handle ketika user memilih gambar
   const handleFileChange = (e) => {
@@ -126,6 +127,7 @@ const ModalProfile = ({ onClose }) => {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setShowPasswordForm(false);
     } catch (error) {
       console.error("Gagal memperbarui password:", error);
       alert(
@@ -163,202 +165,227 @@ const ModalProfile = ({ onClose }) => {
           <Icon icon="mdi:close" width="22" />
         </button>
 
-        {/* Header Profil  */}
-        <div className="relative mt-2 mb-4 flex justify-center items-center w-full ">
-          <div className="relative w-24 h-24 rounded-full border-4 border-[#862440] p-0.5 shadow-md bg-gray-100 flex items-center justify-center">
-            {previewUrl || currentUser?.profile_picture ? (
-              <img
-                src={previewUrl || currentUser.profile_picture}
-                alt="Profil"
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              <Icon
-                icon="fa6-solid:user"
-                className="text-gray-400"
-                width="36"
-              />
-            )}
-          </div>
-
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-          />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current.click()}
-            className="absolute -bottom-3  bg-[#862440] text-white w-8 h-8 rounded-full shadow-md flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          >
-            <Icon icon="mdi:camera" width="14" />
-          </button>
-        </div>
-
-        {/* Informasi Utama */}
-        <div className="text-center w-full px-2 mb-6">
-          <h2 className="text-lg font-bold text-gray-800 truncate">
-            {currentUser.name || "name Pengguna"}
-          </h2>
-          <p className="text-xs text-gray-400 font-mono mt-0.5 tracking-wider">
-            {currentUser.id_number || "-"}
-          </p>
-        </div>
-
-        <div className="w-full h-[1px] bg-gray-100 mb-4" />
-
-        {/* Detail Data Profil  */}
-        <div className="w-full space-y-4 px-1 mb-6">
-          {/* Email */}
-          <div className="flex items-center gap-3 text-gray-700">
-            <Icon
-              icon="material-symbols:mail-outline"
-              width="20"
-              className="text-[#862440] shrink-0"
-            />
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                Email
-              </span>
-              <span className="text-[13px] font-semibold text-gray-700 truncate">
-                {currentUser.email || "-"}
-              </span>
-            </div>
-          </div>
-
-          {/* Nomor Telepon */}
-          <div className="flex items-center justify-between gap-3 text-gray-700 w-full min-h-[44px]">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <Icon
-                icon="material-symbols:call-outline"
-                width="20"
-                className="text-[#862440] shrink-0"
-              />
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                  No. Telepon
-                </span>
-                {isEditingPhone ? (
-                  <input
-                    type="number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    disabled={isUpdatingPhone}
-                    className="text-[13px] font-semibold text-gray-700 border-b border-gray-400 focus:outline-none focus:border-[#862440] bg-transparent py-0 w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    autoFocus
+        {!showPasswordForm ? (
+          <>
+            {/* Header Profil  */}
+            <div className="relative mt-2 mb-4 flex justify-center items-center w-full ">
+              <div className="relative w-24 h-24 rounded-full border-4 border-[#862440] p-0.5 shadow-md bg-gray-100 flex items-center justify-center">
+                {previewUrl || currentUser?.profile_picture ? (
+                  <img
+                    src={previewUrl || currentUser.profile_picture}
+                    alt="Profil"
+                    className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
-                  <span className="text-[13px] font-semibold text-gray-700 truncate">
-                    {currentUser?.phone_number || "-"}
-                  </span>
+                  <Icon
+                    icon="fa6-solid:user"
+                    className="text-gray-400"
+                    width="36"
+                  />
                 )}
+              </div>
+
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current.click()}
+                className="absolute -bottom-3  bg-[#862440] text-white w-8 h-8 rounded-full shadow-md flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+              >
+                <Icon icon="mdi:camera" width="14" />
+              </button>
+            </div>
+
+            {/* Informasi Utama */}
+            <div className="text-center w-full px-2 mb-6">
+              <h2 className="text-lg font-bold text-gray-800 truncate">
+                {currentUser.name || "name Pengguna"}
+              </h2>
+              <p className="text-xs text-gray-400 font-mono mt-0.5 tracking-wider">
+                {currentUser.id_number || "-"}
+              </p>
+            </div>
+
+            <div className="w-full h-[1px] bg-gray-100 mb-4" />
+
+            {/* Detail Data Profil  */}
+            <div className="w-full space-y-4 px-1 mb-6">
+              {/* Email */}
+              <div className="flex items-center gap-3 text-gray-700">
+                <Icon
+                  icon="material-symbols:mail-outline"
+                  width="20"
+                  className="text-[#862440] shrink-0"
+                />
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                    Email
+                  </span>
+                  <span className="text-[13px] font-semibold text-gray-700 truncate">
+                    {currentUser.email || "-"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Nomor Telepon */}
+              <div className="flex items-center justify-between gap-3 text-gray-700 w-full min-h-[44px]">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Icon
+                    icon="material-symbols:call-outline"
+                    width="20"
+                    className="text-[#862440] shrink-0"
+                  />
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                      No. Telepon
+                    </span>
+                    {isEditingPhone ? (
+                      <input
+                        type="number"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        disabled={isUpdatingPhone}
+                        className="text-[13px] font-semibold text-gray-700 border-b border-gray-400 focus:outline-none focus:border-[#862440] bg-transparent py-0 w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="text-[13px] font-semibold text-gray-700 truncate">
+                        {currentUser?.phone_number || "-"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Ikon Edit */}
+                <div className="shrink-0 flex items-center gap-1">
+                  {isEditingPhone ? (
+                    <>
+                      <button
+                        onClick={handleUpdatePhone}
+                        disabled={isUpdatingPhone}
+                        className="text-green-600 hover:text-green-700 p-1"
+                        title="Simpan"
+                      >
+                        <Icon
+                          icon="material-symbols:check-circle-rounded"
+                          width="20"
+                        />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditingPhone(false);
+                          setPhoneNumber(currentUser?.phone_number || "");
+                        }}
+                        disabled={isUpdatingPhone}
+                        className="text-gray-400 hover:text-gray-500 p-1"
+                        title="Batal"
+                      >
+                        <Icon icon="material-symbols:cancel-rounded" width="20" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setIsEditingPhone(true)}
+                      className="text-gray-400 hover:text-[#862440] p-1 transition-colors mt-[12px]"
+                      title="Ubah Nomor"
+                    >
+                      <Icon icon="material-symbols:edit-outline" width="14" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Ikon Edit */}
-            <div className="shrink-0 flex items-center gap-1">
-              {isEditingPhone ? (
-                <>
-                  <button
-                    onClick={handleUpdatePhone}
-                    disabled={isUpdatingPhone}
-                    className="text-green-600 hover:text-green-700 p-1"
-                    title="Simpan"
-                  >
-                    <Icon
-                      icon="material-symbols:check-circle-rounded"
-                      width="20"
-                    />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsEditingPhone(false);
-                      setPhoneNumber(currentUser?.phone_number || "");
-                    }}
-                    disabled={isUpdatingPhone}
-                    className="text-gray-400 hover:text-gray-500 p-1"
-                    title="Batal"
-                  >
-                    <Icon icon="material-symbols:cancel-rounded" width="20" />
-                  </button>
-                </>
-              ) : (
+            <div className="w-full mb-4">
+              <button
+                type="button"
+                onClick={() => setShowPasswordForm(true)}
+                className="w-full py-2.5 rounded-xl border border-[#862440] text-[#862440] font-semibold hover:bg-[#FFF0F3] transition"
+              >
+                Ganti Password
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-full mb-4">
+              <button
+                type="button"
+                onClick={() => setShowPasswordForm(false)}
+                className="w-full py-2.5 rounded-xl border border-[#862440] text-[#862440] font-semibold hover:bg-[#FFF0F3] transition"
+              >
+                Kembali ke Profil
+              </button>
+            </div>
+
+            <div className="w-full rounded-2xl border border-gray-200 bg-[#FEF3F2] p-4 mb-4">
+              <div className="mb-3">
+                <h3 className="text-sm font-semibold text-[#861a34]">
+                  Ubah Password
+                </h3>
+                <p className="text-xs text-gray-500">
+                  Masukkan password lama dan password baru.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                    Password Lama
+                  </label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
+                    placeholder="Password lama"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                    Password Baru
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
+                    placeholder="Password baru"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                    Konfirmasi Password Baru
+                  </label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
+                    placeholder="Konfirmasi password baru"
+                  />
+                </div>
+
                 <button
-                  onClick={() => setIsEditingPhone(true)}
-                  className="text-gray-400 hover:text-[#862440] p-1 transition-colors mt-[12px]"
-                  title="Ubah Nomor"
+                  type="button"
+                  onClick={handleUpdatePassword}
+                  disabled={isUpdatingPassword}
+                  className="w-full rounded-xl bg-[#862440] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#6d1d33] transition"
                 >
-                  <Icon icon="material-symbols:edit-outline" width="14" />
+                  {isUpdatingPassword ? "Menyimpan..." : "Simpan Password"}
                 </button>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Ubah Password */}
-        <div className="w-full rounded-2xl border border-gray-200 bg-[#FEF3F2] p-4 mb-4">
-          <div className="mb-3">
-            <h3 className="text-sm font-semibold text-[#861a34]">
-              Ubah Password
-            </h3>
-            <p className="text-xs text-gray-500">
-              Masukkan password lama dan password baru.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                Password Lama
-              </label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
-                placeholder="Password lama"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                Password Baru
-              </label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
-                placeholder="Password baru"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                Konfirmasi Password Baru
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
-                placeholder="Konfirmasi password baru"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleUpdatePassword}
-              disabled={isUpdatingPassword}
-              className="w-full rounded-xl bg-[#862440] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#6d1d33] transition"
-            >
-              {isUpdatingPassword ? "Menyimpan..." : "Simpan Password"}
-            </button>
-          </div>
-        </div>
+          </>
+        )}
 
         {selectedFile && (
           <div className="w-full flex gap-2 mb-4">
