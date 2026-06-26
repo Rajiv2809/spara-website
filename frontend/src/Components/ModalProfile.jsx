@@ -16,6 +16,10 @@ const ModalProfile = ({ onClose }) => {
     currentUser?.phone_number || "",
   );
   const [isUpdatingPhone, setIsUpdatingPhone] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   // Handle ketika user memilih gambar
   const handleFileChange = (e) => {
@@ -98,6 +102,41 @@ const ModalProfile = ({ onClose }) => {
     }
   };
 
+  const handleUpdatePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert("Lengkapi semua kolom password terlebih dahulu.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Password baru dan konfirmasi password tidak sama.");
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+
+    try {
+      await axiosClient.post("/update-password", {
+        current_password: currentPassword,
+        password: newPassword,
+        password_confirmation: confirmPassword,
+      });
+
+      alert("Password berhasil diperbarui.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.error("Gagal memperbarui password:", error);
+      alert(
+        error.response?.data?.message ||
+          "Terjadi kesalahan saat memperbarui password.",
+      );
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
   // Membatalkan pilihan gambar baru
   const handleCancelSelection = () => {
     setSelectedFile(null);
@@ -113,7 +152,7 @@ const ModalProfile = ({ onClose }) => {
       {/* Kartu Modal  */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-[360px] flex flex-col items-center z-[10] transform transition-all animate-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-[360px] max-h-[90vh] overflow-y-auto flex flex-col items-center z-[10] transform transition-all animate-in zoom-in-95 duration-200"
       >
         {/* Tombol Close Pojok Kanan Atas */}
         <button
@@ -256,6 +295,68 @@ const ModalProfile = ({ onClose }) => {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Ubah Password */}
+        <div className="w-full rounded-2xl border border-gray-200 bg-[#FEF3F2] p-4 mb-4">
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold text-[#861a34]">
+              Ubah Password
+            </h3>
+            <p className="text-xs text-gray-500">
+              Masukkan password lama dan password baru.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                Password Lama
+              </label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
+                placeholder="Password lama"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                Password Baru
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
+                placeholder="Password baru"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-gray-600 mb-1">
+                Konfirmasi Password Baru
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700"
+                placeholder="Konfirmasi password baru"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleUpdatePassword}
+              disabled={isUpdatingPassword}
+              className="w-full rounded-xl bg-[#862440] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#6d1d33] transition"
+            >
+              {isUpdatingPassword ? "Menyimpan..." : "Simpan Password"}
+            </button>
           </div>
         </div>
 
