@@ -19,6 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->string('profile_picture')->nullable();
             $table->enum('role', ['admin', 'lecturer', 'pic', 'mahasiswa', 'kepala'])->default('mahasiswa');
+
+            $table->unsignedBigInteger('id_prodi')->nullable();
+            $table->foreign('id_prodi')->references('id_prodi')->on('study_programs')->nullOnDelete();
+
             $table->rememberToken();
             $table->timestamps();
         });
