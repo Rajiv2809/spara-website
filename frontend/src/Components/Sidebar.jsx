@@ -72,7 +72,6 @@ const menuByRole = {
       label: "Kalender",
       href: "/kalender-peminjaman",
     },
-    { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
     {
       icon: "material-symbols:check-circle-outline",
       label: "Persetujuan",
@@ -110,12 +109,6 @@ const menuByRole = {
       label: "Kalender",
       href: "/kalender-peminjaman",
     },
-    { icon: "mdi:file-chart-outline", label: "Laporan", href: "/laporan" },
-    // {
-    //   icon: "material-symbols:check-circle-outline",
-    //   label: "Persetujuan",
-    //   href: "/persetujuan-peminjaman",
-    // },
     {
       icon: "mdi:account-cog-outline",
       label: "Kelola Admin",

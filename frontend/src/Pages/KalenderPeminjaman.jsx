@@ -240,10 +240,6 @@ export default function KalenderPeminjaman() {
                             >
                               {dayNumber}
                             </span>
-<<<<<<< Updated upstream
-                          )}
-                        </div>
-=======
                             {dayEvents.length > 0 && (
                               <span className="inline-flex items-center rounded-full bg-[#FDE8D8] px-1 sm:px-2 py-0.5 text-[10px] font-semibold text-[#B45309] leading-none">
                                 {dayEvents.length}
@@ -275,7 +271,6 @@ export default function KalenderPeminjaman() {
                             </div>
                           )}
                         </>
->>>>>>> Stashed changes
                       )}
                     </button>
                   );

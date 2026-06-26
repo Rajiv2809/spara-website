@@ -15,7 +15,6 @@ import KelolaPeralatan from "./Pages/KelolaPeralatan.jsx";
 import KelolaAdmin from "./Pages/KelolaAdmin";
 import AllListPeminjaman from "./Pages/AllLlistPeminjman.jsx";
 import Register from "./Pages/Register.jsx";
-import Laporan from "./Pages/Laporan.jsx";
 import PeminjamanKepala from "./Pages/PeminjamanKepala.jsx";
 import KalenderPeminjaman from "./Pages/KalenderPeminjaman.jsx";
 const router = createBrowserRouter([
@@ -61,7 +60,7 @@ const router = createBrowserRouter([
       },
       {
         path:"/laporan",
-        element: <Laporan/>
+        element: <Navigate to="/dashboard" replace />
       },
       {
         path:"/kalender-peminjaman",
