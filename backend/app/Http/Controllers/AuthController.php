@@ -154,4 +154,27 @@ class AuthController extends Controller
             'user' => $this->formatProfilePhoto($user),
         ], 200);
     }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Password lama tidak sesuai.'
+            ], 422);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password berhasil diperbarui.'
+        ], 200);
+    }
 }
