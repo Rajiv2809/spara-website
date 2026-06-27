@@ -139,7 +139,7 @@ const Sidebar = () => {
   }, []);
 
   const handleLogoutClick = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setShowLogoutModal(true);
   };
 
@@ -214,40 +214,53 @@ const Sidebar = () => {
       </div>
 
       {/* Profile & Logout */}
-      <div
-        onClick={() => {
-          setShowProfileModal(true);
-          setIsOpen(false); //
-        }}
-        className="mt-auto flex flex-row gap-2 items-center p-2 rounded-md mb-8 border border-[#eeeeee] cursor-pointer hover:bg-[#682B3C] transition-colors group"
-      >
-        <div className="w-11 h-11 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-          {currentUser?.profile_picture ? (
-            <img
-              src={currentUser.profile_picture}
-              alt="Profil"
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <Icon icon="fa6-solid:user" className="text-gray-400" width="16" />
-          )}
-        </div>
-        <div className="text-left flex-1 min-w-0">
-          <h1 className="text-[15px] truncate font-medium group-hover:underline">
-            {currentUser?.name || "Nama Pengguna"}
-          </h1>
-          <h3 className="text-[10px] text-[#B1B1B1] truncate">Lihat Profil</h3>
+      <div className="mt-auto mb-5 px-1 flex flex-col gap-2">
+        {/* Profile Card */}
+        <div
+          onClick={() => {
+            setShowProfileModal(true);
+            setIsOpen(false);
+          }}
+          className="flex flex-row items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-[#6d1c30] bg-[#6d1c3055] border border-white/10 group"
+        >
+          {/* Avatar */}
+          <div className="relative shrink-0">
+            <div className="w-11 h-11 rounded-full ring-2 ring-white/30 bg-gray-200 flex items-center justify-center overflow-hidden">
+              {currentUser?.profile_picture ? (
+                <img
+                  src={currentUser.profile_picture}
+                  alt="Profil"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <Icon icon="fa6-solid:user" className="text-gray-400" width="16" />
+              )}
+            </div>
+            {/* Online Dot */}
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-[#862440] rounded-full" />
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-[14px] font-semibold truncate text-white leading-tight group-hover:text-[#FFEDDD] transition-colors">
+              {currentUser?.name || "Nama Pengguna"}
+            </h1>
+            <span className="text-[10px] text-white/50 flex items-center gap-1 mt-0.5">
+              <Icon icon="mdi:account-circle-outline" width="11" />
+              Lihat &amp; Edit Profil
+            </span>
+          </div>
+
+          <Icon icon="mdi:chevron-right" width="18" className="text-white/40 shrink-0 group-hover:text-white/70 transition-colors" />
         </div>
 
+        {/* Logout Button */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleLogoutClick(e);
-          }}
-          className="p-1 rounded hover:bg-[#862440] text-[#FFEDDD] transition-colors shrink-0 ml-1 flex items-center justify-center"
-          title="Keluar Aplikasi"
+          onClick={handleLogoutClick}
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-white/15 text-white/70 text-[13px] font-medium hover:bg-red-700/30 hover:text-white hover:border-red-400/40 transition-all duration-200"
         >
-          <Icon icon="material-symbols:logout-rounded" width="24" />
+          <Icon icon="material-symbols:logout-rounded" width="18" />
+          Keluar Aplikasi
         </button>
       </div>
     </div>

@@ -209,17 +209,6 @@ export default function LandingPage() {
 
         <div className="relative z-10 px-10 md:px-20 max-w-2xl">
           {/* Value badges */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {["✓ Gratis", "✓ Tanpa Biaya", "✓ Untuk Sivitas Akademika"].map((badge) => (
-              <span
-                key={badge}
-                className="text-xs bg-white/15 backdrop-blur-sm border border-white/25 text-white px-3 py-1 rounded-full font-medium"
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight text-white drop-shadow-lg">
             Pinjam{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-rose-300">
@@ -417,7 +406,7 @@ export default function LandingPage() {
         </div>
 
         <div className="flex justify-between items-center max-w-5xl mx-auto px-10 mt-10 pt-6 border-t border-white/10 text-xs opacity-30">
-          <p>© 2026 SPARA Polibatam. All rights reserved.</p>
+          <p>© 2026 SPARA Polibatam.</p>
           <p>Dikembangkan oleh Tim PBL-TRPL209</p>
         </div>
       </footer>
