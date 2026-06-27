@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
+import {useStateContext} from "../Contexts/context.jsx";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -472,6 +473,8 @@ const PersetujuanPeminjaman = () => {
   const [modalDetail, setModalDetail]     = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  const {showToast} = useStateContext();
+
   const statusRef = useRef(null);
 
   useEffect(() => {
@@ -525,8 +528,7 @@ const PersetujuanPeminjaman = () => {
       })
       .catch((err) => {
         setModalSetujui(null);
-        const msg = err?.response?.data?.message || "Gagal menyetujui";
-        alert(msg);
+        showToast
       })
       .finally(() => setActionLoading(false));
   };

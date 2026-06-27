@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
+import {useStateContext} from "../contexts/ContextProvider";
 
 const Input = ({ label, name, type = "text", required = false, value, onChange, ...props }) => (
   <div className="flex flex-col gap-1">
@@ -217,6 +218,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
   const now = new Date();
   const currentTime = now.toTimeString().slice(0, 5);
   const isToday = tanggalCek === minDate;
+  const {showToast} = UseStateContext();
 
   const [form, setForm] = useState({
     name_kegiatan: "",
@@ -316,7 +318,7 @@ const ModalPengajuan = ({ ruangan, onClose, onSuccess }) => {
         console.error("Gagal submit:", err);
         setIsSubmitting(false);
         setStep(2);
-        alert("Gagal mengirim pengajuan, coba lagi.");
+        showToast(err.response.data.message, 'red');
       });
   };
 
