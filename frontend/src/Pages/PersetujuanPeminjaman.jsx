@@ -528,7 +528,7 @@ const PersetujuanPeminjaman = () => {
       })
       .catch((err) => {
         setModalSetujui(null);
-        showToast
+        alert(err.response.data.message);
       })
       .finally(() => setActionLoading(false));
   };
