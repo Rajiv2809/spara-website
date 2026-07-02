@@ -19,16 +19,16 @@ const DefaultLayout = () => {
        
 
         axiosClient.get('/me')
-            .then(({ data }) => {
-                setCurrentUser(data.user);
-            })
-            .catch((error) => {
-                console.log(error.response);
-                setToken(null);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+           .then(({ data }) => {
+               setCurrentUser(data.user);
+           })
+           .catch((error) => {
+               console.log(error.response);
+               setToken(null);
+           })
+           .finally(() => {
+               setLoading(false);
+           });
     }, []);
 
     return (
