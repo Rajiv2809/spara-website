@@ -118,9 +118,12 @@ class PeminjamanController extends Controller
             }
         }
 
-        // ── Buat 3 row persetujuan ───────────────────────────────────────────
+        // ── Buat row persetujuan ───────────────────────────────────────────
+        $pjSamaDenganPic = $nomorIndukPic
+            && $request->id_number_penanggungjawab === $nomorIndukPic;
+
         $persetujuans = [
-            // Row 1 — Penanggung jawab (user yang membuat peminjaman)
+            // Row 1 — Penanggung jawab (atau PJ + PIC jika sama)
             [
                 'id_peminjaman'         => $peminjaman->id_peminjaman,
                 'id_number_penyetuju' => $request->id_number_penanggungjawab,
@@ -128,22 +131,26 @@ class PeminjamanController extends Controller
                 'created_at'            => Carbon::now(),
                 'updated_at'            => Carbon::now(),
             ],
-            // Row 2 — PIC ruangan
-            [
+        ];
+
+        // Row 2 — PIC ruangan (hanya jika berbeda dengan penanggung jawab)
+        if (!$pjSamaDenganPic && $nomorIndukPic) {
+            $persetujuans[] = [
                 'id_peminjaman'         => $peminjaman->id_peminjaman,
                 'id_number_penyetuju' => $nomorIndukPic,
                 'status_persetujuan'    => 'menunggu',
                 'created_at'            => Carbon::now(),
                 'updated_at'            => Carbon::now(),
-            ],
-            // Row 3 — Admin (null)
-            [
-                'id_peminjaman'         => $peminjaman->id_peminjaman,
-                'id_number_penyetuju' => null,
-                'status_persetujuan'    => 'menunggu',
-                'created_at'            => Carbon::now(),
-                'updated_at'            => Carbon::now(),
-            ],
+            ];
+        }
+
+        // Row terakhir — Admin (null)
+        $persetujuans[] = [
+            'id_peminjaman'         => $peminjaman->id_peminjaman,
+            'id_number_penyetuju' => null,
+            'status_persetujuan'    => 'menunggu',
+            'created_at'            => Carbon::now(),
+            'updated_at'            => Carbon::now(),
         ];
 
         Persetujuan::insert($persetujuans);
