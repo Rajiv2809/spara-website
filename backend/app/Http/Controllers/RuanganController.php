@@ -48,6 +48,10 @@ class RuanganController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->user()?->role === 'pic') {
+            abort(403, 'PIC tidak diperbolehkan menambah ruangan.');
+        }
+
         $validated = $request->validate([
             'kode_ruangan'      => 'required|unique:ruangans,kode_ruangan',
             'name_ruangan'      => 'required|string|max:255',
@@ -79,6 +83,24 @@ class RuanganController extends Controller
     public function update(Request $request, int $id)
     {
         $ruangan = Ruangan::findOrFail($id);
+
+        if ($request->user()?->role === 'pic') {
+            if (!in_array($request->status_ruangan, ['tersedia', 'maintenance'], true)) {
+                abort(403, 'PIC hanya boleh mengubah status menjadi tersedia atau maintenance.');
+            }
+
+            $validated = $request->validate([
+                'status_ruangan' => 'required|in:tersedia,maintenance',
+            ]);
+
+            $ruangan->update([ 'status_ruangan' => $validated['status_ruangan'] ]);
+            $ruangan->load(['gedung', 'pic.user']);
+
+            return response()->json([
+                'message' => 'Status ruangan berhasil diperbarui',
+                'data'    => new RuanganResource($ruangan->fresh()),
+            ]);
+        }
 
         $validated = $request->validate([
             'kode_ruangan'      => 'required|unique:ruangans,kode_ruangan,' . $id . ',id_ruangan',
@@ -113,6 +135,10 @@ class RuanganController extends Controller
 
     public function destroy(int $id)
     {
+        if (request()->user()?->role === 'pic') {
+            abort(403, 'PIC tidak diperbolehkan menghapus ruangan.');
+        }
+
         $ruangan = Ruangan::findOrFail($id);
         $ruangan->delete();
 

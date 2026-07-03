@@ -3,6 +3,7 @@ import Sidebar from "../Components/Sidebar";
 import { Icon } from "@iconify/react";
 import gedung_utama from "../assets/gu601.jpeg";
 import axiosClient from "../axios";
+import { useStateContext } from "../Contexts/context.jsx";
 
 // STATUS CONFIG
 const STATUS_STYLES = {
@@ -90,7 +91,7 @@ const DropdownField = ({ loading, error, onRetry, children }) => {
 };
 
 // ROOM CARD
-const RoomCard = ({ room, onEdit, onDelete }) => {
+const RoomCard = ({ room, onEdit, onDelete, canDelete }) => {
   const statusCfg = STATUS_STYLES[room.status_ruangan] ?? STATUS_STYLES.tersedia;
 
   return (
@@ -142,13 +143,15 @@ const RoomCard = ({ room, onEdit, onDelete }) => {
             <Icon icon="mdi:pencil-outline" width={12} />
             Ubah
           </button>
-          <button
-            onClick={() => onDelete(room)}
-            className="bg-[#862440] text-white p-2 rounded-lg hover:bg-[#6e1d35] hover:scale-105 transition-all"
-            title="Hapus ruangan"
-          >
-            <Icon icon="mdi:delete-outline" width={14} />
-          </button>
+          {canDelete && (
+            <button
+              onClick={() => onDelete(room)}
+              className="bg-[#862440] text-white p-2 rounded-lg hover:bg-[#6e1d35] hover:scale-105 transition-all"
+              title="Hapus ruangan"
+            >
+              <Icon icon="mdi:delete-outline" width={14} />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -168,7 +171,7 @@ const EMPTY_FORM = {
   id_number_pic:   "",
 };
 
-const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
+const ModalRuangan = ({ onClose, onSave, editData, saving, isPic }) => {
   const [form, setForm] = useState(
     editData ? {
       kode_ruangan:      editData.kode_ruangan      ?? "",
@@ -250,6 +253,11 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
 
   const validate = () => {
     const e = {};
+    if (isPic && editData) {
+      if (!form.status_ruangan) e.status_ruangan = "Status wajib dipilih.";
+      return e;
+    }
+
     if (!form.kode_ruangan.trim())  e.kode_ruangan   = "Kode ruangan wajib diisi.";
     if (!form.name_ruangan.trim())  e.name_ruangan   = "name ruangan wajib diisi.";
     if (!form.id_gedung)            e.id_gedung      = "Gedung wajib dipilih.";
@@ -272,6 +280,7 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
   const errorText  = "text-red-500 text-[10px] mt-0.5";
 
   const selectedPic = picList.find((p) => String(p.id_number) === String(form.id_number_pic));
+  const isPicEditing = isPic && Boolean(editData);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -291,110 +300,175 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
         {/* Fields */}
         <div className="p-5 flex flex-col gap-4 overflow-y-auto">
 
-          {/* Kode Ruangan */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Kode Ruangan <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="kode_ruangan" value={form.kode_ruangan} onChange={handleChange}
-              placeholder="Contoh: GU-601"
-              className={`${inputBase} ${errors.kode_ruangan ? "border-red-400" : ""}`}
-            />
-            {errors.kode_ruangan && <p className={errorText}>{errors.kode_ruangan}</p>}
-          </div>
-
-          {/* name Ruangan */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              name Ruangan <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="name_ruangan" value={form.name_ruangan} onChange={handleChange}
-              placeholder="Contoh: Ruang Rapat Utama"
-              className={`${inputBase} ${errors.name_ruangan ? "border-red-400" : ""}`}
-            />
-            {errors.name_ruangan && <p className={errorText}>{errors.name_ruangan}</p>}
-          </div>
-
-          {/* Gedung & Lantai — 2 kolom */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-                Gedung <span className="text-red-500">*</span>
-              </label>
-              <DropdownField loading={gedungLoading} error={gedungError} onRetry={fetchGedung}>
-                <select
-                  name="id_gedung" value={form.id_gedung} onChange={handleChange}
-                  className={`${selectBase} ${errors.id_gedung ? "border-red-400" : ""}`}
-                >
-                  <option value="">— Pilih Gedung —</option>
-                  {gedungList.map((g) => (
-                    <option key={g.id_gedung} value={g.id_gedung}>{g.name_gedung}</option>
-                  ))}
-                </select>
-              </DropdownField>
-              {errors.id_gedung && <p className={errorText}>{errors.id_gedung}</p>}
-            </div>
-
-            <div>
-              <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-                Lantai <span className="text-red-500">*</span>
-              </label>
-              <DropdownField loading={lantaiLoading} error={lantaiError} onRetry={fetchLantai}>
-                <select
-                  name="nomor_lantai" value={form.nomor_lantai} onChange={handleChange}
-                  className={`${selectBase} ${errors.nomor_lantai ? "border-red-400" : ""}`}
-                >
-                  <option value="">— Pilih Lantai —</option>
-                  {lantaiList.map((l) => (
-                    <option key={l.nomor_lantai} value={l.nomor_lantai}>
-                      {l.name_lantai ? `${l.name_lantai} (${l.nomor_lantai})` : `Lantai ${l.nomor_lantai}`}
-                    </option>
-                  ))}
-                </select>
-              </DropdownField>
-              {errors.nomor_lantai && <p className={errorText}>{errors.nomor_lantai}</p>}
-            </div>
-          </div>
-
-          {/* Kapasitas */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Kapasitas <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number" name="kapasitas" value={form.kapasitas} onChange={handleChange}
-              placeholder="Jumlah orang" min={1}
-              className={`${inputBase} ${errors.kapasitas ? "border-red-400" : ""}`}
-            />
-            {errors.kapasitas && <p className={errorText}>{errors.kapasitas}</p>}
-          </div>
-
-          {/* PIC Dropdown */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              PIC (Penanggung Jawab) <span className="text-red-500">*</span>
-            </label>
-            <DropdownField loading={picLoading} error={picError} onRetry={fetchPic}>
-              <select
-                name="id_number_pic" value={form.id_number_pic} onChange={handleChange}
-                className={`${selectBase} ${errors.id_number_pic ? "border-red-400" : ""}`}
-              >
-                <option value="">— Pilih PIC —</option>
-                {picList.map((pic) => (
-                  <option key={pic.id_number} value={pic.id_number}>{pic.name}</option>
-                ))}
-              </select>
-            </DropdownField>
-            {errors.id_number_pic && <p className={errorText}>{errors.id_number_pic}</p>}
-            {selectedPic && (
-              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-emerald-600">
-                <Icon icon="mdi:account-check-outline" width={13} />
-                <span>Terpilih: <b>{selectedPic.name}</b></span>
+          {!isPicEditing && (
+            <>
+              {/* Kode Ruangan */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  Kode Ruangan <span className="text-red-500">*</span>
+                </label>
+                <input
+                  name="kode_ruangan" value={form.kode_ruangan} onChange={handleChange}
+                  placeholder="Contoh: GU-601"
+                  className={`${inputBase} ${errors.kode_ruangan ? "border-red-400" : ""}`}
+                />
+                {errors.kode_ruangan && <p className={errorText}>{errors.kode_ruangan}</p>}
               </div>
-            )}
-          </div>
+
+              {/* name Ruangan */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  name Ruangan <span className="text-red-500">*</span>
+                </label>
+                <input
+                  name="name_ruangan" value={form.name_ruangan} onChange={handleChange}
+                  placeholder="Contoh: Ruang Rapat Utama"
+                  className={`${inputBase} ${errors.name_ruangan ? "border-red-400" : ""}`}
+                />
+                {errors.name_ruangan && <p className={errorText}>{errors.name_ruangan}</p>}
+              </div>
+
+              {/* Gedung & Lantai — 2 kolom */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                    Gedung <span className="text-red-500">*</span>
+                  </label>
+                  <DropdownField loading={gedungLoading} error={gedungError} onRetry={fetchGedung}>
+                    <select
+                      name="id_gedung" value={form.id_gedung} onChange={handleChange}
+                      className={`${selectBase} ${errors.id_gedung ? "border-red-400" : ""}`}
+                    >
+                      <option value="">— Pilih Gedung —</option>
+                      {gedungList.map((g) => (
+                        <option key={g.id_gedung} value={g.id_gedung}>{g.name_gedung}</option>
+                      ))}
+                    </select>
+                  </DropdownField>
+                  {errors.id_gedung && <p className={errorText}>{errors.id_gedung}</p>}
+                </div>
+
+                <div>
+                  <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                    Lantai <span className="text-red-500">*</span>
+                  </label>
+                  <DropdownField loading={lantaiLoading} error={lantaiError} onRetry={fetchLantai}>
+                    <select
+                      name="nomor_lantai" value={form.nomor_lantai} onChange={handleChange}
+                      className={`${selectBase} ${errors.nomor_lantai ? "border-red-400" : ""}`}
+                    >
+                      <option value="">— Pilih Lantai —</option>
+                      {lantaiList.map((l) => (
+                        <option key={l.nomor_lantai} value={l.nomor_lantai}>
+                          {l.name_lantai ? `${l.name_lantai} (${l.nomor_lantai})` : `Lantai ${l.nomor_lantai}`}
+                        </option>
+                      ))}
+                    </select>
+                  </DropdownField>
+                  {errors.nomor_lantai && <p className={errorText}>{errors.nomor_lantai}</p>}
+                </div>
+              </div>
+
+              {/* Kapasitas */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  Kapasitas <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number" name="kapasitas" value={form.kapasitas} onChange={handleChange}
+                  placeholder="Jumlah orang" min={1}
+                  className={`${inputBase} ${errors.kapasitas ? "border-red-400" : ""}`}
+                />
+                {errors.kapasitas && <p className={errorText}>{errors.kapasitas}</p>}
+              </div>
+
+              {/* PIC Dropdown */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  PIC (Penanggung Jawab) <span className="text-red-500">*</span>
+                </label>
+                <DropdownField loading={picLoading} error={picError} onRetry={fetchPic}>
+                  <select
+                    name="id_number_pic" value={form.id_number_pic} onChange={handleChange}
+                    className={`${selectBase} ${errors.id_number_pic ? "border-red-400" : ""}`}
+                  >
+                    <option value="">— Pilih PIC —</option>
+                    {picList.map((pic) => (
+                      <option key={pic.id_number} value={pic.id_number}>{pic.name}</option>
+                    ))}
+                  </select>
+                </DropdownField>
+                {errors.id_number_pic && <p className={errorText}>{errors.id_number_pic}</p>}
+                {selectedPic && (
+                  <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-emerald-600">
+                    <Icon icon="mdi:account-check-outline" width={13} />
+                    <span>Terpilih: <b>{selectedPic.name}</b></span>
+                  </div>
+                )}
+              </div>
+
+              {/* Fasilitas */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  Fasilitas <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="fasilitas" value={form.fasilitas} onChange={handleChange}
+                  placeholder="Contoh: AC, Proyektor, Whiteboard"
+                  rows={2}
+                  className={`${inputBase} resize-none ${errors.fasilitas ? "border-red-400" : ""}`}
+                />
+                {errors.fasilitas && <p className={errorText}>{errors.fasilitas}</p>}
+              </div>
+
+              {/* Deskripsi */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  Deskripsi <span className="text-gray-400 font-normal">(opsional)</span>
+                </label>
+                <textarea
+                  name="deskripsi_ruangan" value={form.deskripsi_ruangan} onChange={handleChange}
+                  placeholder="Deskripsi tambahan tentang ruangan..."
+                  rows={2}
+                  className={`${inputBase} resize-none`}
+                />
+              </div>
+
+              {/* Foto Upload */}
+              <div>
+                <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
+                  Foto Ruangan <span className="text-gray-400 font-normal">(opsional)</span>
+                </label>
+                <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-pink-400 transition group">
+                  {fotoPreview ? (
+                    <div className="relative w-full">
+                      <img src={fotoPreview} alt="Preview" className="w-full h-36 rounded-lg object-cover border border-gray-200" />
+                      <button
+                        type="button"
+                        onClick={handleRemoveFoto}
+                        className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 transition shadow"
+                      >
+                        <Icon icon="mdi:close" width={13} />
+                      </button>
+                      <p className="text-[10px] text-gray-400 mt-2">Klik untuk ganti foto</p>
+                    </div>
+                  ) : (
+                    <>
+                      <Icon icon="mdi:cloud-upload-outline" className="text-3xl text-gray-300 group-hover:text-pink-400 mb-2 transition" />
+                      <p className="text-[12px] text-gray-500">Klik untuk upload foto</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">PNG / JPG, maks 2MB</p>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg"
+                    onChange={handleFotoChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </>
+          )}
 
           {/* Status */}
           <div>
@@ -406,74 +480,18 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
                 name="status_ruangan" value={form.status_ruangan} onChange={handleChange}
                 className={`${selectBase} ${errors.status_ruangan ? "border-red-400" : ""}`}
               >
+                {isPicEditing && !["tersedia", "maintenance"].includes(form.status_ruangan) && (
+                  <option value={form.status_ruangan} disabled>
+                    {STATUS_STYLES[form.status_ruangan]?.label ?? form.status_ruangan}
+                  </option>
+                )}
                 <option value="tersedia">Tersedia</option>
                 <option value="maintenance">Maintenance</option>
-                <option value="tidak_tersedia">Tidak Tersedia</option>
+                {!isPicEditing && <option value="tidak_tersedia">Tidak Tersedia</option>}
               </select>
               <Icon icon="mdi:chevron-down" className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width={16} />
             </div>
             {errors.status_ruangan && <p className={errorText}>{errors.status_ruangan}</p>}
-          </div>
-
-          {/* Fasilitas */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Fasilitas <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="fasilitas" value={form.fasilitas} onChange={handleChange}
-              placeholder="Contoh: AC, Proyektor, Whiteboard"
-              rows={2}
-              className={`${inputBase} resize-none ${errors.fasilitas ? "border-red-400" : ""}`}
-            />
-            {errors.fasilitas && <p className={errorText}>{errors.fasilitas}</p>}
-          </div>
-
-          {/* Deskripsi */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Deskripsi <span className="text-gray-400 font-normal">(opsional)</span>
-            </label>
-            <textarea
-              name="deskripsi_ruangan" value={form.deskripsi_ruangan} onChange={handleChange}
-              placeholder="Deskripsi tambahan tentang ruangan..."
-              rows={2}
-              className={`${inputBase} resize-none`}
-            />
-          </div>
-
-          {/* Foto Upload */}
-          <div>
-            <label className="text-[12px] font-semibold text-gray-700 mb-1 block">
-              Foto Ruangan <span className="text-gray-400 font-normal">(opsional)</span>
-            </label>
-            <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-pink-400 transition group">
-              {fotoPreview ? (
-                <div className="relative w-full">
-                  <img src={fotoPreview} alt="Preview" className="w-full h-36 rounded-lg object-cover border border-gray-200" />
-                  <button
-                    type="button"
-                    onClick={handleRemoveFoto}
-                    className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 transition shadow"
-                  >
-                    <Icon icon="mdi:close" width={13} />
-                  </button>
-                  <p className="text-[10px] text-gray-400 mt-2">Klik untuk ganti foto</p>
-                </div>
-              ) : (
-                <>
-                  <Icon icon="mdi:cloud-upload-outline" className="text-3xl text-gray-300 group-hover:text-pink-400 mb-2 transition" />
-                  <p className="text-[12px] text-gray-500">Klik untuk upload foto</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">PNG / JPG, maks 2MB</p>
-                </>
-              )}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/jpg"
-                onChange={handleFotoChange}
-                className="hidden"
-              />
-            </label>
           </div>
 
         </div>
@@ -501,6 +519,9 @@ const ModalRuangan = ({ onClose, onSave, editData, saving }) => {
 
 // MAIN PAGE
 const KelolaRuangan = () => {
+  const { currentUser } = useStateContext();
+  const isPic = currentUser?.role?.toLowerCase() === "pic";
+
   const [rooms, setRooms]                 = useState([]);
   const [showModal, setShowModal]         = useState(false);
   const [editData, setEditData]           = useState(null);
@@ -659,13 +680,15 @@ const KelolaRuangan = () => {
               Lihat dan kelola seluruh ruangan yang dapat dipinjam dalam sistem
             </p>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="self-start sm:self-auto flex items-center gap-2 bg-orange-400 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold transition shadow-md hover:shadow-lg"
-          >
-            <Icon icon="mdi:plus" width={16} />
-            Tambah Ruangan
-          </button>
+          {!isPic && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="self-start sm:self-auto flex items-center gap-2 bg-orange-400 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold transition shadow-md hover:shadow-lg"
+            >
+              <Icon icon="mdi:plus" width={16} />
+              Tambah Ruangan
+            </button>
+          )}
         </div>
 
         {/* STATS */}
@@ -729,6 +752,7 @@ const KelolaRuangan = () => {
                   room={room}
                   onEdit={openEdit}
                   onDelete={(r) => setConfirmDelete(r)}
+                  canDelete={!isPic}
                 />
               ))}
             </div>
@@ -785,7 +809,7 @@ const KelolaRuangan = () => {
       </div>
 
       {showModal && (
-        <ModalRuangan onClose={closeModal} onSave={handleSave} editData={editData} saving={saving} />
+        <ModalRuangan onClose={closeModal} onSave={handleSave} editData={editData} saving={saving} isPic={isPic} />
       )}
 
       {confirmDelete && (
