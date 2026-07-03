@@ -7,16 +7,28 @@ import {
 } from 'recharts';
 
 const STATUS_CONFIG = {
-    disetujui: { label: 'Disetujui', bg: 'bg-emerald-100', text: 'text-emerald-800' },
-    menunggu:  { label: 'Menunggu',  bg: 'bg-amber-100',   text: 'text-amber-800'   },
-    ditolak:   { label: 'Ditolak',   bg: 'bg-red-100',     text: 'text-red-800'     },
+    disetujui:  { label: 'Disetujui',  bg: 'bg-emerald-100', text: 'text-emerald-800' },
+    menunggu:   { label: 'Menunggu',   bg: 'bg-amber-100',   text: 'text-amber-800'   },
+    ditolak:    { label: 'Ditolak',    bg: 'bg-red-100',     text: 'text-red-800'     },
+    dibatalkan: { label: 'Dibatalkan', bg: 'bg-gray-100',    text: 'text-gray-600'    },
 };
 
 const STATUS_COLORS = {
-    disetujui: '#10b981',
-    menunggu:  '#f59e0b',
-    ditolak:   '#ef4444',
+    disetujui:  '#10b981',
+    menunggu:   '#f59e0b',
+    ditolak:    '#ef4444',
+    dibatalkan: '#9ca3af',
 };
+
+// Fallback for any status value not covered above, so the UI never crashes
+// even if the backend introduces a new status later.
+const FALLBACK_STATUS = { label: 'Tidak diketahui', bg: 'bg-gray-100', text: 'text-gray-600' };
+const FALLBACK_COLOR = '#9ca3af';
+
+const getStatusConfig = (statusKey) =>
+    STATUS_CONFIG[statusKey] ?? { ...FALLBACK_STATUS, label: statusKey ?? FALLBACK_STATUS.label };
+
+const getStatusColor = (statusKey) => STATUS_COLORS[statusKey] ?? FALLBACK_COLOR;
 
 const fmtDate = (iso) =>
     new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -65,22 +77,44 @@ export default function DashboardAdmin() {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    const counts = {
-        total:     data.length,
-        disetujui: data.filter((x) => x.status_persetujuan === 'disetujui').length,
-        menunggu:  data.filter((x) => x.status_persetujuan === 'menunggu').length,
-        ditolak:   data.filter((x) => x.status_persetujuan === 'ditolak').length,
-    };
+    // Tally counts dynamically per status found in the data, so any status
+    // value (including ones not in STATUS_CONFIG) is still counted correctly.
+    const counts = useMemo(() => {
+        const base = {
+            total:     data.length,
+            disetujui: 0,
+            menunggu:  0,
+            ditolak:   0,
+            dibatalkan: 0,
+        };
 
-    const statusChartData = useMemo(() => (
-        Object.keys(STATUS_CONFIG)
+        data.forEach((x) => {
+            const key = x.status_persetujuan;
+            if (key in base) {
+                base[key] += 1;
+            } else {
+                base[key] = (base[key] ?? 0) + 1;
+            }
+        });
+
+        return base;
+    }, [data]);
+
+    const statusChartData = useMemo(() => {
+        // Union of known statuses + any unexpected ones present in the data,
+        // so the pie chart reflects reality even with unrecognized statuses.
+        const knownKeys = Object.keys(STATUS_CONFIG);
+        const dataKeys = Object.keys(counts).filter((k) => k !== 'total');
+        const allKeys = Array.from(new Set([...knownKeys, ...dataKeys]));
+
+        return allKeys
             .map((key) => ({
                 key,
-                name: STATUS_CONFIG[key].label,
-                value: counts[key],
+                name: getStatusConfig(key).label,
+                value: counts[key] ?? 0,
             }))
-            .filter((item) => item.value > 0)
-    ), [data]);
+            .filter((item) => item.value > 0);
+    }, [counts]);
 
     const dailyChartData = useMemo(() => {
         const grouped = {};
@@ -89,9 +123,20 @@ export default function DashboardAdmin() {
             const tgl = p.hari_tanggal?.slice(0, 10);
             if (!tgl) return;
             if (!grouped[tgl]) {
-                grouped[tgl] = { tanggal: tgl, disetujui: 0, menunggu: 0, ditolak: 0 };
+                grouped[tgl] = {
+                    tanggal: tgl,
+                    disetujui: 0,
+                    menunggu: 0,
+                    ditolak: 0,
+                    dibatalkan: 0,
+                };
             }
-            grouped[tgl][p.status_persetujuan] += 1;
+            const key = p.status_persetujuan;
+            if (key in grouped[tgl]) {
+                grouped[tgl][key] += 1;
+            } else {
+                grouped[tgl][key] = (grouped[tgl][key] ?? 0) + 1;
+            }
         });
 
         return Object.values(grouped)
@@ -146,6 +191,7 @@ export default function DashboardAdmin() {
                     <option value="menunggu">Menunggu</option>
                     <option value="disetujui">Disetujui</option>
                     <option value="ditolak">Ditolak</option>
+                    <option value="dibatalkan">Dibatalkan</option>
                 </select>
 
                 <button
@@ -169,16 +215,17 @@ export default function DashboardAdmin() {
             )}
 
             {/* ── Stat cards ─────────────────────────────────────── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
                 {[
-                    { key: 'total',     label: 'Total',     color: 'text-gray-800'    },
-                    { key: 'disetujui', label: 'Disetujui', color: 'text-emerald-700' },
-                    { key: 'menunggu',  label: 'Menunggu',  color: 'text-amber-700'   },
-                    { key: 'ditolak',   label: 'Ditolak',   color: 'text-red-700'     },
+                    { key: 'total',      label: 'Total',      color: 'text-gray-800'    },
+                    { key: 'disetujui',  label: 'Disetujui',  color: 'text-emerald-700' },
+                    { key: 'menunggu',   label: 'Menunggu',   color: 'text-amber-700'   },
+                    { key: 'ditolak',    label: 'Ditolak',    color: 'text-red-700'     },
+                    { key: 'dibatalkan', label: 'Dibatalkan', color: 'text-gray-500'    },
                 ].map(({ key, label, color }) => (
                     <div key={key} className="bg-white/70 rounded-xl p-4 shadow-sm">
                         <p className="text-xs text-gray-500 mb-1">{label}</p>
-                        <p className={`text-2xl font-semibold ${color}`}>{counts[key]}</p>
+                        <p className={`text-2xl font-semibold ${color}`}>{counts[key] ?? 0}</p>
                     </div>
                 ))}
             </div>
@@ -199,7 +246,7 @@ export default function DashboardAdmin() {
                                     paddingAngle={3}
                                 >
                                     {statusChartData.map((entry) => (
-                                        <Cell key={entry.key} fill={STATUS_COLORS[entry.key]} />
+                                        <Cell key={entry.key} fill={getStatusColor(entry.key)} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
@@ -217,9 +264,10 @@ export default function DashboardAdmin() {
                                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                                 <Tooltip />
                                 <Legend verticalAlign="bottom" height={28} />
-                                <Bar dataKey="disetujui" stackId="a" name="Disetujui" fill={STATUS_COLORS.disetujui} />
-                                <Bar dataKey="menunggu"  stackId="a" name="Menunggu"  fill={STATUS_COLORS.menunggu} />
-                                <Bar dataKey="ditolak"   stackId="a" name="Ditolak"   fill={STATUS_COLORS.ditolak} radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="disetujui"  stackId="a" name="Disetujui"  fill={STATUS_COLORS.disetujui} />
+                                <Bar dataKey="menunggu"   stackId="a" name="Menunggu"   fill={STATUS_COLORS.menunggu} />
+                                <Bar dataKey="ditolak"    stackId="a" name="Ditolak"    fill={STATUS_COLORS.ditolak} />
+                                <Bar dataKey="dibatalkan" stackId="a" name="Dibatalkan" fill={STATUS_COLORS.dibatalkan} radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -245,7 +293,7 @@ export default function DashboardAdmin() {
             {!loading && !error && data.length > 0 && (
                 <div className="flex flex-col gap-3">
                     {data.map((p) => {
-                        const st   = STATUS_CONFIG[p.status_persetujuan];
+                        const st   = getStatusConfig(p.status_persetujuan);
                         const aset = p.alat
                             ? { icon: '🖥', label: p.alat.name_alat }
                             : p.ruangan

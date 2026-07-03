@@ -81,5 +81,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/batalkan-peminjaman/{id}', [KepalaController::class, 'batalkanPeminjaman']);
         Route::post('/jadwalkan-ulang/{id}', [KepalaController::class, 'jadwalkanUlang']);
         Route::post('/cek-ketersediaan', [KepalaController::class, 'cekKetersediaan']);
+        Route::get('/rekap-peminjaman/export-pdf', [KepalaController::class, 'exportPdf']);
+        Route::get('/rekap-peminjaman/export-excel', [KepalaController::class, 'exportExcel']);
     });
 });

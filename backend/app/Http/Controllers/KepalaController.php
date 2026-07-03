@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Validator};
 use Carbon\Carbon;
 use App\Models\{Peminjaman, Persetujuan, Notification};
+use App\Exports\RekapPeminjamanExport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KepalaController extends Controller
 {
@@ -325,5 +328,91 @@ class KepalaController extends Controller
                 'error'   => $e->getMessage(),
             ], 500);
         }
+
+    }
+     private function buildRekapQuery(Request $request)
+    {
+        $bulan = (int) $request->input('bulan', now()->month);
+        $tahun = (int) $request->input('tahun', now()->year);
+
+        $query = Peminjaman::with(['peminjam', 'alat', 'ruangan'])
+            ->whereYear('hari_tanggal', $tahun)
+            ->whereMonth('hari_tanggal', $bulan);
+
+        if ($request->filled('jenis') && $request->jenis !== 'semua') {
+            $request->jenis === 'ruangan'
+                ? $query->whereNotNull('id_ruangan')
+                : $query->whereNotNull('id_alat');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status_persetujuan', $request->status);
+        }
+
+        if ($request->filled('jenis_kegiatan')) {
+            $query->where('jenis_kegiatan', $request->jenis_kegiatan);
+        }
+
+        return $query->orderBy('hari_tanggal')->orderBy('jam_mulai');
+    }
+
+    /**
+     * Bentuk data rekap: siapa peminjam + ruangan/alat yang dipinjam.
+     */
+    private function mapRekapData($peminjamans)
+    {
+        return $peminjamans->map(function ($p) {
+            return [
+                'id_peminjaman'      => $p->id_peminjaman,
+                'name_kegiatan'      => $p->name_kegiatan,
+                'jenis_kegiatan'     => $p->jenis_kegiatan,
+                'hari_tanggal'       => $p->hari_tanggal?->toDateString(),
+                'jam_mulai'          => $p->jam_mulai,
+                'jam_selesai'        => $p->jam_selesai,
+                'keterangan'         => $p->keterangan,
+                'status_persetujuan' => $p->status_persetujuan,
+                'jenis'              => $p->id_ruangan ? 'ruangan' : 'alat',
+
+                // Siapa yang meminjam
+                'name_peminjam'      => $p->peminjam?->name,
+                'unit_peminjam'      => $p->peminjam?->unit ?? $p->peminjam?->jabatan ?? null,
+
+                // Ruangan / alat yang dipinjam
+                'name_ruangan'       => $p->ruangan?->name_ruangan,
+                'kode_ruangan'       => $p->ruangan?->kode_ruangan,
+                'name_alat'          => $p->alat?->name_alat,
+                'kode_alat'          => $p->alat?->kode_alat,
+            ];
+        });
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $peminjamans = $this->buildRekapQuery($request)->get();
+        $data        = $this->mapRekapData($peminjamans);
+
+        $bulan     = (int) $request->input('bulan', now()->month);
+        $tahun     = (int) $request->input('tahun', now()->year);
+        $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
+
+        $pdf = Pdf::loadView('pdf.rekap-peminjaman', [
+            'data'      => $data,
+            'namaBulan' => $namaBulan,
+            'tahun'     => $tahun,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download("rekap-peminjaman-{$namaBulan}-{$tahun}.pdf");
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $peminjamans = $this->buildRekapQuery($request)->get();
+        $data        = $this->mapRekapData($peminjamans);
+
+        $bulan     = (int) $request->input('bulan', now()->month);
+        $tahun     = (int) $request->input('tahun', now()->year);
+        $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
+
+        return Excel::download(new RekapPeminjamanExport($data), "rekap-peminjaman-{$namaBulan}-{$tahun}.xlsx");
     }
 }

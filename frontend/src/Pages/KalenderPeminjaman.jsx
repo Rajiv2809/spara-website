@@ -32,6 +32,7 @@ export default function KalenderPeminjaman() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [exporting, setExporting] = useState(null); // 'pdf' | 'excel' | null
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -110,17 +111,80 @@ export default function KalenderPeminjaman() {
     );
   };
 
+  // ── Export PDF / Excel untuk bulan yang sedang ditampilkan ─────────────
+  const handleExport = async (type) => {
+    setExporting(type);
+    try {
+      const endpoint = type === 'pdf'
+        ? '/kepala/rekap-peminjaman/export-pdf'
+        : '/kepala/rekap-peminjaman/export-excel';
+
+      const params = {
+        bulan: currentMonth + 1, // JS month 0-indexed, backend 1-indexed
+        tahun: currentYear,
+      };
+      if (filterJenis !== 'semua') params.jenis = filterJenis;
+      if (filterStatus) params.status = filterStatus;
+
+      const response = await axiosClient.get(endpoint, {
+        params,
+        responseType: 'blob',
+      });
+
+      const extension = type === 'pdf' ? 'pdf' : 'xlsx';
+      const fileName = `rekap-peminjaman-${monthNames[currentMonth]}-${currentYear}.${extension}`;
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Gagal mengekspor laporan:', err);
+      alert('Gagal mengekspor laporan. Silakan coba lagi.');
+    } finally {
+      setExporting(null);
+    }
+  };
+
   return (
     <div className="bg-gradient-to-b from-[#FFF6F1] to-[#FFD1D1] min-h-screen">
       <Sidebar />
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4">
-        <div className="mb-6">
-          <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
-            Kalender Peminjaman
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Lihat semua peminjaman ruangan dan alat dalam tampilan kalender.
-          </p>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-[#2D0A18] text-[26px] lg:text-[32px] font-extrabold leading-tight">
+              Kalender Peminjaman
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Lihat semua peminjaman ruangan dan alat dalam tampilan kalender.
+            </p>
+          </div>
+
+          {/* 👇 Tombol download PDF & Excel */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => handleExport('pdf')}
+              disabled={exporting !== null || loading}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#D85A30] px-4 py-2 text-sm font-semibold text-white hover:bg-[#c14e28] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <Icon icon="mdi:file-pdf-box" width={18} />
+              {exporting === 'pdf' ? 'Mengekspor...' : 'Download PDF'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleExport('excel')}
+              disabled={exporting !== null || loading}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <Icon icon="mdi:file-excel-box" width={18} />
+              {exporting === 'excel' ? 'Mengekspor...' : 'Download Excel'}
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col xl:flex-row gap-3 mb-5">
