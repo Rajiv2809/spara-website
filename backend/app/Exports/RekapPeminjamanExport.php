@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\{FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize};
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -14,7 +15,7 @@ class RekapPeminjamanExport implements FromCollection, WithHeadings, WithMapping
         $this->data = $data;
     }
 
-    public function collection()
+    public function collection(): Collection
     {
         return collect($this->data);
     }
