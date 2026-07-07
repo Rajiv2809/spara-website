@@ -556,7 +556,7 @@ const KelolaRuangan = () => {
     payload.append("kapasitas",         Number(formData.kapasitas));
     payload.append("fasilitas",         formData.fasilitas.trim());
     payload.append("deskripsi_ruangan", formData.deskripsi_ruangan?.trim() ?? "");
-    payload.append("status_ruangan",    formData.status_ruangan);
+    // payload.append("status_ruangan",    formData.status_ruangan);
     payload.append("nomor_lantai",      Number(formData.nomor_lantai));
     payload.append("id_gedung",         Number(formData.id_gedung));
     payload.append("id_number_pic",   Number(formData.id_number_pic));

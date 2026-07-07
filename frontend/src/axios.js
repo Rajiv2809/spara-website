@@ -4,7 +4,10 @@ import Cookies from "js-cookie";
 const URL = `http://127.0.0.1:8000/api/`
 
 const axiosClient = axios.create({
-    baseURL: URL
+    baseURL: URL,
+    headers: {
+        "ngrok-skip-browser-warning": "true"
+    }
 })
 
 axiosClient.interceptors.request.use(config => {

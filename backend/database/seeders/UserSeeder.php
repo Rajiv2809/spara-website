@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 10000001,
                 'name'        => 'Admin Utama',
-                'email'       => 'admin@kampus.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000001',
                 'password'    => Hash::make('password'),
                 'role'        => 'admin',
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 19900001,
                 'name'        => 'Dr. Budi Santoso',
-                'email'       => 'budi.santoso@kampus.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000002',
                 'password'    => Hash::make('password'),
                 'role'        => 'lecturer',
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 19900002,
                 'name'        => 'Dr. Sari Dewi',
-                'email'       => 'sari.dewi@kampus.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000003',
                 'password'    => Hash::make('password'),
                 'role'        => 'lecturer',
@@ -43,7 +43,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 20230001,
                 'name'        => 'Andi Wijaya',
-                'email'       => 'andi.pic@kampus.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000004',
                 'password'    => Hash::make('password'),
                 'role'        => 'pic',
@@ -53,7 +53,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 2021101001,
                 'name'        => 'Rizky Pratama',
-                'email'       => 'rizky@mahasiswa.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000005',
                 'password'    => Hash::make('password'),
                 'role'        => 'mahasiswa',
@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 2021101002,
                 'name'        => 'Siti Nurhaliza',
-                'email'       => 'siti@mahasiswa.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000006',
                 'password'    => Hash::make('password'),
                 'role'        => 'mahasiswa',
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 2022202001,
                 'name'        => 'Fajar Hidayat',
-                'email'       => 'fajar@mahasiswa.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000007',
                 'password'    => Hash::make('password'),
                 'role'        => 'mahasiswa',
@@ -81,7 +81,7 @@ class UserSeeder extends Seeder
             [
                 'id_number' => 10000002,
                 'name'        => 'Kepala SBUM',
-                'email'       => 'kepala.sbum@kampus.ac.id',
+                'email'       => 'rajivcream@gmail.com',
                 'phone_number'  => '081200000008',
                 'password'    => Hash::make('password'),
                 'role'        => 'kepala',
