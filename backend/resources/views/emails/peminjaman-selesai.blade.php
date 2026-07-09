@@ -1,12 +1,18 @@
 @component('mail::message')
-# Peminjaman Disetujui
+# Peminjaman Anda Disetujui ✅
 
 Halo **{{ $namaPeminjam }}**,
 
-Peminjaman **{{ $itemName }}** Anda telah **disetujui oleh semua pihak** dan siap digunakan.
+Selamat! Peminjaman Anda telah **disetujui oleh semua pihak** dan siap digunakan.
+
+@component('mail::panel')
+**Item:** {{ $itemName }}
+@endcomponent
+
+Silakan cek detail peminjaman Anda melalui portal.
 
 @component('mail::button', ['url' => $link])
-Lihat Detail
+Lihat Riwayat Peminjaman
 @endcomponent
 
 Terima kasih,<br>

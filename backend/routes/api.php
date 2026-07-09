@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController};
+use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController, ApprovalTokenController};
 use App\Models\{Alat, Ruangan, User};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -11,6 +11,10 @@ use App\Models\{Alat, Ruangan, User};
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/riwayat-debug', [PeminjamanController::class, 'riwayatDebug']);
+
+// ── One-click approval dari email (tidak perlu login) ─────────────────────
+Route::get('/approve/{token}', [ApprovalTokenController::class, 'approve']);
+Route::get('/tolak/{token}',   [ApprovalTokenController::class, 'tolak']);
 
 // Public stats for landing page (no auth required)
 Route::get('/public-stats', function () {

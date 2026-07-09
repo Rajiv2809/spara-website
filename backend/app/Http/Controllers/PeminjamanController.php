@@ -11,8 +11,10 @@ use App\Http\Resources\PersetujuanResource;
 use App\Http\Resources\ListPersetujuanResource;
 use App\Models\Ruangan;
 use App\Models\Alat;
-use App\Mail\PersetujuanMenungguMail;
+use App\Mail\ApprovalRequestMail;
 use App\Mail\PeminjamanSelesaiMail;
+use App\Mail\PersetujuanDitolakMail;
+use App\Http\Controllers\ApprovalTokenController;
 
 class PeminjamanController extends Controller
 {
@@ -157,10 +159,12 @@ class PeminjamanController extends Controller
 
         Persetujuan::insert($persetujuans);
 
-        // ── Ambil kembali row pertama (butuh id untuk link email) ─────────
+        // ── Ambil row pertama & generate approval token ───────────────────
         $persetujuanPertama = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
             ->orderBy('id')
             ->first();
+
+        $tokenPertama = ApprovalTokenController::generateToken($persetujuanPertama);
 
         // ── Notifikasi ke penanggung jawab ──────────────────────────────────
         $itemName = $peminjaman->ruangan?->name_ruangan
@@ -179,17 +183,21 @@ class PeminjamanController extends Controller
         $penanggungJawab = User::where('id_number', $request->id_number_penanggungjawab)->first();
         if ($penanggungJawab?->email) {
             try {
-                $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
-                Mail::to($penanggungJawab->email)->send(new PersetujuanMenungguMail(
-                    namaPenerima: $penanggungJawab->name,
-                    itemName: $itemName,
-                    approverName: $request->user()->name,
-                    tahap: 'Penanggung Jawab',
-                    link: $frontendUrl . '/persetujuan-peminjaman',
+                Mail::to($penanggungJawab->email)->send(new ApprovalRequestMail(
+                    namaApprover:  $penanggungJawab->name,
+                    namaPeminjam:  $request->user()->name,
+                    itemName:      $itemName,
+                    namaKegiatan:  $peminjaman->name_kegiatan,
+                    tanggal:       \Carbon\Carbon::parse($peminjaman->hari_tanggal)->translatedFormat('l, d F Y'),
+                    jamMulai:      $peminjaman->jam_mulai,
+                    jamSelesai:    $peminjaman->jam_selesai,
+                    peran:         'Penanggung Jawab',
+                    linkSetujui:   url("/api/approve/{$tokenPertama}"),
+                    linkTolak:     url("/api/tolak/{$tokenPertama}"),
                 ));
             } catch (\Throwable $e) {
-                Log::warning('Gagal mengirim email persetujuan awal', [
-                    'to' => $penanggungJawab->email,
+                Log::warning('Gagal mengirim email approval ke PJ', [
+                    'to'        => $penanggungJawab->email,
                     'exception' => $e->getMessage(),
                 ]);
             }
@@ -354,95 +362,107 @@ class PeminjamanController extends Controller
         $persetujuan->updated_at = Carbon::now();
         $persetujuan->save();
 
-        // ── Notifikasi ─────────────────────────────────────────────────────
-        $itemName = $peminjaman->ruangan?->name_ruangan
-            ?? $peminjaman->alat?->name_alat
-            ?? 'Item';
+        // ── Info dasar ─────────────────────────────────────────────────────
+        $itemName     = $peminjaman->ruangan?->name_ruangan ?? $peminjaman->alat?->name_alat ?? 'Item';
         $approverName = optional($persetujuan->user)->name ?? auth()->user()?->name ?? 'Sistem';
+        $frontendUrl  = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
 
-        // Cek apakah semua tahap sudah disetujui
+        $tanggalFormatted = \Carbon\Carbon::parse($peminjaman->hari_tanggal)->translatedFormat('l, d F Y');
+
+        // ── Cek apakah semua tahap sudah disetujui ─────────────────────────
         $semuaDisetujui = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
             ->where('status_persetujuan', '!=', 'disetujui')
             ->doesntExist();
 
         if ($semuaDisetujui) {
+            // ── Semua selesai: update status & kirim email ke peminjam ────
             $peminjaman->status_persetujuan = 'disetujui';
             $peminjaman->save();
 
-            // Notif ke peminjam
             Notification::create([
-                'id_number'   => $peminjaman->id_peminjam,
+                'id_number'     => $peminjaman->id_peminjam,
                 'type'          => 'disetujui',
-                'judul'         => 'Peminjaman Disetujui',
-                'pesan'         => "Peminjaman {$itemName} telah disetujui oleh semua pihak.",
+                'judul'         => 'Peminjaman Disetujui ✅',
+                'pesan'         => "Peminjaman {$itemName} telah disetujui oleh semua pihak dan siap digunakan.",
                 'peminjaman_id' => $peminjaman->id_peminjaman,
             ]);
 
-            // ── Email selesai ke peminjam ─────────────────────────────────
             $peminjamUser = User::where('id_number', $peminjaman->id_peminjam)->first();
             if ($peminjamUser?->email) {
                 try {
-                    $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
                     Mail::to($peminjamUser->email)->send(new PeminjamanSelesaiMail(
                         namaPeminjam: $peminjamUser->name,
-                        itemName: $itemName,
-                        link: $frontendUrl . '/riwayat',
+                        itemName:     $itemName,
+                        link:         $frontendUrl . '/riwayat',
                     ));
                 } catch (\Throwable $e) {
                     Log::warning('Gagal mengirim email peminjaman selesai', [
-                        'to' => $peminjamUser->email,
-                        'exception' => $e->getMessage(),
+                        'to' => $peminjamUser->email, 'exception' => $e->getMessage(),
                     ]);
                 }
             }
         } else {
-            // Notif ke penyetuju selanjutnya
+            // ── Masih ada tahap berikutnya — kirim notifikasi progress ke peminjam ──
+            Notification::create([
+                'id_number'     => $peminjaman->id_peminjam,
+                'type'          => 'progress',
+                'judul'         => 'Persetujuan Diproses',
+                'pesan'         => "{$itemName} telah disetujui oleh {$approverName}. Menunggu persetujuan tahap berikutnya.",
+                'peminjaman_id' => $peminjaman->id_peminjaman,
+            ]);
+            // ── Masih ada tahap berikutnya: kirim email approval ke approver berikutnya ──
             $next = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
                 ->where('id', '>', $persetujuan->id)
                 ->orderBy('id')
                 ->first();
 
             if ($next) {
+                // Generate token untuk approver berikutnya
+                $nextToken = ApprovalTokenController::generateToken($next);
+
                 if ($next->id_number_penyetuju) {
+                    // ── Approver berikutnya adalah PIC ────────────────────
+                    $nextUser = User::where('id_number', $next->id_number_penyetuju)->first();
+
                     Notification::create([
-                        'id_number'   => $next->id_number_penyetuju,
+                        'id_number'     => $next->id_number_penyetuju,
                         'type'          => 'menunggu',
                         'judul'         => 'Perlu Persetujuan',
                         'pesan'         => "{$itemName} telah disetujui oleh {$approverName}, menunggu persetujuan Anda.",
                         'peminjaman_id' => $peminjaman->id_peminjaman,
                     ]);
 
-                    // ── Email ke penyetuju berikutnya (mis. PIC) ────────────
-                    $nextUser = User::where('id_number', $next->id_number_penyetuju)->first();
                     if ($nextUser?->email) {
-                        $tahapLabel = match ($nextUser->role) {
+                        $peranNext = match ($nextUser->role) {
                             'pic'   => 'PIC',
                             'admin' => 'Admin',
                             default => ucfirst($nextUser->role),
                         };
-
                         try {
-                            $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
-                            Mail::to($nextUser->email)->send(new PersetujuanMenungguMail(
-                                namaPenerima: $nextUser->name,
-                                itemName: $itemName,
-                                approverName: $approverName,
-                                tahap: $tahapLabel,
-                                link: $frontendUrl . '/persetujuan-peminjaman',
+                            Mail::to($nextUser->email)->send(new ApprovalRequestMail(
+                                namaApprover: $nextUser->name,
+                                namaPeminjam: $peminjaman->peminjam?->name ?? 'Peminjam',
+                                itemName:     $itemName,
+                                namaKegiatan: $peminjaman->name_kegiatan,
+                                tanggal:      $tanggalFormatted,
+                                jamMulai:     $peminjaman->jam_mulai,
+                                jamSelesai:   $peminjaman->jam_selesai,
+                                peran:        $peranNext,
+                                linkSetujui:  url("/api/approve/{$nextToken}"),
+                                linkTolak:    url("/api/tolak/{$nextToken}"),
                             ));
                         } catch (\Throwable $e) {
-                            Log::warning('Gagal mengirim email ke penyetuju berikutnya', [
-                                'to' => $nextUser->email,
-                                'exception' => $e->getMessage(),
+                            Log::warning('Gagal mengirim email approval ke PIC', [
+                                'to' => $nextUser->email, 'exception' => $e->getMessage(),
                             ]);
                         }
                     }
                 } else {
-                    // Admin — notif & email semua admin
+                    // ── Approver berikutnya adalah Admin (semua admin) ────
                     $admins = User::where('role', 'admin')->get();
                     foreach ($admins as $adminUser) {
                         Notification::create([
-                            'id_number'   => $adminUser->id_number,
+                            'id_number'     => $adminUser->id_number,
                             'type'          => 'menunggu',
                             'judul'         => 'Perlu Persetujuan Admin',
                             'pesan'         => "{$itemName} telah disetujui oleh {$approverName}, menunggu persetujuan Admin.",
@@ -451,18 +471,21 @@ class PeminjamanController extends Controller
 
                         if ($adminUser->email) {
                             try {
-                                $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
-                                Mail::to($adminUser->email)->send(new PersetujuanMenungguMail(
-                                    namaPenerima: $adminUser->name,
-                                    itemName: $itemName,
-                                    approverName: $approverName,
-                                    tahap: 'Admin',
-                                    link: $frontendUrl . '/persetujuan-peminjaman',
+                                Mail::to($adminUser->email)->send(new ApprovalRequestMail(
+                                    namaApprover: $adminUser->name,
+                                    namaPeminjam: $peminjaman->peminjam?->name ?? 'Peminjam',
+                                    itemName:     $itemName,
+                                    namaKegiatan: $peminjaman->name_kegiatan,
+                                    tanggal:      $tanggalFormatted,
+                                    jamMulai:     $peminjaman->jam_mulai,
+                                    jamSelesai:   $peminjaman->jam_selesai,
+                                    peran:        'Admin',
+                                    linkSetujui:  url("/api/approve/{$nextToken}"),
+                                    linkTolak:    url("/api/tolak/{$nextToken}"),
                                 ));
                             } catch (\Throwable $e) {
-                                Log::warning('Gagal mengirim email ke admin', [
-                                    'to' => $adminUser->email,
-                                    'exception' => $e->getMessage(),
+                                Log::warning('Gagal mengirim email approval ke admin', [
+                                    'to' => $adminUser->email, 'exception' => $e->getMessage(),
                                 ]);
                             }
                         }
@@ -509,6 +532,33 @@ class PeminjamanController extends Controller
             'pesan'         => "Peminjaman {$itemName} ditolak oleh {$penolak}.",
             'peminjaman_id' => $peminjaman->id_peminjaman,
         ]);
+
+        // ── Email penolakan ke peminjam ────────────────────────────────────
+        $peminjamUser = User::where('id_number', $peminjaman->id_peminjam)->first();
+        if ($peminjamUser?->email) {
+            $penolaRole = auth()->user()?->role ?? 'admin';
+            $tahapLabel = match ($penolaRole) {
+                'pic'      => 'PIC',
+                'admin'    => 'Admin',
+                'lecturer' => 'Penanggung Jawab',
+                default    => ucfirst($penolaRole),
+            };
+            try {
+                $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
+                Mail::to($peminjamUser->email)->send(new PersetujuanDitolakMail(
+                    namaPeminjam: $peminjamUser->name,
+                    itemName: $itemName,
+                    penolaName: $penolak,
+                    tahap: $tahapLabel,
+                    link: $frontendUrl . '/riwayat',
+                ));
+            } catch (\Throwable $e) {
+                Log::warning('Gagal mengirim email penolakan peminjaman', [
+                    'to' => $peminjamUser->email,
+                    'exception' => $e->getMessage(),
+                ]);
+            }
+        }
 
         return response()->json([
             'message' => 'Peminjaman ditolak.',

@@ -11,6 +11,13 @@ class Persetujuan extends Model
         'id_peminjaman',
         'id_number_penyetuju',
         'status_persetujuan',
+        'alasan_penolakan',
+        'approval_token',
+        'token_expires_at',
+    ];
+
+    protected $casts = [
+        'token_expires_at' => 'datetime',
     ];
 
     public function peminjam()
