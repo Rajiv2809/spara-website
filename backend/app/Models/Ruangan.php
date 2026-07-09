@@ -14,7 +14,6 @@ class Ruangan extends Model
         'kode_ruangan',
         'name_ruangan',
         'kapasitas',
-        'fasilitas',
         'deskripsi_ruangan',
         'status_ruangan',
         'nomor_lantai',
@@ -22,6 +21,11 @@ class Ruangan extends Model
         'id_number_pic',
         'path_foto',
     ];
+
+    public function fasilitas(): HasMany
+    {
+        return $this->hasMany(Fasilitas::class, 'id_ruangan', 'id_ruangan');
+    }
 
     public function lantai(): BelongsTo
     {

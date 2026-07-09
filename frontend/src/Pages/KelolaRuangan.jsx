@@ -129,9 +129,19 @@ const RoomCard = ({ room, onEdit, onDelete, canDelete }) => {
             <Icon icon="mdi:account-group" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
             <p className="leading-snug"><b>Kapasitas</b>: {room.kapasitas} Orang</p>
           </div>
-          <div className="flex gap-2 items-start">
-            <Icon icon="mdi:office-building" className="text-pink-500 shrink-0 mt-[1px]" width={14} />
-            <p className="leading-snug line-clamp-2"><b>Fasilitas</b>: {room.fasilitas || "-"}</p>
+          <div className="flex gap-2 items-start mt-1.5">
+            <Icon icon="mdi:star-check-outline" className="text-pink-500 shrink-0 mt-[3px]" width={14} />
+            <div className="flex flex-wrap gap-1">
+              {(Array.isArray(room.fasilitas) ? room.fasilitas : []).length > 0
+                ? (Array.isArray(room.fasilitas) ? room.fasilitas : []).slice(0, 4).map((f) => (
+                    <span key={f} className="bg-pink-100 text-[#C0254A] text-[9px] px-1.5 py-0.5 rounded-full font-semibold">{f}</span>
+                  ))
+                : <span className="text-gray-400 text-[10px]">-</span>
+              }
+              {(Array.isArray(room.fasilitas) ? room.fasilitas : []).length > 4 && (
+                <span className="bg-gray-100 text-gray-500 text-[9px] px-1.5 py-0.5 rounded-full font-semibold">+{room.fasilitas.length - 4}</span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -179,7 +189,7 @@ const ModalRuangan = ({ onClose, onSave, editData, saving, isPic }) => {
       id_gedung:         String(editData.id_gedung  ?? ""),
       nomor_lantai:      String(editData.nomor_lantai ?? ""),
       kapasitas:         editData.kapasitas          ?? "",
-      fasilitas:         editData.fasilitas          ?? "",
+      fasilitas:         Array.isArray(editData.fasilitas) ? editData.fasilitas.join(', ') : (editData.fasilitas ?? ""),
       deskripsi_ruangan: editData.deskripsi_ruangan ?? "",
       status_ruangan:    editData.status_ruangan    ?? "tersedia",
       id_number_pic:   editData.id_number_pic != null ? String(editData.id_number_pic) : "",
@@ -548,7 +558,7 @@ const KelolaRuangan = () => {
           kode_ruangan:      item.kode_ruangan,
           name_ruangan:      item.name_ruangan,
           kapasitas:         item.kapasitas,
-          fasilitas:         item.fasilitas,
+          fasilitas:         Array.isArray(item.fasilitas) ? item.fasilitas : [],
           deskripsi_ruangan: item.deskripsi_ruangan,
           status_ruangan:    item.status_ruangan,
           path_foto:         item.path_foto ?? null,

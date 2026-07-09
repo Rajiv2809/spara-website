@@ -618,7 +618,7 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
                   width={15}
                 />
                 <p className="text-[11px] text-blue-600 leading-relaxed">
-                  Jadwal peminjaman akan diperbarui dan persetujuan akan direset ke tahap awal (Penanggungjawab → PIC → Admin SBUM).
+                  Jadwal peminjaman akan diperbarui dan langsung disetujui oleh Kepala SBUM.
                 </p>
               </div>
             </div>
@@ -909,7 +909,7 @@ const MonitoringPeminjaman = () => {
                   jam_mulai: jam_mulai_baru,
                   jam_selesai: jam_selesai_baru,
                   alasan_kepala,
-                  status_persetujuan: "menunggu",
+                  status_persetujuan: "disetujui",
                   ...(id_ruangan_baru
                     ? { id_ruangan: Number(id_ruangan_baru) }
                     : {}),
@@ -922,18 +922,15 @@ const MonitoringPeminjaman = () => {
           prev
             ? {
                 ...prev,
-                menunggu: prev.menunggu + 1,
-                disetujui: wasDisetujui
-                  ? Math.max(0, prev.disetujui - 1)
-                  : prev.disetujui,
+                menunggu: wasDisetujui
+                  ? prev.menunggu
+                  : Math.max(0, prev.menunggu - 1),
+                disetujui: wasDisetujui ? prev.disetujui : prev.disetujui + 1,
               }
             : prev
         );
 
-        showToast(
-          "Jadwal diperbarui. Persetujuan direset ke tahap awal.",
-          "success"
-        );
+        showToast("Jadwal diperbarui dan langsung disetujui.", "success");
       }
     } catch (err) {
       const msg =

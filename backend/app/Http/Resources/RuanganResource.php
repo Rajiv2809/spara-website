@@ -14,7 +14,7 @@ class RuanganResource extends JsonResource
             'kode_ruangan'      => $this->kode_ruangan,
             'name_ruangan'      => $this->name_ruangan,
             'kapasitas'         => $this->kapasitas,
-            'fasilitas'         => $this->fasilitas,
+            'fasilitas'         => $this->fasilitas ? $this->fasilitas->pluck('nama_fasilitas')->toArray() : [],
             'deskripsi_ruangan' => $this->deskripsi_ruangan,
             'status_ruangan'    => $this->status_ruangan,
             'path_foto' => $this->path_foto

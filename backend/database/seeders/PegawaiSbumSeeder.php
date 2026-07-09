@@ -9,22 +9,29 @@ class PegawaiSbumSeeder extends Seeder
 {
     public function run(): void
     {
-        // Tambahkan user terlebih dahulu (role admin di users)
-        DB::table('users')->insert([
-            [
-                'id_number' => 10000005,
-                'name'        => 'Ketua SBUM',
-                'email'       => 'ketua.sbum@kampus.ac.id',
-                'phone_number'  => '081200000010',
-                'password'    => Hash::make('password'),
-                'role'        => 'kepala',
-                'created_at'  => now(), 'updated_at' => now(),
-            ],
-        ]);
+        $pegawai = [
+            ['id_number' => 10000002, 'name' => 'Kepala SBUM', 'email' => 'kepala.sbum@polibatam.ac.id', 'phone_number' => '081200000008', 'role' => 'ketua'],
+            ['id_number' => 10000003, 'name' => 'Staff SBUM', 'email' => 'staff.sbum@polibatam.ac.id', 'phone_number' => '081200000009', 'role' => 'admin'],
+        ];
 
-        // DB::table('pegawai_sbums')->insert([
-        //     ['id_number' => 10000001, 'role' => 'admin',  'created_at' => now(), 'updated_at' => now()],
-        //     ['id_number' => 10000002, 'role' => 'kepala',  'created_at' => now(), 'updated_at' => now()],
-        // ]);
+        foreach ($pegawai as $data) {
+            DB::table('users')->updateOrInsert(
+                ['id_number' => $data['id_number']],
+                [
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'phone_number' => $data['phone_number'],
+                    'password' => Hash::make('password'),
+                    'role' => 'kepala',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            DB::table('pegawai_sbums')->updateOrInsert(
+                ['id_number' => $data['id_number']],
+                ['role' => $data['role'], 'created_at' => now(), 'updated_at' => now()]
+            );
+        }
     }
 }

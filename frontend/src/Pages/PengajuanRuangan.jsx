@@ -288,7 +288,7 @@ const PeminjamanRuangan = () => {
           gedung     : r.name_gedung,
           lantai     : `Lantai ${r.nomor_lantai}`,
           kapasitas  : r.kapasitas,
-          fasilitas  : r.fasilitas.split(', '),
+          fasilitas  : Array.isArray(r.fasilitas) ? r.fasilitas : (r.fasilitas ? r.fasilitas.split(', ') : []),
           deskripsi  : r.deskripsi_ruangan,
           status     : r.status_ruangan.toUpperCase().replace('_', ' '),
           path_foto  : r.path_foto,

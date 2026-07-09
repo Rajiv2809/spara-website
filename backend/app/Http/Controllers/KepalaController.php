@@ -221,11 +221,11 @@ class KepalaController extends Controller
         try {
             DB::beginTransaction();
 
-            // ── 2. Update jadwal + RESET status ke menunggu ───────────────────
+            // ── 2. Update jadwal + tetapkan status disetujui oleh kepala ─────
             $peminjaman->hari_tanggal       = $request->hari_tanggal_baru;
             $peminjaman->jam_mulai          = $request->jam_mulai_baru;
             $peminjaman->jam_selesai        = $request->jam_selesai_baru;
-            $peminjaman->status_persetujuan = 'menunggu'; // ← RESET KE AWAL
+            $peminjaman->status_persetujuan = 'disetujui';
             $peminjaman->alasan_kepala      = $request->alasan_kepala;
             $peminjaman->diubah_pada        = Carbon::now();
 
@@ -235,57 +235,29 @@ class KepalaController extends Controller
 
             $peminjaman->save();
 
-            // ── 3. Ambil data untuk reset persetujuan ─────────────────────────
-            // Nomor induk Penanggung Jawab dari persetujuan pertama (id terkecil)
-            $pjLama = Persetujuan::where('id_peminjaman', $id)
-                ->orderBy('id')
-                ->first();
-
-            $nomorIndukPj = $pjLama?->id_number_penyetuju ?? $peminjaman->id_peminjam;
-
-            // Nomor induk PIC dari ruangan/alat yang dipakai (baru atau lama)
-            $nomorIndukPic = null;
-            if ($peminjaman->id_ruangan || $request->filled('id_ruangan_baru')) {
-                $idRuangan = $request->id_ruangan_baru ?? $peminjaman->id_ruangan;
-                $ruangan = DB::table('ruangans')->where('id_ruangan', $idRuangan)->first();
-                $nomorIndukPic = $ruangan?->id_number_pic;
-            } elseif ($peminjaman->id_alat) {
-                $alat = DB::table('alats')->where('id_alat', $peminjaman->id_alat)->first();
-                $nomorIndukPic = $alat?->id_number_pic;
-            }
-
-            // ── 4. Hapus persetujuan lama, buat ulang 3 tahap ──────────────────
-            Persetujuan::where('id_peminjaman', $id)->delete();
-
+            // ── 3. Tetapkan ulang persetujuan agar peminjaman tetap dianggap disetujui oleh kepala ───
             $now = Carbon::now();
-            $persetujuans = [
-                // Tahap 1: Penanggungjawab
-                [
-                    'id_peminjaman'         => $id,
-                    'id_number_penyetuju' => $nomorIndukPj,
-                    'status_persetujuan'    => 'menunggu',
-                    'created_at'            => $now,
-                    'updated_at'            => $now,
-                ],
-                // Tahap 2: PIC
-                [
-                    'id_peminjaman'         => $id,
-                    'id_number_penyetuju' => $nomorIndukPic,
-                    'status_persetujuan'    => 'menunggu',
-                    'created_at'            => $now,
-                    'updated_at'            => $now,
-                ],
-                // Tahap 3: Admin SBUM
-                [
-                    'id_peminjaman'         => $id,
-                    'id_number_penyetuju' => null,
-                    'status_persetujuan'    => 'menunggu',
-                    'created_at'            => $now,
-                    'updated_at'            => $now,
-                ],
-            ];
+            $existingPersetujuans = Persetujuan::where('id_peminjaman', $id)->get();
 
-            Persetujuan::insert($persetujuans);
+            if ($existingPersetujuans->isNotEmpty()) {
+                foreach ($existingPersetujuans as $persetujuan) {
+                    $persetujuan->status_persetujuan = 'disetujui';
+                    $persetujuan->updated_at = $now;
+                    $persetujuan->save();
+                }
+            } else {
+                $persetujuans = [
+                    [
+                        'id_peminjaman'         => $id,
+                        'id_number_penyetuju' => $peminjaman->id_peminjam,
+                        'status_persetujuan'    => 'disetujui',
+                        'created_at'            => $now,
+                        'updated_at'            => $now,
+                    ],
+                ];
+
+                Persetujuan::insert($persetujuans);
+            }
 
             // ── 5. Notifikasi ───────────────────────────────────────────────────
             $itemName = $peminjaman->ruangan?->name_ruangan
@@ -296,26 +268,15 @@ class KepalaController extends Controller
             Notification::create([
                 'id_number'   => $peminjaman->id_peminjam,
                 'type'          => 'menunggu',
-                'judul'         => 'Jadwal Diubah — Perlu Persetujuan Ulang',
-                'pesan'         => "Jadwal peminjaman {$itemName} diubah oleh Kepala SBUM. Persetujuan direset ke tahap awal.",
+                'judul'         => 'Jadwal Diubah — Disetujui Kepala SBUM',
+                'pesan'         => "Jadwal peminjaman {$itemName} diubah oleh Kepala SBUM dan langsung disetujui.",
                 'peminjaman_id' => $peminjaman->id_peminjaman,
             ]);
-
-            // Ke penanggung jawab
-            if ($nomorIndukPj) {
-                Notification::create([
-                    'id_number'   => $nomorIndukPj,
-                    'type'          => 'menunggu',
-                    'judul'         => 'Persetujuan Ulang Diperlukan',
-                    'pesan'         => "Peminjaman {$itemName} dijadwalkan ulang oleh Kepala SBUM dan memerlukan persetujuan Anda kembali.",
-                    'peminjaman_id' => $peminjaman->id_peminjaman,
-                ]);
-            }
 
             DB::commit();
 
             return response()->json([
-                'message' => 'Jadwal berhasil diperbarui. Persetujuan direset ke tahap awal.',
+                'message' => 'Jadwal berhasil diperbarui dan langsung disetujui oleh Kepala SBUM.',
                 'data'    => $peminjaman->fresh(),
             ]);
 

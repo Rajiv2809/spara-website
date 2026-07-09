@@ -179,12 +179,13 @@ class PeminjamanController extends Controller
         $penanggungJawab = User::where('id_number', $request->id_number_penanggungjawab)->first();
         if ($penanggungJawab?->email) {
             try {
+                $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
                 Mail::to($penanggungJawab->email)->send(new PersetujuanMenungguMail(
                     namaPenerima: $penanggungJawab->name,
                     itemName: $itemName,
                     approverName: $request->user()->name,
                     tahap: 'Penanggung Jawab',
-                    link: url("/persetujuan/{$persetujuanPertama->id}"),
+                    link: $frontendUrl . '/persetujuan-peminjaman',
                 ));
             } catch (\Throwable $e) {
                 Log::warning('Gagal mengirim email persetujuan awal', [
@@ -357,7 +358,7 @@ class PeminjamanController extends Controller
         $itemName = $peminjaman->ruangan?->name_ruangan
             ?? $peminjaman->alat?->name_alat
             ?? 'Item';
-        $approverName = $persetujuan->user?->name ?? auth()->user()->name;
+        $approverName = optional($persetujuan->user)->name ?? auth()->user()?->name ?? 'Sistem';
 
         // Cek apakah semua tahap sudah disetujui
         $semuaDisetujui = Persetujuan::where('id_peminjaman', $peminjaman->id_peminjaman)
@@ -381,10 +382,11 @@ class PeminjamanController extends Controller
             $peminjamUser = User::where('id_number', $peminjaman->id_peminjam)->first();
             if ($peminjamUser?->email) {
                 try {
+                    $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
                     Mail::to($peminjamUser->email)->send(new PeminjamanSelesaiMail(
                         namaPeminjam: $peminjamUser->name,
                         itemName: $itemName,
-                        link: url("/peminjaman/{$peminjaman->id_peminjaman}"),
+                        link: $frontendUrl . '/riwayat',
                     ));
                 } catch (\Throwable $e) {
                     Log::warning('Gagal mengirim email peminjaman selesai', [
@@ -420,12 +422,13 @@ class PeminjamanController extends Controller
                         };
 
                         try {
+                            $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
                             Mail::to($nextUser->email)->send(new PersetujuanMenungguMail(
                                 namaPenerima: $nextUser->name,
                                 itemName: $itemName,
                                 approverName: $approverName,
                                 tahap: $tahapLabel,
-                                link: url("/persetujuan/{$next->id}"),
+                                link: $frontendUrl . '/persetujuan-peminjaman',
                             ));
                         } catch (\Throwable $e) {
                             Log::warning('Gagal mengirim email ke penyetuju berikutnya', [
@@ -448,12 +451,13 @@ class PeminjamanController extends Controller
 
                         if ($adminUser->email) {
                             try {
+                                $frontendUrl = rtrim(env('FRONTEND_URL', env('APP_URL')), '/');
                                 Mail::to($adminUser->email)->send(new PersetujuanMenungguMail(
                                     namaPenerima: $adminUser->name,
                                     itemName: $itemName,
                                     approverName: $approverName,
                                     tahap: 'Admin',
-                                    link: url("/persetujuan/{$next->id}"),
+                                    link: $frontendUrl . '/persetujuan-peminjaman',
                                 ));
                             } catch (\Throwable $e) {
                                 Log::warning('Gagal mengirim email ke admin', [
@@ -497,7 +501,7 @@ class PeminjamanController extends Controller
         $itemName = $peminjaman?->ruangan?->name_ruangan
             ?? $peminjaman?->alat?->name_alat
             ?? 'Item';
-        $penolak = auth()->user()->name;
+        $penolak = auth()->user()?->name ?? 'Sistem';
         Notification::create([
             'id_number'   => $peminjaman->id_peminjam,
             'type'          => 'ditolak',

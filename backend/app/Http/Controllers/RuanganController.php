@@ -12,13 +12,13 @@ class RuanganController extends Controller
 
     public function getRuangan()
     {
-        $ruangan = Ruangan::with(['gedung', 'pic.user'])->get();
+        $ruangan = Ruangan::with(['gedung', 'pic.user', 'fasilitas'])->get();
         return RuanganResource::collection($ruangan);
     }
 
     public function show(int $id)
     {
-        $ruangan = Ruangan::with(['gedung', 'pic.user'])->findOrFail($id);
+        $ruangan = Ruangan::with(['gedung', 'pic.user', 'fasilitas'])->findOrFail($id);
         return new RuanganResource($ruangan);
     }
 
@@ -71,8 +71,18 @@ class RuanganController extends Controller
         }
         unset($validated['foto']);
 
+        $fasilitasRaw = $validated['fasilitas'];
+        unset($validated['fasilitas']);
+
         $ruangan = Ruangan::create($validated);
-        $ruangan->load(['gedung', 'pic.user']);
+
+        // Simpan fasilitas
+        $facilities = array_filter(array_map('trim', explode(',', $fasilitasRaw)));
+        foreach ($facilities as $facility) {
+            $ruangan->fasilitas()->create(['nama_fasilitas' => $facility]);
+        }
+
+        $ruangan->load(['gedung', 'pic.user', 'fasilitas']);
 
         return response()->json([
             'message' => 'Ruangan berhasil ditambahkan',
@@ -94,7 +104,7 @@ class RuanganController extends Controller
             ]);
 
             $ruangan->update([ 'status_ruangan' => $validated['status_ruangan'] ]);
-            $ruangan->load(['gedung', 'pic.user']);
+            $ruangan->load(['gedung', 'pic.user', 'fasilitas']);
 
             return response()->json([
                 'message' => 'Status ruangan berhasil diperbarui',
@@ -124,8 +134,19 @@ class RuanganController extends Controller
         }
         unset($validated['foto']);
 
+        $fasilitasRaw = $validated['fasilitas'];
+        unset($validated['fasilitas']);
+
         $ruangan->update($validated);
-        $ruangan->load(['gedung', 'pic.user']);
+
+        // Sync fasilitas
+        $ruangan->fasilitas()->delete();
+        $facilities = array_filter(array_map('trim', explode(',', $fasilitasRaw)));
+        foreach ($facilities as $facility) {
+            $ruangan->fasilitas()->create(['nama_fasilitas' => $facility]);
+        }
+
+        $ruangan->load(['gedung', 'pic.user', 'fasilitas']);
 
         return response()->json([
             'message' => 'Ruangan berhasil diperbarui',
