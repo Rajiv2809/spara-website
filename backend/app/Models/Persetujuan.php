@@ -19,8 +19,7 @@ class Persetujuan extends Model
     }
     public function user()
     {
-        return $this->be
-        longsTo(User::class, 'id_number_penyetuju', 'id_number');
+        return $this->belongsTo(User::class, 'id_number_penyetuju', 'id_number');
     }
     public function peminjaman()
     {
