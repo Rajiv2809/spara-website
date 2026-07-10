@@ -81,7 +81,16 @@ class AlatController extends Controller
     {
         $peminjaman = Peminjaman::with('persetujuans')
             ->where('id_alat', $id)
-            ->whereDate('hari_tanggal', $tanggal)
+            ->whereNotIn('status_persetujuan', ['ditolak', 'dibatalkan'])
+            ->where(function ($q) use ($tanggal) {
+                // Peminjaman 1 hari
+                $q->whereDate('hari_tanggal', $tanggal)
+                  // ATAU peminjaman multi-hari yang mencakup tanggal ini
+                  ->orWhere(function ($q2) use ($tanggal) {
+                      $q2->whereDate('tanggal_mulai', '<=', $tanggal)
+                         ->whereDate('tanggal_selesai', '>=', $tanggal);
+                  });
+            })
             ->get();
 
         return JadwaRuanganResource::collection($peminjaman);

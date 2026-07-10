@@ -10,6 +10,15 @@ const formatTanggal = (iso) => {
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
 };
+
+// Format rentang tanggal — kalau sama tampil satu tanggal, kalau beda tampil "mulai s/d selesai"
+const formatRentangTanggal = (item) => {
+  const mulai   = item.tanggal_mulai   || item.hari_tanggal;
+  const selesai = item.tanggal_selesai || item.hari_tanggal;
+  if (!mulai) return "-";
+  if (!selesai || mulai === selesai) return formatTanggal(mulai);
+  return `${formatTanggal(mulai)} – ${formatTanggal(selesai)}`;
+};
 const formatJam = (jam) => jam?.slice(0, 5) ?? "-";
 
 const formatWA = (phone) => {
@@ -99,7 +108,7 @@ const ModalDetail = ({ item, onClose }) => {
             </h3>
             <div className="bg-[#FFF6F8] rounded-2xl p-4 space-y-2">
               {[
-                { icon: "ph:calendar-blank",     label: "Tanggal",  value: formatTanggal(item.hari_tanggal) },
+                { icon: "ph:calendar-blank",     label: "Tanggal",  value: formatRentangTanggal(item) },
                 { icon: "ph:clock",              label: "Waktu",    value: `${formatJam(item.jam_mulai)} – ${formatJam(item.jam_selesai)}` },
                 { icon: "ph:tag",                label: "Jenis",    value: item.jenis_kegiatan || "-" },
                 { icon: "ph:note-pencil-bold",   label: "Kegiatan", value: item.name_kegiatan || "-" },
@@ -256,7 +265,7 @@ const ModalBatal = ({ item, onClose, onConfirm, loading }) => {
           </p>
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-1.5">
             {[
-              { icon: "ph:calendar-blank", text: formatTanggal(item.hari_tanggal) },
+              { icon: "ph:calendar-blank", text: formatRentangTanggal(item) },
               { icon: "ph:clock",          text: `${formatJam(item.jam_mulai)} s/d ${formatJam(item.jam_selesai)}` },
               { icon: "ph:note-pencil",    text: item.name_kegiatan },
             ].map(({ icon, text }) => (
@@ -442,7 +451,7 @@ const Riwayat = () => {
                   {/* Card Info */}
                   <div className="px-4 pb-3 space-y-1.5">
                     {[
-                      { icon: "ph:calendar-blank", label: "Tanggal",  value: formatTanggal(item.hari_tanggal) },
+                      { icon: "ph:calendar-blank", label: "Tanggal",  value: formatRentangTanggal(item) },
                       { icon: "ph:clock",          label: "Waktu",    value: `${formatJam(item.jam_mulai)} – ${formatJam(item.jam_selesai)}` },
                       { icon: "ph:tag",            label: "Jenis",    value: item.jenis_kegiatan || "-" },
                       { icon: "ph:user-circle-fill",label: "PIC",     value: item.pic || "-" },

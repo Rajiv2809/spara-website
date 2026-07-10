@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Models\{Peminjaman, Ruangan, Gedungs, Lantai};
+use Illuminate\Support\Facades\{Storage, DB};
+use App\Models\{Peminjaman, Ruangan, Gedungs, Lantai, User};
 use App\Http\Resources\{RuanganResource, JadwaRuanganResource};
 
 class RuanganController extends Controller
@@ -12,13 +12,27 @@ class RuanganController extends Controller
 
     public function getRuangan()
     {
-        $ruangan = Ruangan::with(['gedung', 'pic.user', 'fasilitas'])->get();
+        $ruangan = Ruangan::with(['gedung', 'picUser', 'fasilitas'])->get();
         return RuanganResource::collection($ruangan);
+    }
+
+    /**
+     * Daftar semua user yang bisa dijadikan PIC (lecturer & pic).
+     */
+    public function getPicList()
+    {
+        $pics = DB::table('users')
+            ->whereIn('role', ['lecturer', 'pic'])
+            ->select('id_number', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json(['data' => $pics]);
     }
 
     public function show(int $id)
     {
-        $ruangan = Ruangan::with(['gedung', 'pic.user', 'fasilitas'])->findOrFail($id);
+        $ruangan = Ruangan::with(['gedung', 'picUser', 'fasilitas'])->findOrFail($id);
         return new RuanganResource($ruangan);
     }
 
@@ -26,7 +40,16 @@ class RuanganController extends Controller
     {
         $peminjaman = Peminjaman::with('persetujuans')
             ->where('id_ruangan', $id)
-            ->whereDate('hari_tanggal', $tanggal)
+            ->whereNotIn('status_persetujuan', ['ditolak', 'dibatalkan'])
+            ->where(function ($q) use ($tanggal) {
+                // Peminjaman 1 hari
+                $q->whereDate('hari_tanggal', $tanggal)
+                  // ATAU peminjaman multi-hari yang mencakup tanggal ini
+                  ->orWhere(function ($q2) use ($tanggal) {
+                      $q2->whereDate('tanggal_mulai', '<=', $tanggal)
+                         ->whereDate('tanggal_selesai', '>=', $tanggal);
+                  });
+            })
             ->get();
 
         return JadwaRuanganResource::collection($peminjaman);
@@ -82,7 +105,7 @@ class RuanganController extends Controller
             $ruangan->fasilitas()->create(['nama_fasilitas' => $facility]);
         }
 
-        $ruangan->load(['gedung', 'pic.user', 'fasilitas']);
+        $ruangan->load(['gedung', 'picUser', 'fasilitas']);
 
         return response()->json([
             'message' => 'Ruangan berhasil ditambahkan',
@@ -104,7 +127,7 @@ class RuanganController extends Controller
             ]);
 
             $ruangan->update([ 'status_ruangan' => $validated['status_ruangan'] ]);
-            $ruangan->load(['gedung', 'pic.user', 'fasilitas']);
+            $ruangan->load(['gedung', 'picUser', 'fasilitas']);
 
             return response()->json([
                 'message' => 'Status ruangan berhasil diperbarui',
@@ -146,7 +169,7 @@ class RuanganController extends Controller
             $ruangan->fasilitas()->create(['nama_fasilitas' => $facility]);
         }
 
-        $ruangan->load(['gedung', 'pic.user', 'fasilitas']);
+        $ruangan->load(['gedung', 'picUser', 'fasilitas']);
 
         return response()->json([
             'message' => 'Ruangan berhasil diperbarui',

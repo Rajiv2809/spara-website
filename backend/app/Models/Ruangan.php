@@ -37,14 +37,10 @@ class Ruangan extends Model
         return $this->belongsTo(Gedungs::class, 'id_gedung', 'id_gedung');
     }
 
-    public function pic(): BelongsTo
+    /** Relasi langsung ke User (bypass tabel pics) */
+    public function picUser(): BelongsTo
     {
-        return $this->belongsTo(Pic::class, 'id_number_pic', 'id_number');
-    }
-
-    public function penanggungJawab()
-    {
-        return $this->pic?->user;
+        return $this->belongsTo(User::class, 'id_number_pic', 'id_number');
     }
 
     public function peminjaman(): HasMany

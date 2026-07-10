@@ -24,9 +24,8 @@ class RuanganResource extends JsonResource
             'id_gedung'         => $this->id_gedung,
             'name_gedung'       => $this->gedung?->name_gedung ?? '-',
 
-            'pic'               => $this->pic?->user?->name ?? '-',
-
-            'id_number_pic'   => $this->id_number_pic,
+            'pic'               => $this->picUser?->name ?? '-',
+            'id_number_pic'     => $this->id_number_pic,
         ];
     }
 }

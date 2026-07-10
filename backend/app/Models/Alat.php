@@ -20,9 +20,10 @@ class Alat extends Model
         'path_foto',
     ];
 
-    public function pic(): BelongsTo
+    /** Relasi langsung ke User (bypass tabel pics) */
+    public function picUser(): BelongsTo
     {
-        return $this->belongsTo(Pic::class, 'id_number_pic', 'id_number');
+        return $this->belongsTo(User::class, 'id_number_pic', 'id_number');
     }
 
     public function peminjaman(): HasMany

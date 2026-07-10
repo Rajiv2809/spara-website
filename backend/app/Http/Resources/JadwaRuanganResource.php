@@ -19,11 +19,13 @@ class JadwaRuanganResource extends JsonResource
         $hasDitolak = $persetujuans->contains(fn($p) => $p->status_persetujuan === 'ditolak');
 
         return [
-            'jam_mulai' => $this->jam_mulai,
-            'jam_selesai' => $this->jam_selesai,
-            'name_kegiatan' => $this->name_kegiatan,
-            'jenis_kegiatan' => $this->jenis_kegiatan,
-            'status_konfirmasi' => $allDisetujui ? 'disetujui' : ($hasDitolak ? 'ditolak' : 'pending'),
+            'jam_mulai'          => $this->jam_mulai,
+            'jam_selesai'        => $this->jam_selesai,
+            'name_kegiatan'      => $this->name_kegiatan,
+            'jenis_kegiatan'     => $this->jenis_kegiatan,
+            'tanggal_mulai'      => $this->tanggal_mulai?->toDateString() ?? $this->hari_tanggal?->toDateString(),
+            'tanggal_selesai'    => $this->tanggal_selesai?->toDateString() ?? $this->hari_tanggal?->toDateString(),
+            'status_konfirmasi'  => $allDisetujui ? 'disetujui' : ($hasDitolak ? 'ditolak' : 'pending'),
         ];
     }
 }

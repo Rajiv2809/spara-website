@@ -44,6 +44,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/get-gedung', [RuanganController::class, 'getGedung']);
     Route::get('/get-lantai', [RuanganController::class, 'getLantai']);
+    Route::get('/get-pic-list', [RuanganController::class, 'getPicList']);
 
     Route::get('/get-alat', [AlatController::class, 'getAlat']);
     Route::get('/alat/{id}', [AlatController::class, 'show']);
@@ -63,6 +64,9 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/persetujuan', [PeminjamanController::class, 'getPersetujuan']);
     Route::get('/list-persetujuan', [PeminjamanController::class, 'getPersetujuanList']);
+
+    // ── Kalender publik — semua role ──────────────────────────────────────
+    Route::get('/kalender', [PeminjamanController::class, 'getKalender']);
 
     Route::post('/persetujuan-setujui/{id}', [PeminjamanController::class, 'setujuPeminjaman']);
     Route::post('/persetujuan-tolak/{id}', [PeminjamanController::class, 'tolakPeminjaman']);

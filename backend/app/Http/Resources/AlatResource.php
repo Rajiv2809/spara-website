@@ -15,7 +15,7 @@ class AlatResource extends JsonResource
             'name_alat'   => $this->name_alat,
             'deskripsi_alat' => $this->deskripsi_alat,
             'status_alat' => $this->status_alat,
-            'pic'         => $this->penanggungJawab?->name ?? '-',
+            'pic'         => $this->picUser?->name ?? '-',
             'id_number_pic' => $this->id_number_pic,
             'path_foto'      => $this->path_foto
             ? asset('storage/' . $this->path_foto)

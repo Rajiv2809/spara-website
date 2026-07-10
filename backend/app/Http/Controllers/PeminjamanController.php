@@ -21,14 +21,18 @@ class PeminjamanController extends Controller
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name_kegiatan'  => 'required|string|max:255',
-            'jenis_kegiatan' => 'required|string|max:255',
-            'hari_tanggal'   => 'required|date',
-            'jam_mulai'      => 'required|date_format:H:i',
-            'jam_selesai'    => 'required|date_format:H:i|after:jam_mulai',
-            'keterangan'     => 'nullable|string',
-            'id_alat'        => 'nullable|exists:alats,id_alat',
-            'id_ruangan'     =>     'nullable|exists:ruangans,id_ruangan',
+            'name_kegiatan'             => 'required|string|max:255',
+            'jenis_kegiatan'            => 'required|string|max:255',
+            // tanggal_mulai & tanggal_selesai untuk multi-hari
+            // hari_tanggal tetap wajib (= tanggal_mulai) agar backward-compatible
+            'hari_tanggal'              => 'required|date',
+            'tanggal_mulai'             => 'nullable|date|after_or_equal:today',
+            'tanggal_selesai'           => 'nullable|date|after_or_equal:tanggal_mulai',
+            'jam_mulai'                 => 'required|date_format:H:i',
+            'jam_selesai'               => 'required|date_format:H:i|after:jam_mulai',
+            'keterangan'                => 'nullable|string',
+            'id_alat'                   => 'nullable|exists:alats,id_alat',
+            'id_ruangan'                => 'nullable|exists:ruangans,id_ruangan',
             'id_number_penanggungjawab' => 'required|exists:users,id_number',
         ]);
 
@@ -39,58 +43,97 @@ class PeminjamanController extends Controller
             ], 422);
         }
 
-        // Cek konflik jadwal ruangan — hanya blokir jika sudah disetujui 3 tahap
-        if ($request->id_ruangan && $request->jam_mulai && $request->jam_selesai) {
-            $konflik = Peminjaman::where('id_ruangan', $request->id_ruangan)
-                ->where('hari_tanggal', $request->hari_tanggal)
-                ->where('status_persetujuan', '!=', 'ditolak')
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
-                        ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
-                        ->orWhere(function ($q) use ($request) {
-                            $q->where('jam_mulai', '<=', $request->jam_mulai)
-                                ->where('jam_selesai', '>=', $request->jam_selesai);
-                        });
-                })
-                ->whereDoesntHave('persetujuans', function ($q) {
-                    $q->where('status_persetujuan', '!=', 'disetujui');
-                })
-                ->whereHas('persetujuans')
-                ->exists();
+        // ── Normalkan rentang tanggal ──────────────────────────────────────
+        $tanggalMulai   = $request->tanggal_mulai   ?? $request->hari_tanggal;
+        $tanggalSelesai = $request->tanggal_selesai ?? $request->hari_tanggal;
 
-            if ($konflik) {
-                return response()->json([
-                    'message' => 'Ruangan sudah dibooking pada jam tersebut.',
-                ], 409);
+        // Validasi ekstra: tanggal_selesai tidak boleh sebelum tanggal_mulai
+        if ($tanggalSelesai < $tanggalMulai) {
+            return response()->json([
+                'message' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
+            ], 422);
+        }
+
+        // Hitung semua tanggal dalam rentang
+        $allDates = [];
+        $current  = Carbon::parse($tanggalMulai);
+        $end      = Carbon::parse($tanggalSelesai);
+        while ($current->lte($end)) {
+            $allDates[] = $current->toDateString();
+            $current->addDay();
+        }
+
+        // Batasi maksimal 30 hari
+        if (count($allDates) > 30) {
+            return response()->json([
+                'message' => 'Peminjaman maksimal 30 hari sekaligus.',
+            ], 422);
+        }
+
+        // ── Cek konflik ruangan di setiap hari dalam rentang ──────────────
+        if ($request->id_ruangan) {
+            foreach ($allDates as $tgl) {
+                $konflik = Peminjaman::where('id_ruangan', $request->id_ruangan)
+                    ->where(function ($q) use ($tgl) {
+                        // peminjaman yang overlap secara tanggal
+                        $q->where('hari_tanggal', $tgl)
+                          ->orWhere(function ($q2) use ($tgl) {
+                              $q2->where('tanggal_mulai', '<=', $tgl)
+                                 ->where('tanggal_selesai', '>=', $tgl);
+                          });
+                    })
+                    ->whereNotIn('status_persetujuan', ['ditolak', 'dibatalkan'])
+                    ->where(function ($query) use ($request) {
+                        $query->where('jam_mulai', '<', $request->jam_selesai)
+                              ->where('jam_selesai', '>', $request->jam_mulai);
+                    })
+                    ->whereDoesntHave('persetujuans', fn ($q) =>
+                        $q->where('status_persetujuan', '!=', 'disetujui')
+                    )
+                    ->whereHas('persetujuans')
+                    ->exists();
+
+                if ($konflik) {
+                    return response()->json([
+                        'message' => "Ruangan sudah dibooking pada tanggal {$tgl} jam {$request->jam_mulai}–{$request->jam_selesai}.",
+                    ], 409);
+                }
             }
         }
 
-        // Cek konflik jadwal alat
-        if ($request->id_alat && $request->jam_mulai && $request->jam_selesai) {
-            $konflikAlat = Peminjaman::where('id_alat', $request->id_alat)
-                ->where('hari_tanggal', $request->hari_tanggal)
-                ->where('status_persetujuan', '!=', 'ditolak')
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
-                        ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
-                        ->orWhere(function ($q) use ($request) {
-                            $q->where('jam_mulai', '<=', $request->jam_mulai)
-                                ->where('jam_selesai', '>=', $request->jam_selesai);
-                        });
-                })->exists();
+        // ── Cek konflik alat di setiap hari dalam rentang ─────────────────
+        if ($request->id_alat) {
+            foreach ($allDates as $tgl) {
+                $konflikAlat = Peminjaman::where('id_alat', $request->id_alat)
+                    ->where(function ($q) use ($tgl) {
+                        $q->where('hari_tanggal', $tgl)
+                          ->orWhere(function ($q2) use ($tgl) {
+                              $q2->where('tanggal_mulai', '<=', $tgl)
+                                 ->where('tanggal_selesai', '>=', $tgl);
+                          });
+                    })
+                    ->whereNotIn('status_persetujuan', ['ditolak', 'dibatalkan'])
+                    ->where(function ($query) use ($request) {
+                        $query->where('jam_mulai', '<', $request->jam_selesai)
+                              ->where('jam_selesai', '>', $request->jam_mulai);
+                    })
+                    ->exists();
 
-            if ($konflikAlat) {
-                return response()->json([
-                    'message' => 'Alat sudah dipinjam pada jam tersebut.',
-                ], 409);
+                if ($konflikAlat) {
+                    return response()->json([
+                        'message' => "Alat sudah dipinjam pada tanggal {$tgl} jam {$request->jam_mulai}–{$request->jam_selesai}.",
+                    ], 409);
+                }
             }
         }
 
-        // Buat peminjaman
+        // ── Buat peminjaman ───────────────────────────────────────────────
         $peminjaman = Peminjaman::create([
             'name_kegiatan'      => $request->name_kegiatan,
             'jenis_kegiatan'     => $request->jenis_kegiatan,
-            'hari_tanggal'       => $request->hari_tanggal,
+            'hari_tanggal'       => $tanggalMulai,   // backward-compat
+            'tanggal_mulai'      => $tanggalMulai,
+            'tanggal_selesai'    => $tanggalSelesai,
             'jam_mulai'          => $request->jam_mulai,
             'jam_selesai'        => $request->jam_selesai,
             'keterangan'         => $request->keterangan,
@@ -629,6 +672,54 @@ class PeminjamanController extends Controller
         }
 
         return response()->json(['message' => 'Peminjaman berhasil dibatalkan.']);
+    }
+
+    /**
+     * GET /api/kalender
+     * Kalender peminjaman untuk semua role.
+     * Hanya mengembalikan: tanggal, jam mulai-selesai, nama item, status.
+     * Tidak ada detail peminjam.
+     */
+    public function getKalender(Request $request)
+    {
+        $request->validate([
+            'bulan'  => 'nullable|integer|min:1|max:12',
+            'tahun'  => 'nullable|integer|min:2020|max:2100',
+            'jenis'  => 'nullable|in:ruangan,alat,semua',
+            'status' => 'nullable|in:menunggu,disetujui,ditolak',
+        ]);
+
+        $bulan = (int) $request->input('bulan', now()->month);
+        $tahun = (int) $request->input('tahun', now()->year);
+
+        $query = Peminjaman::with(['ruangan', 'alat'])
+            ->whereYear('hari_tanggal', $tahun)
+            ->whereMonth('hari_tanggal', $bulan)
+            ->whereNotIn('status_persetujuan', ['dibatalkan']);
+
+        if ($request->filled('jenis') && $request->jenis !== 'semua') {
+            $request->jenis === 'ruangan'
+                ? $query->whereNotNull('id_ruangan')
+                : $query->whereNotNull('id_alat');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status_persetujuan', $request->status);
+        }
+
+        $data = $query->orderBy('hari_tanggal')->orderBy('jam_mulai')
+            ->get()
+            ->map(fn ($p) => [
+                'id_peminjaman'      => $p->id_peminjaman,
+                'hari_tanggal'       => $p->hari_tanggal?->toDateString(),
+                'jam_mulai'          => substr($p->jam_mulai, 0, 5),
+                'jam_selesai'        => substr($p->jam_selesai, 0, 5),
+                'item'               => $p->ruangan?->name_ruangan ?? $p->alat?->name_alat ?? '-',
+                'jenis'              => $p->id_ruangan ? 'ruangan' : 'alat',
+                'status_persetujuan' => $p->status_persetujuan,
+            ]);
+
+        return response()->json(['data' => $data]);
     }
 
     public function riwayat()

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
+import TimePicker24 from "./TimePicker24";
 
 const Input = ({ label, name, type = "text", required = false, value, onChange, ...props }) => (
   <div className="flex flex-col gap-1">
@@ -189,12 +190,13 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [tanggalCek, setTanggalCek] = useState("");
+  const [tanggalSelesai, setTanggalSelesai] = useState("");
+  const [multiHari, setMultiHari] = useState(false);
   const [jamMulaiCek, setJamMulaiCek] = useState("");
   const [jamSelesaiCek, setJamSelesaiCek] = useState("");
 
   const [jadwalTerpakai, setJadwalTerpakai] = useState([]);
   const [isLoadingJadwal, setIsLoadingJadwal] = useState(false);
-
   const [showPendingWarning, setShowPendingWarning] = useState(false);
 
   const today = new Date();
@@ -210,11 +212,22 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
     name_kegiatan: "",
     id_number_penanggungjawab: "",
     hari_tanggal: "",
+    tanggal_mulai: "",
+    tanggal_selesai: "",
     jam_mulai: "",
     jam_selesai: "",
     id_alat: "",
     keterangan: "",
   });
+
+  const jumlahHari = (() => {
+    if (!tanggalCek) return 0;
+    if (!multiHari || !tanggalSelesai) return 1;
+    const start = new Date(tanggalCek);
+    const end   = new Date(tanggalSelesai);
+    const diff  = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    return diff > 0 ? diff : 0;
+  })();
 
   useEffect(() => {
     setForm((prev) => ({ ...prev, id_alat: peralatan?.id || "" }));
@@ -272,6 +285,8 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
       name_kegiatan: form.name_kegiatan,
       jenis_kegiatan: form.jenis_kegiatan,
       hari_tanggal: form.hari_tanggal,
+      tanggal_mulai: form.tanggal_mulai,
+      tanggal_selesai: form.tanggal_selesai,
       jam_mulai: form.jam_mulai.slice(0, 5),
       jam_selesai: form.jam_selesai.slice(0, 5),
       id_alat: form.id_alat,
@@ -326,41 +341,41 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
       )}
 
       <div
-        className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center md:pl-[300px] px-4"
+        className="fixed inset-0 bg-black/50 z-50 flex justify-center items-start md:items-center overflow-y-auto md:pl-[300px] px-3 py-4 md:py-0"
         onClick={onClose}
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"
+          className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[95vh] md:max-h-[90vh] my-auto"
         >
           {/* Header */}
-          <div className="bg-[#A3264C] text-white px-6 py-4 flex items-center justify-between rounded-t-2xl">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Icon icon="mdi:tools" />
+          <div className="bg-[#A3264C] text-white px-4 md:px-6 py-3 md:py-4 flex items-center justify-between rounded-t-2xl flex-shrink-0">
+            <h2 className="text-sm md:text-lg font-semibold flex items-center gap-2 leading-tight">
+              <Icon icon="mdi:tools" width={16} />
               Form Pengajuan Peminjaman Peralatan
             </h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center"
+              className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center flex-shrink-0 ml-2"
             >
               ✕
             </button>
           </div>
 
           {/* Stepper */}
-          <div className="px-10 pt-6 pb-2">
+          <div className="px-4 md:px-10 pt-4 pb-2 flex-shrink-0">
             <div className="flex justify-between relative">
-              <div className="absolute top-5 left-0 w-full h-[2px] bg-gray-200" />
+              <div className="absolute top-4 md:top-5 left-0 w-full h-[2px] bg-gray-200" />
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex-1 text-center relative z-10">
                   <div
-                    className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-sm font-semibold ${
+                    className={`w-8 h-8 md:w-10 md:h-10 mx-auto rounded-full flex items-center justify-center text-xs md:text-sm font-semibold ${
                       step >= s ? "bg-[#E84D7A] text-white" : "bg-gray-200 text-gray-500"
                     }`}
                   >
                     {s}
                   </div>
-                  <p className="text-xs mt-2 text-gray-500">
+                  <p className="text-[10px] md:text-xs mt-1 md:mt-2 text-gray-500">
                     {s === 1 && "Cek Jadwal"}
                     {s === 2 && "Isi Form"}
                     {s === 3 && "Konfirmasi"}
@@ -371,7 +386,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto px-8 pt-6 pb-8">
+          <div className="overflow-y-auto px-4 md:px-8 pt-4 pb-6 flex-1">
             {/* STEP 1 - Cek Jadwal */}
             {step === 1 && (
               <>
@@ -384,27 +399,52 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                   </p>
 
                   <Input
-                    label="Cek Ketersediaan"
+                    label={multiHari ? "Tanggal Mulai" : "Pilih Tanggal"}
                     type="date"
                     value={tanggalCek}
                     min={minDate}
-                    onChange={(e) => setTanggalCek(e.target.value)}
+                    onChange={(e) => { setTanggalCek(e.target.value); setTanggalSelesai(""); }}
                   />
 
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <Input
+                  {/* Toggle multi-hari */}
+                  <div className="mt-3 flex items-center gap-2 cursor-pointer select-none"
+                    onClick={() => { setMultiHari(v => !v); setTanggalSelesai(""); }}>
+                    <div className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${multiHari ? "bg-[#A3264C]" : "bg-gray-300"}`}>
+                      <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${multiHari ? "translate-x-4" : "translate-x-0"}`} />
+                    </div>
+                    <span className="text-sm text-gray-600 font-medium">Lebih dari 1 hari</span>
+                  </div>
+
+                  {multiHari && (
+                    <div className="mt-3">
+                      <Input
+                        label="Tanggal Selesai"
+                        type="date"
+                        value={tanggalSelesai}
+                        min={tanggalCek || minDate}
+                        onChange={(e) => setTanggalSelesai(e.target.value)}
+                      />
+                      {tanggalCek && tanggalSelesai && jumlahHari > 0 && (
+                        <p className="text-[12px] text-[#A3264C] mt-1 font-medium">
+                          Durasi: {jumlahHari} hari
+                          {jumlahHari > 30 && <span className="text-red-600 ml-1">(Maksimal 30 hari)</span>}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                    <TimePicker24
                       label="Jam Mulai"
-                      type="time"
                       value={jamMulaiCek}
-                      min={isToday ? currentTime : undefined}
-                      onChange={(e) => setJamMulaiCek(e.target.value)}
+                      minTime={isToday ? currentTime : ""}
+                      onChange={(v) => setJamMulaiCek(v)}
                     />
-                    <Input
+                    <TimePicker24
                       label="Jam Selesai"
-                      type="time"
                       value={jamSelesaiCek}
-                      min={jamMulaiCek || (isToday ? currentTime : undefined)}
-                      onChange={(e) => setJamSelesaiCek(e.target.value)}
+                      minTime={jamMulaiCek || (isToday ? currentTime : "")}
+                      onChange={(v) => setJamSelesaiCek(v)}
                     />
                   </div>
 
@@ -474,7 +514,14 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <Icon icon="mdi:calendar" className="text-[#A3264C]" />
-                      <span>{form.hari_tanggal}</span>
+                      <span>
+                        {form.tanggal_mulai === form.tanggal_selesai
+                          ? form.tanggal_mulai
+                          : `${form.tanggal_mulai} s/d ${form.tanggal_selesai}`}
+                        {form.tanggal_mulai !== form.tanggal_selesai && jumlahHari > 0 && (
+                          <span className="ml-1 text-[#A3264C] font-semibold">({jumlahHari} hari)</span>
+                        )}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                       <Icon icon="mdi:clock-outline" className="text-[#A3264C]" />
@@ -486,7 +533,7 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
 
                 <h3 className="text-xl font-semibold text-[#3D0C1F] mb-4">Detail Pengajuan</h3>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select
                     label="Jenis Kegiatan"
                     name="jenis_kegiatan"
@@ -524,18 +571,14 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                   />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
-                  <Input
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                  <TimePicker24
                     label="Jam Mulai"
-                    name="jam_mulai"
-                    type="time"
                     value={form.jam_mulai}
                     disabled
                   />
-                  <Input
+                  <TimePicker24
                     label="Jam Selesai"
-                    name="jam_selesai"
-                    type="time"
                     value={form.jam_selesai}
                     disabled
                   />
@@ -570,12 +613,27 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
                       return;
                     }
 
+                    if (multiHari && !tanggalSelesai) {
+                      alert("Silahkan pilih tanggal selesai.");
+                      return;
+                    }
+
+                    if (multiHari && tanggalSelesai < tanggalCek) {
+                      alert("Tanggal selesai tidak boleh sebelum tanggal mulai.");
+                      return;
+                    }
+
+                    if (multiHari && jumlahHari > 30) {
+                      alert("Peminjaman maksimal 30 hari sekaligus.");
+                      return;
+                    }
+
                     if (jamMulaiCek >= jamSelesaiCek) {
                       alert("Jam selesai harus lebih besar dari jam mulai.");
                       return;
                     }
 
-                    if (tanggalCek === minDate && jamMulaiCek < currentTime) {
+                    if (tanggalCek === minDate && !multiHari && jamMulaiCek < currentTime) {
                       alert("Jam mulai tidak boleh lebih kecil dari waktu saat ini.");
                       return;
                     }
@@ -592,9 +650,11 @@ const ModalPengajuan = ({ peralatan, onClose, onSuccess }) => {
 
                     setForm((prev) => ({
                       ...prev,
-                      hari_tanggal: tanggalCek,
-                      jam_mulai: jamMulaiCek,
-                      jam_selesai: jamSelesaiCek,
+                      hari_tanggal:    tanggalCek,
+                      tanggal_mulai:   tanggalCek,
+                      tanggal_selesai: multiHari ? tanggalSelesai : tanggalCek,
+                      jam_mulai:       jamMulaiCek,
+                      jam_selesai:     jamSelesaiCek,
                     }));
                     setStep(2);
                   } else {

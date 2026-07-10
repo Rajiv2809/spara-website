@@ -20,6 +20,7 @@ const menuByRole = {
       href: "/peminjaman-peralatan",
     },
     { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
+    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender" },
   ],
   pic: [
     { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
@@ -34,6 +35,7 @@ const menuByRole = {
       href: "/peminjaman-peralatan",
     },
     { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
+    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender" },
     {
       icon: "material-symbols:meeting-room-outline",
       label: "Kelola Ruangan",
@@ -91,6 +93,7 @@ const menuByRole = {
       href: "/peminjaman-peralatan",
     },
     { icon: "material-symbols:history", label: "Riwayat", href: "/riwayat" },
+    { icon: "mdi:calendar-month", label: "Kalender", href: "/kalender" },
     {
       icon: "material-symbols:check-circle-outline",
       label: "Persetujuan",
@@ -164,8 +167,8 @@ const Sidebar = () => {
   // Konten sidebar — dipakai ulang untuk desktop & mobile drawer
   const SidebarContent = () => (
     <div className="flex flex-col h-full px-3">
-      {/* Header */}
-      <div className="flex flex-row items-center justify-between">
+      {/* Header / Logo */}
+      <div className="flex flex-row items-center justify-between pt-3 pb-2">
         <div className="flex flex-row items-center">
           <img src={logo2} className="w-[88px]" alt="Logo" />
           <div>
@@ -185,14 +188,46 @@ const Sidebar = () => {
         </button>
       </div>
 
-      <div className="w-full h-[1px] bg-white mt-1" />
+      <div className="w-full h-[1px] bg-white/20" />
 
-      {/* Role Badge */}
-      <div className="mt-3 mb-1 px-2">
-        <span className="inline-block bg-[#682B3C] text-[#FFEDDD] text-[11px] font-semibold px-3 py-1 rounded-full capitalize">
-          {role}
-        </span>
+      {/* ── Profile Card (di bawah logo, di atas menu) ── */}
+      <div
+        onClick={() => { setShowProfileModal(true); setIsOpen(false); }}
+        className="mx-1 mt-3 flex flex-row items-center gap-3 p-3 rounded-xl cursor-pointer
+                   transition-all duration-200 hover:bg-[#6d1c30] bg-[#6d1c3055]
+                   border border-white/10 group"
+      >
+        {/* Avatar */}
+        <div className="relative shrink-0">
+          <div className="w-11 h-11 rounded-full ring-2 ring-white/30 bg-gray-200 flex items-center justify-center overflow-hidden">
+            {currentUser?.profile_picture ? (
+              <img
+                src={currentUser.profile_picture}
+                alt="Profil"
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <Icon icon="fa6-solid:user" className="text-gray-400" width="16" />
+            )}
+          </div>
+          {/* Online dot */}
+          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-[#862440] rounded-full" />
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <h1 className="text-[14px] font-semibold truncate text-white leading-tight group-hover:text-[#FFEDDD] transition-colors">
+            {currentUser?.name || "Nama Pengguna"}
+          </h1>
+          <span className="inline-block mt-0.5 bg-[#682B3C] text-[#FFEDDD] text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize">
+            {role}
+          </span>
+        </div>
+
+        <Icon icon="mdi:chevron-right" width="16" className="text-white/40 shrink-0 group-hover:text-white/70 transition-colors" />
       </div>
+
+      <div className="w-full h-[1px] bg-white/20 mt-3" />
 
       {/* Menu Items */}
       <div className="flex flex-col gap-1 mt-2">
@@ -204,7 +239,7 @@ const Sidebar = () => {
               href={menu.href}
               onClick={() => setIsOpen(false)}
               className={`flex flex-row gap-2 items-center p-4 rounded-lg text-[#FFEDDD] transition-colors
-                                ${isActive ? "bg-[#682B3C] font-bold" : "hover:bg-[#682B3C]"}`}
+                ${isActive ? "bg-[#682B3C] font-bold" : "hover:bg-[#682B3C]"}`}
             >
               <Icon icon={menu.icon} width="26" />
               <span className="text-[18px] font-semibold">{menu.label}</span>
@@ -213,51 +248,13 @@ const Sidebar = () => {
         })}
       </div>
 
-      {/* Profile & Logout */}
-      <div className="mt-auto mb-5 px-1 flex flex-col gap-2">
-        {/* Profile Card */}
-        <div
-          onClick={() => {
-            setShowProfileModal(true);
-            setIsOpen(false);
-          }}
-          className="flex flex-row items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-[#6d1c30] bg-[#6d1c3055] border border-white/10 group"
-        >
-          {/* Avatar */}
-          <div className="relative shrink-0">
-            <div className="w-11 h-11 rounded-full ring-2 ring-white/30 bg-gray-200 flex items-center justify-center overflow-hidden">
-              {currentUser?.profile_picture ? (
-                <img
-                  src={currentUser.profile_picture}
-                  alt="Profil"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <Icon icon="fa6-solid:user" className="text-gray-400" width="16" />
-              )}
-            </div>
-            {/* Online Dot */}
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-[#862440] rounded-full" />
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <h1 className="text-[14px] font-semibold truncate text-white leading-tight group-hover:text-[#FFEDDD] transition-colors">
-              {currentUser?.name || "Nama Pengguna"}
-            </h1>
-            <span className="text-[10px] text-white/50 flex items-center gap-1 mt-0.5">
-              <Icon icon="mdi:account-circle-outline" width="11" />
-              Lihat &amp; Edit Profil
-            </span>
-          </div>
-
-          <Icon icon="mdi:chevron-right" width="18" className="text-white/40 shrink-0 group-hover:text-white/70 transition-colors" />
-        </div>
-
-        {/* Logout Button */}
+      {/* Logout — tetap di bawah */}
+      <div className="mt-auto mb-5 px-1">
         <button
           onClick={handleLogoutClick}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-white/15 text-white/70 text-[13px] font-medium hover:bg-red-700/30 hover:text-white hover:border-red-400/40 transition-all duration-200"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-white/15
+                     text-white/70 text-[13px] font-medium
+                     hover:bg-red-700/30 hover:text-white hover:border-red-400/40 transition-all duration-200"
         >
           <Icon icon="material-symbols:logout-rounded" width="18" />
           Keluar Aplikasi

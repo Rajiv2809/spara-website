@@ -16,8 +16,8 @@ class PeminjamanResource extends JsonResource
     public function toArray(Request $request): array
     {
         // Ambil user PIC langsung dari relasi ruangan/alat
-        $picUser = $this->ruangan?->pic?->user
-            ?? $this->alat?->pic?->user
+        $picUser = $this->ruangan?->picUser
+            ?? $this->alat?->picUser
             ?? null;
 
         return [
@@ -29,6 +29,8 @@ class PeminjamanResource extends JsonResource
             'name_kegiatan'      => $this->name_kegiatan,
             'jenis_kegiatan'     => $this->jenis_kegiatan,
             'hari_tanggal'       => $this->hari_tanggal,
+            'tanggal_mulai'      => $this->tanggal_mulai,
+            'tanggal_selesai'    => $this->tanggal_selesai,
             'jam_mulai'          => $this->jam_mulai,
             'jam_selesai'        => $this->jam_selesai,
             'keterangan'         => $this->keterangan,

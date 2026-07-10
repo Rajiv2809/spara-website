@@ -26,8 +26,8 @@ class ListPersetujuanResource extends JsonResource
             'kode_alat' => $this->peminjaman?->alat?->kode_alat ?? null,
             'kode_ruangan' => $this->peminjaman?->ruangan?->kode_ruangan ?? null,
             'name_ruangan' => $this->peminjaman?->ruangan?->name_ruangan ?? null,
-            'pic' => $this->peminjaman?->ruangan?->pic?->user?->name
-                ?? $this->peminjaman?->alat?->pic?->user?->name
+            'pic' => $this->peminjaman?->ruangan?->picUser?->name
+                ?? $this->peminjaman?->alat?->picUser?->name
                 ?? null,
             'status_persetujuan' => $this->status_persetujuan,
             'peminjam' => $this->peminjaman?->peminjam?->name ?? null,

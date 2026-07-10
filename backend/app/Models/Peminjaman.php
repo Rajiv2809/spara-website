@@ -14,6 +14,8 @@ class Peminjaman extends Model
         'name_kegiatan',
         'jenis_kegiatan',
         'hari_tanggal',
+        'tanggal_mulai',
+        'tanggal_selesai',
         'jam_mulai',
         'jam_selesai',
         'keterangan',
@@ -29,9 +31,11 @@ class Peminjaman extends Model
     protected function casts(): array
     {
         return [
-            'hari_tanggal' => 'date',
-            'dibuat_pada'  => 'datetime',
-            'diubah_pada'  => 'datetime',
+            'hari_tanggal'    => 'date',
+            'tanggal_mulai'   => 'date',
+            'tanggal_selesai' => 'date',
+            'dibuat_pada'     => 'datetime',
+            'diubah_pada'     => 'datetime',
         ];
     }
 
