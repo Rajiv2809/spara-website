@@ -54,11 +54,6 @@ const menuByRole = {
   ],
   admin: [
     { icon: "mdi:view-dashboard", label: "Dashboard", href: "/dashboard" },
-    // {
-    //   icon: "octicon:checklist-16",
-    //   label: "Peminjaman",
-    //   href: "/pengajuan-ruangan",
-    // },
     {
       icon: "material-symbols:devices-outline",
       label: "Kelola Alat",
@@ -73,6 +68,16 @@ const menuByRole = {
       icon: "mdi:calendar-month",
       label: "Kalender",
       href: "/kalender-peminjaman",
+    },
+    {
+      icon: "octicon:checklist-16",
+      label: "Peminjaman",
+      href: "/peminjaman-kepala",
+    },
+    {
+      icon: "mdi:bookmark-plus-outline",
+      label: "Booking Langsung",
+      href: "/admin/peminjaman",
     },
     {
       icon: "material-symbols:check-circle-outline",
@@ -238,10 +243,10 @@ const Sidebar = () => {
               key={menu.href + menu.label}
               href={menu.href}
               onClick={() => setIsOpen(false)}
-              className={`flex flex-row gap-2 items-center p-4 rounded-lg text-[#FFEDDD] transition-colors
+              className={`flex flex-row gap-3 items-center p-4 rounded-lg text-[#FFEDDD] transition-colors
                 ${isActive ? "bg-[#682B3C] font-bold" : "hover:bg-[#682B3C]"}`}
             >
-              <Icon icon={menu.icon} width="26" />
+              <Icon icon={menu.icon} width="28" height="28" />
               <span className="text-[18px] font-semibold">{menu.label}</span>
             </a>
           );

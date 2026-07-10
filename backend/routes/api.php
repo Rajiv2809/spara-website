@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController, ApprovalTokenController};
+use App\Http\Controllers\{AdminController, AuthController, PeminjamanController, RuanganController, AlatController, KepalaController, NotificationController, ApprovalTokenController, AdminPeminjamanController};
 use App\Models\{Alat, Ruangan, User};
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -83,6 +83,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/admin', [AdminController::class, 'store']);
     Route::put('/admin/{id_number}', [AdminController::class, 'update']);
     Route::delete('/admin/{id_number}', [AdminController::class, 'destroy']);
+
+    // ── Peminjaman langsung oleh Admin (tanpa alur persetujuan) ──────────
+    // Prefix berbeda agar tidak bentrok dengan /admin/{id_number}
+    Route::post('/booking-admin',  [AdminPeminjamanController::class, 'store']);
+    Route::get('/booking-admin',   [AdminPeminjamanController::class, 'index']);
 
     Route::prefix('kepala')->group(function () {
         Route::get('/monitoring-peminjaman', [KepalaController::class, 'getMonitoringPeminjaman']);

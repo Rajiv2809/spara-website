@@ -14,6 +14,16 @@ class KepalaController extends Controller
 {
     public function getMonitoringPeminjaman(Request $request)
     {
+        $request->validate([
+            'jenis'          => 'nullable|in:ruangan,alat,semua',
+            'status'         => 'nullable|in:menunggu,disetujui,ditolak,dibatalkan',
+            'bulan'          => 'nullable|integer|min:1|max:12',
+            'tahun'          => 'nullable|integer|min:2020|max:2100',
+            'tanggal'        => 'nullable|date_format:Y-m-d',
+            'tanggal_mulai'  => 'nullable|date_format:Y-m-d',
+            'tanggal_selesai'=> 'nullable|date_format:Y-m-d|after_or_equal:tanggal_mulai',
+        ]);
+
         $query = Peminjaman::with(['peminjam', 'alat', 'ruangan', 'persetujuans'])
             ->orderBy('hari_tanggal', 'asc')
             ->orderBy('jam_mulai', 'asc');
@@ -29,6 +39,8 @@ class KepalaController extends Controller
         } else {
             $query->whereIn('status_persetujuan', ['menunggu', 'disetujui']);
         }
+
+        $this->applyDateFilter($query, $request);
 
         $peminjamans = $query->get();
 
@@ -57,7 +69,23 @@ class KepalaController extends Controller
             ];
         });
 
-        $allActive = Peminjaman::whereIn('status_persetujuan', ['menunggu', 'disetujui'])->get();
+        $statsQuery = Peminjaman::query();
+
+        if ($request->jenis === 'ruangan') {
+            $statsQuery->whereNotNull('id_ruangan');
+        } elseif ($request->jenis === 'alat') {
+            $statsQuery->whereNotNull('id_alat');
+        }
+
+        if ($request->filled('status')) {
+            $statsQuery->where('status_persetujuan', $request->status);
+        } else {
+            $statsQuery->whereIn('status_persetujuan', ['menunggu', 'disetujui']);
+        }
+
+        $this->applyDateFilter($statsQuery, $request);
+
+        $allActive = $statsQuery->get();
         $stats = [
             'total'     => $allActive->count(),
             'menunggu'  => $allActive->where('status_persetujuan', 'menunggu')->count(),
@@ -291,14 +319,73 @@ class KepalaController extends Controller
         }
 
     }
-     private function buildRekapQuery(Request $request)
+    private function applyDateFilter($query, Request $request): void
     {
+        if ($request->filled('tanggal')) {
+            $query->whereDate('hari_tanggal', $request->tanggal);
+            return;
+        }
+
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            if ($request->filled('tanggal_mulai')) {
+                $query->whereDate('hari_tanggal', '>=', $request->tanggal_mulai);
+            }
+
+            if ($request->filled('tanggal_selesai')) {
+                $query->whereDate('hari_tanggal', '<=', $request->tanggal_selesai);
+            }
+
+            return;
+        }
+
+        if ($request->filled('bulan') || $request->filled('tahun')) {
+            $bulan = (int) $request->input('bulan', now()->month);
+            $tahun = (int) $request->input('tahun', now()->year);
+
+            $query->whereYear('hari_tanggal', $tahun)
+                ->whereMonth('hari_tanggal', $bulan);
+        }
+    }
+
+    private function periodeLabel(Request $request): string
+    {
+        if ($request->filled('tanggal')) {
+            return Carbon::parse($request->tanggal)->translatedFormat('d F Y');
+        }
+
+        if ($request->filled('tanggal_mulai') || $request->filled('tanggal_selesai')) {
+            $mulai = $request->filled('tanggal_mulai')
+                ? Carbon::parse($request->tanggal_mulai)->translatedFormat('d F Y')
+                : 'Awal';
+            $selesai = $request->filled('tanggal_selesai')
+                ? Carbon::parse($request->tanggal_selesai)->translatedFormat('d F Y')
+                : 'Akhir';
+
+            return "{$mulai} - {$selesai}";
+        }
+
         $bulan = (int) $request->input('bulan', now()->month);
         $tahun = (int) $request->input('tahun', now()->year);
 
-        $query = Peminjaman::with(['peminjam', 'alat', 'ruangan'])
-            ->whereYear('hari_tanggal', $tahun)
-            ->whereMonth('hari_tanggal', $bulan);
+        return Carbon::create()->month($bulan)->translatedFormat('F') . " {$tahun}";
+    }
+
+    private function buildRekapQuery(Request $request)
+    {
+        $request->validate([
+            'jenis'          => 'nullable|in:ruangan,alat,semua',
+            'status'         => 'nullable|in:menunggu,disetujui,ditolak,dibatalkan',
+            'jenis_kegiatan' => 'nullable|string',
+            'bulan'          => 'nullable|integer|min:1|max:12',
+            'tahun'          => 'nullable|integer|min:2020|max:2100',
+            'tanggal'        => 'nullable|date_format:Y-m-d',
+            'tanggal_mulai'  => 'nullable|date_format:Y-m-d',
+            'tanggal_selesai'=> 'nullable|date_format:Y-m-d|after_or_equal:tanggal_mulai',
+        ]);
+
+        $query = Peminjaman::with(['peminjam', 'alat', 'ruangan']);
+
+        $this->applyDateFilter($query, $request);
 
         if ($request->filled('jenis') && $request->jenis !== 'semua') {
             $request->jenis === 'ruangan'
@@ -351,29 +438,22 @@ class KepalaController extends Controller
     {
         $peminjamans = $this->buildRekapQuery($request)->get();
         $data        = $this->mapRekapData($peminjamans);
-
-        $bulan     = (int) $request->input('bulan', now()->month);
-        $tahun     = (int) $request->input('tahun', now()->year);
-        $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
+        $periode    = $this->periodeLabel($request);
 
         $pdf = Pdf::loadView('pdf.rekap-peminjaman', [
             'data'      => $data,
-            'namaBulan' => $namaBulan,
-            'tahun'     => $tahun,
+            'periode'   => $periode,
         ])->setPaper('a4', 'landscape');
 
-        return $pdf->download("rekap-peminjaman-{$namaBulan}-{$tahun}.pdf");
+        return $pdf->download('rekap-peminjaman-' . str($periode)->slug('-') . '.pdf');
     }
 
     public function exportExcel(Request $request)
     {
         $peminjamans = $this->buildRekapQuery($request)->get();
         $data        = $this->mapRekapData($peminjamans);
+        $periode    = $this->periodeLabel($request);
 
-        $bulan     = (int) $request->input('bulan', now()->month);
-        $tahun     = (int) $request->input('tahun', now()->year);
-        $namaBulan = Carbon::create()->month($bulan)->translatedFormat('F');
-
-        return Excel::download(new RekapPeminjamanExport($data), "rekap-peminjaman-{$namaBulan}-{$tahun}.xlsx");
+        return Excel::download(new RekapPeminjamanExport($data), 'rekap-peminjaman-' . str($periode)->slug('-') . '.xlsx');
     }
 }

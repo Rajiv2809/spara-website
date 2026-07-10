@@ -375,21 +375,39 @@ const LoanCard = ({ item, onApprove, onReject, onDetail }) => {
 
       {/* Actions */}
       <div className="flex items-center gap-2 px-4 pb-4">
-        <button
-          onClick={() => onApprove(item)}
-          className="flex items-center gap-1.5 bg-green-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full border-none cursor-pointer shadow-sm shadow-green-200 hover:opacity-85 transition-opacity"
-        >
-          <Icon icon="ph:check-circle-fill" width={13} color="white" />
-          Setujui
-        </button>
+        {item.status_persetujuan === "menunggu" && (
+          <>
+            <button
+              onClick={() => onApprove(item)}
+              className="flex items-center gap-1.5 bg-green-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full border-none cursor-pointer shadow-sm shadow-green-200 hover:opacity-85 transition-opacity"
+            >
+              <Icon icon="ph:check-circle-fill" width={13} color="white" />
+              Setujui
+            </button>
 
-        <button
-          onClick={() => onReject(item)}
-          className="flex items-center gap-1.5 bg-red-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full border-none cursor-pointer shadow-sm shadow-red-200 hover:opacity-85 transition-opacity"
-        >
-          <Icon icon="ph:x-circle-fill" width={13} color="white" />
-          Tolak
-        </button>
+            <button
+              onClick={() => onReject(item)}
+              className="flex items-center gap-1.5 bg-red-600 text-white text-[11px] font-bold px-4 py-1.5 rounded-full border-none cursor-pointer shadow-sm shadow-red-200 hover:opacity-85 transition-opacity"
+            >
+              <Icon icon="ph:x-circle-fill" width={13} color="white" />
+              Tolak
+            </button>
+          </>
+        )}
+
+        {item.status_persetujuan === "disetujui" && (
+          <span className="flex items-center gap-1.5 text-green-600 text-[11px] font-bold px-3 py-1.5 bg-green-50 rounded-full border border-green-200">
+            <Icon icon="ph:check-circle-fill" width={13} />
+            Sudah Disetujui
+          </span>
+        )}
+
+        {item.status_persetujuan === "ditolak" && (
+          <span className="flex items-center gap-1.5 text-red-600 text-[11px] font-bold px-3 py-1.5 bg-red-50 rounded-full border border-red-200">
+            <Icon icon="ph:x-circle-fill" width={13} />
+            Sudah Ditolak
+          </span>
+        )}
 
         <button
           onClick={() => onDetail(item)}

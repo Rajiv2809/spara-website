@@ -4,6 +4,17 @@ import { Icon } from "@iconify/react";
 import axiosClient from "../axios";
 
 const ITEMS_PER_PAGE = 8;
+const MONTH_NAMES = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+];
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+const getYearOptions = () => {
+  const current = new Date().getFullYear();
+  return Array.from({ length: 11 }, (_, index) => current - 5 + index);
+};
 
 const STATUS_CONFIG = {
   menunggu: {
@@ -714,7 +725,103 @@ const ModalAksi = ({ peminjaman, onClose, onSubmit }) => {
   );
 };
 
-const PeminjamanCard = ({ item, onAksi }) => {
+const DetailRow = ({ icon, label, value, full = false }) => (
+  <div className={full ? "sm:col-span-2" : ""}>
+    <p className="text-[11px] font-semibold text-gray-400 mb-1 flex items-center gap-1.5">
+      <Icon icon={icon} width={13} className="text-[#C0254A]" />
+      {label}
+    </p>
+    <p className="rounded-xl bg-[#FFF5F7] border border-pink-100 px-3 py-2 text-[13px] font-semibold text-[#2D0A18] leading-relaxed">
+      {value || "-"}
+    </p>
+  </div>
+);
+
+const ModalDetail = ({ peminjaman, onClose }) => {
+  if (!peminjaman) return null;
+
+  const isRuangan = peminjaman.jenis === "ruangan";
+  const itemName = isRuangan
+    ? peminjaman.name_ruangan || "Ruangan"
+    : peminjaman.name_alat || "Alat";
+  const itemCode = isRuangan
+    ? peminjaman.kode_ruangan || "-"
+    : peminjaman.kode_alat || "-";
+  const itemType = isRuangan ? "Ruangan" : "Alat";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-3xl w-[620px] max-w-[95vw] max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="bg-gradient-to-r from-[#3D0C1F] to-[#C0254A] p-5 flex items-start justify-between sticky top-0 z-10">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+              <Icon icon={isRuangan ? "mdi:door-sliding" : "mdi:tools"} width={24} className="text-white" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-white font-bold text-[18px] leading-tight truncate">
+                Detail Peminjaman
+              </h2>
+              <p className="text-pink-100 text-[12px] mt-1 truncate">
+                {itemName} · {itemType}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center hover:bg-white/30 transition text-xl leading-none flex-shrink-0 ml-2"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-pink-50 border border-pink-100 p-4 mb-5">
+            <div className="min-w-0">
+              <p className="text-[11px] text-gray-400 font-semibold uppercase">Item dipinjam</p>
+              <p className="text-[18px] font-extrabold text-[#2D0A18] truncate">{itemName}</p>
+              <p className="text-[12px] text-[#C0254A] font-semibold">{itemCode}</p>
+            </div>
+            <StatusBadge status={peminjaman.status_persetujuan} />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <DetailRow icon="mdi:text-box-outline" label="Nama kegiatan" value={peminjaman.name_kegiatan} full />
+            <DetailRow icon="mdi:tag-outline" label="Jenis kegiatan" value={peminjaman.jenis_kegiatan} />
+            <DetailRow icon="mdi:shape-outline" label="Jenis peminjaman" value={itemType} />
+            <DetailRow icon="mdi:account-outline" label="Peminjam" value={peminjaman.name_peminjam} />
+            <DetailRow icon="mdi:identifier" label="Nomor induk" value={peminjaman.id_number_peminjam} />
+            <DetailRow icon="mdi:office-building-outline" label="Unit/Jabatan" value={peminjaman.unit_peminjam} />
+            <DetailRow icon="mdi:calendar" label="Tanggal" value={formatTanggal(peminjaman.hari_tanggal)} />
+            <DetailRow
+              icon="mdi:clock-outline"
+              label="Waktu"
+              value={`${formatJam(peminjaman.jam_mulai)} - ${formatJam(peminjaman.jam_selesai)}`}
+            />
+            <DetailRow icon="mdi:information-outline" label="Keterangan" value={peminjaman.keterangan || "Tanpa keterangan tambahan"} full />
+            {peminjaman.alasan_kepala && (
+              <DetailRow icon="mdi:comment-alert-outline" label="Alasan ketua" value={peminjaman.alasan_kepala} full />
+            )}
+          </div>
+
+          <button
+            onClick={onClose}
+            className="mt-5 w-full rounded-xl bg-gradient-to-r from-[#C0254A] to-[#3D0C1F] py-2.5 text-sm font-bold text-white hover:opacity-90 transition"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PeminjamanCard = ({ item, onAksi, onDetail }) => {
   const isRuangan = item.jenis === "ruangan";
   const canAksi =
     item.status_persetujuan === "menunggu" ||
@@ -785,7 +892,18 @@ const PeminjamanCard = ({ item, onAksi }) => {
         </span>
       </div>
 
-      {canAksi && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <button
+          onClick={() => onDetail(item)}
+          className={`mt-0.5 w-full flex items-center justify-center gap-2 border-2 border-gray-200 hover:border-[#C0254A]/40 text-gray-500 hover:text-[#C0254A] rounded-xl py-2 text-[12px] font-bold hover:bg-pink-50 transition ${
+            canAksi ? "" : "sm:col-span-2"
+          }`}
+        >
+          <Icon icon="mdi:eye-outline" width={14} />
+          Detail
+        </button>
+
+        {canAksi && (
         <button
           onClick={() => onAksi(item)}
           className="mt-0.5 w-full flex items-center justify-center gap-2 border-2 border-[#C0254A]/20 hover:border-[#C0254A] text-[#C0254A] rounded-xl py-2 text-[12px] font-bold hover:bg-pink-50 transition"
@@ -793,7 +911,8 @@ const PeminjamanCard = ({ item, onAksi }) => {
           <Icon icon="mdi:cog-outline" width={14} />
           Kelola Peminjaman
         </button>
-      )}
+        )}
+      </div>
 
       {item.status_persetujuan === "dibatalkan" && item.alasan_kepala && (
         <div className="rounded-xl p-2.5 text-[10px] leading-relaxed bg-red-50 text-red-600 border border-red-100">
@@ -809,18 +928,50 @@ const PeminjamanCard = ({ item, onAksi }) => {
 const MonitoringPeminjaman = () => {
   const [activeTab, setActiveTab] = useState("semua");
   const [filterStatus, setFilterStatus] = useState(null);
+  const [dateMode, setDateMode] = useState("bulan");
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
+  const [selectedDate, setSelectedDate] = useState(() => todayIso());
+  const [startDate, setStartDate] = useState(() => todayIso());
+  const [endDate, setEndDate] = useState(() => todayIso());
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [detailItem, setDetailItem] = useState(null);
   const [data, setData] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const yearOptions = useMemo(() => getYearOptions(), []);
+
+  const buildDateParams = useCallback(() => {
+    if (dateMode === "tanggal") {
+      return selectedDate ? { tanggal: selectedDate } : {};
+    }
+
+    if (dateMode === "rentang") {
+      return {
+        ...(startDate ? { tanggal_mulai: startDate } : {}),
+        ...(endDate ? { tanggal_selesai: endDate } : {}),
+      };
+    }
+
+    return {
+      bulan: selectedMonth + 1,
+      tahun: selectedYear,
+    };
+  }, [dateMode, selectedDate, startDate, endDate, selectedMonth, selectedYear]);
 
   const fetchData = useCallback(() => {
     setLoading(true);
+    const params = {
+      ...buildDateParams(),
+      ...(activeTab !== "semua" ? { jenis: activeTab } : {}),
+      ...(filterStatus ? { status: filterStatus } : {}),
+    };
+
     axiosClient
-      .get("/kepala/monitoring-peminjaman")
+      .get("/kepala/monitoring-peminjaman", { params })
       .then(({ data: res }) => {
         setData(res.data || []);
         setStats(res.stats || null);
@@ -830,11 +981,17 @@ const MonitoringPeminjaman = () => {
         setData([]);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [activeTab, filterStatus, buildDateParams]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (startDate && endDate && endDate < startDate) {
+      setEndDate(startDate);
+    }
+  }, [startDate, endDate]);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -1027,6 +1184,13 @@ const MonitoringPeminjaman = () => {
         />
       )}
 
+      {detailItem && (
+        <ModalDetail
+          peminjaman={detailItem}
+          onClose={() => setDetailItem(null)}
+        />
+      )}
+
       <div className="lg:ml-[300px] flex-1 lg:p-10 p-4 overflow-y-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3">
@@ -1103,6 +1267,113 @@ const MonitoringPeminjaman = () => {
           </div>
 
           <div className="flex flex-col gap-3 mb-5">
+            <div className="rounded-2xl border border-pink-100 bg-white/80 p-4">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                {[
+                  { value: "bulan", label: "Bulan/Tahun", icon: "mdi:calendar-month-outline" },
+                  { value: "tanggal", label: "Tanggal", icon: "mdi:calendar-today-outline" },
+                  { value: "rentang", label: "Rentang", icon: "mdi:calendar-range-outline" },
+                ].map((mode) => (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    onClick={() => {
+                      setDateMode(mode.value);
+                      setCurrentPage(1);
+                    }}
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-bold transition ${
+                      dateMode === mode.value
+                        ? "bg-gradient-to-r from-[#C0254A] to-[#E11D48] text-white shadow-md"
+                        : "border border-pink-200 bg-white text-[#C0254A] hover:bg-pink-50"
+                    }`}
+                  >
+                    <Icon icon={mode.icon} width={15} />
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+
+              {dateMode === "bulan" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[11px] text-gray-500 font-semibold mb-1.5">Bulan</p>
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => {
+                        setSelectedMonth(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 text-[13px] text-gray-600 outline-none focus:border-[#C0254A]"
+                    >
+                      {MONTH_NAMES.map((name, index) => (
+                        <option key={name} value={index}>{name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-gray-500 font-semibold mb-1.5">Tahun</p>
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => {
+                        setSelectedYear(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 text-[13px] text-gray-600 outline-none focus:border-[#C0254A]"
+                    >
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {dateMode === "tanggal" && (
+                <div>
+                  <p className="text-[11px] text-gray-500 font-semibold mb-1.5">Pilih tanggal</p>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => {
+                      setSelectedDate(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 text-[13px] text-gray-600 outline-none focus:border-[#C0254A]"
+                  />
+                </div>
+              )}
+
+              {dateMode === "rentang" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[11px] text-gray-500 font-semibold mb-1.5">Tanggal mulai</p>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => {
+                        setStartDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 text-[13px] text-gray-600 outline-none focus:border-[#C0254A]"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-gray-500 font-semibold mb-1.5">Tanggal selesai</p>
+                    <input
+                      type="date"
+                      value={endDate}
+                      min={startDate || undefined}
+                      onChange={(e) => {
+                        setEndDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-xl border border-pink-200 bg-white px-3 py-2 text-[13px] text-gray-600 outline-none focus:border-[#C0254A]"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-inner border border-pink-100">
               <input
                 type="text"
@@ -1168,6 +1439,7 @@ const MonitoringPeminjaman = () => {
                   key={`${item.jenis}-${item.id_peminjaman}-${i}`}
                   item={item}
                   onAksi={setSelectedItem}
+                  onDetail={setDetailItem}
                 />
               ))}
             </div>

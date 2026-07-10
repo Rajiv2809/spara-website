@@ -17,6 +17,7 @@ import AllListPeminjaman from "./Pages/AllLlistPeminjman.jsx";
 import Register from "./Pages/Register.jsx";
 import PeminjamanKepala from "./Pages/PeminjamanKepala.jsx";
 import KalenderPeminjaman from "./Pages/KalenderPeminjaman.jsx";
+import AdminPeminjaman from "./Pages/AdminPeminjaman.jsx";
 import KalenderUser from "./Pages/KalenderUser.jsx";
 const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       {
         path:"/kalender-peminjaman",
         element: <KalenderPeminjaman/>
+      },
+      {
+        path: "/admin/peminjaman",
+        element: <AdminPeminjaman />,
       },
       {
         path:"/kalender",

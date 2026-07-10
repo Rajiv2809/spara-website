@@ -17,8 +17,8 @@
     </style>
 </head>
 <body>
-    <h2>Rekap Peminjaman Bulanan</h2>
-    <p class="sub">{{ $namaBulan }} {{ $tahun }}</p>
+    <h2>Rekap Peminjaman</h2>
+    <p class="sub">{{ $periode }}</p>
 
     <table>
         <thead>
@@ -50,7 +50,7 @@
                     <td>{{ $item['keterangan'] ?? '-' }}</td>
                 </tr>
             @empty
-                <tr><td colspan="10" style="text-align:center;">Tidak ada data pada bulan ini.</td></tr>
+                <tr><td colspan="10" style="text-align:center;">Tidak ada data pada periode ini.</td></tr>
             @endforelse
         </tbody>
     </table>
