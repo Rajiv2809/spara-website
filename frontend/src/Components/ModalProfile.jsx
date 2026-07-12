@@ -211,7 +211,7 @@ const ModalProfile = ({ onClose }) => {
                   className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-semibold bg-[#862440]/10 hover:bg-[#862440]/20 text-[#862440] border border-[#862440]/20 transition-all"
                 >
                   <Icon icon="mdi:camera-outline" width="14" />
-                  Ganti Foto Profil
+                  Ubah Foto Profil
                 </button>
               ) : (
                 <>
@@ -338,14 +338,14 @@ const ModalProfile = ({ onClose }) => {
                 </div>
               </div>
 
-              {/* Ganti Password Button */}
+              {/* Ubah Password Button */}
               <button
                 type="button"
                 onClick={() => setShowPasswordForm(true)}
                 className="w-full py-3 rounded-xl border-2 border-[#862440] text-[#862440] font-semibold text-[14px] hover:bg-[#FFF0F3] transition-all flex items-center justify-center gap-2"
               >
                 <Icon icon="material-symbols:lock-outline" width="18" />
-                Ganti Password
+                Ubah Password
               </button>
             </>
           ) : (
